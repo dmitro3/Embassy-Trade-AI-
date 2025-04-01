@@ -24,8 +24,7 @@
     "electron:mac": "npm run export && electron-builder build --mac --x64",
     "electron:linux": "npm run export && electron-builder build --linux --x64",
     "electron:test": "jest --config electron.jest.config.js",
-    "electron:e2e": "xvfb-maybe spectron-test",
-    "beta-release": "node scripts/beta-release.js"
+    "electron:e2e": "xvfb-maybe spectron-test"
   },
   "dependencies": {
     "@motiadev/core": "^0.1.0-beta.15",
@@ -36,9 +35,7 @@
     "@solana/wallet-adapter-wallets": "^0.19.23",
     "@solana/web3.js": "^1.98.0",
     "axios": "^1.8.4",
-    "better-sqlite3": "^8.5.0",
     "bs58": "^5.0.0",
-    "chart.js": "^4.3.0",
     "cors": "^2.8.5",
     "electron-is-dev": "^2.0.0",
     "electron-log": "^5.1.0",
@@ -50,19 +47,15 @@
     "portfinder": "^1.0.35",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
-    "react-chartjs-2": "^5.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.15.1",
-    "socket.io": "^4.7.2",
-    "socket.io-client": "^4.7.2",
     "winston": "^3.12.0",
     "ws": "^8.18.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@playwright/test": "^1.35.1",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "autoprefixer": "^10.4.17",

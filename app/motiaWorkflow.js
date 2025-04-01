@@ -1,12 +1,16 @@
 // motiaWorkflow.js
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 
-const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+// Check if we're in a browser environment before accessing window
+const isBrowser = typeof window !== 'undefined';
+const connection = isBrowser ? new Connection('https://api.mainnet-beta.solana.com', 'confirmed') : null;
 const SOL_TOKEN_ADDRESS = 'So11111111111111111111111111111111111111112'; // SOL mint address
 const EMB_TOKEN_ADDRESS = 'D8U9GxmBGs98geNjWkrYf4GUjHqDvMgG5XdL41TXpump'; // $EMB mint address
 
 // Step 1: Detect installed wallets
 const detectWallets = () => {
+  if (!isBrowser) return [];
+  
   const wallets = [];
   if (window.solana?.isPhantom) wallets.push('Phantom');
   if (window.solflare?.isSolflare) wallets.push('Solflare');
@@ -15,6 +19,8 @@ const detectWallets = () => {
 
 // Step 2: Disconnect from wallet
 const disconnectWalletStep = async () => {
+  if (!isBrowser) return { success: false, error: 'Not in browser environment' };
+  
   try {
     if (window.solana) {
       await window.solana.disconnect();
@@ -28,6 +34,8 @@ const disconnectWalletStep = async () => {
 
 // Step 3: Connect to wallet
 const connectWalletStep = async () => {
+  if (!isBrowser) return { success: false, error: 'Not in browser environment' };
+  
   try {
     if (!window.solana) {
       throw new Error('No Solana wallet found. Please install Phantom or Solflare.');
@@ -45,6 +53,8 @@ const connectWalletStep = async () => {
 
 // Step 4: Fetch SOL and EMB balances
 const fetchBalancesStep = async (walletAddress) => {
+  if (!isBrowser || !connection) return { solBalance: 0, embBalance: 0, error: 'Not in browser environment' };
+  
   if (!walletAddress) {
     return { solBalance: 0, embBalance: 0, error: 'Wallet not connected' };
   }
@@ -89,6 +99,8 @@ const fetchMarketDataStep = async () => {
 
 // Step 6: Convert SOL to EMB
 const convertSolToEmbStep = async (walletAddress, solAmount) => {
+  if (!isBrowser || !connection) return { success: false, error: 'Not in browser environment' };
+  
   if (!walletAddress) {
     return { success: false, error: 'Wallet not connected' };
   }
@@ -134,6 +146,8 @@ const convertSolToEmbStep = async (walletAddress, solAmount) => {
 
 // Step 7: Convert EMB to SOL
 const convertEmbToSolStep = async (walletAddress, embAmount) => {
+  if (!isBrowser || !connection) return { success: false, error: 'Not in browser environment' };
+  
   if (!walletAddress) {
     return { success: false, error: 'Wallet not connected' };
   }
@@ -216,6 +230,8 @@ const tradingFlow = async (tradeAmount, embBalance, balance, lastEntry, prices) 
 
 // Define the conversion flow (SOL to EMB)
 const conversionFlow = async (solAmount) => {
+  if (!isBrowser) return { success: false, error: 'Not in browser environment' };
+  
   const walletResult = await connectWalletStep();
   if (!walletResult.success) {
     throw new Error(walletResult.error);
@@ -231,6 +247,8 @@ const conversionFlow = async (solAmount) => {
 
 // Define the conversion flow (EMB to SOL)
 const conversionEmbToSolFlow = async (embAmount) => {
+  if (!isBrowser) return { success: false, error: 'Not in browser environment' };
+  
   const walletResult = await connectWalletStep();
   if (!walletResult.success) {
     throw new Error(walletResult.error);
