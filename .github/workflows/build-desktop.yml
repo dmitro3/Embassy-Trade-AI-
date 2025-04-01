@@ -1,0 +1,126 @@
+name: Build and Release Desktop App
+
+on:
+  push:
+    branches: [desktop-release]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g. 0.1.0)'
+        required: true
+        default: ''
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build Next.js app
+        run: npm run build
+        
+      - name: Export Next.js app
+        run: npm run export
+      
+      - name: Build Electron app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then
+            npm run electron:mac
+          elif [ "${{ matrix.os }}" = "windows-latest" ]; then
+            npm run electron:win
+          else
+            npm run electron:linux
+          fi
+        shell: bash
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: embassy-trade-desktop-${{ matrix.os }}
+          path: |
+            dist/*.dmg
+            dist/*.exe
+            dist/*.deb
+            dist/*.AppImage
+          if-no-files-found: ignore
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+      
+      - name: Display structure of downloaded files
+        run: ls -R
+      
+      - name: Determine version
+        id: determine_version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          else
+            echo "version=0.1.0-beta.$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Embassy Trade Desktop v${{ steps.determine_version.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
+          files: |
+            embassy-trade-desktop-macos-latest/*.dmg
+            embassy-trade-desktop-windows-latest/*.exe
+            embassy-trade-desktop-ubuntu-latest/*.deb
+            embassy-trade-desktop-ubuntu-latest/*.AppImage
+          body: |
+            # Embassy Trade Desktop App v${{ steps.determine_version.outputs.version }}
+            
+            Desktop application for the Embassy Trade platform with all features:
+            
+            ## Demo/Beta Mode Features
+            - 💯 Full trading simulation capabilities
+            - 🔍 Moonshot Sniper for early investment in high-potential coins
+            - 🤖 AI-driven Auto-Trade feature
+            - 📝 Integrated feedback and bug reporting system
+            - 💪 Works online and offline
+            
+            ## Download
+            - **macOS**: embassy-trade-desktop-${{ steps.determine_version.outputs.version }}.dmg
+            - **Windows**: embassy-trade-desktop-${{ steps.determine_version.outputs.version }}.exe
+            - **Linux**: embassy-trade-desktop-${{ steps.determine_version.outputs.version }}.AppImage or .deb
+            
+            ## Release Notes
+            - Added Moonshot Sniper feature
+            - Added Auto-Trade AI-driven trading capability
+            - Added bug reporting system with auto-patching
+            - Improved performance and stability
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

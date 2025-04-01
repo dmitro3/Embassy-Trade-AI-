@@ -1,36 +1,147 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Embassy Trade - Hybrid Web & Desktop Trading Platform
+
+Embassy Trade is a cutting-edge trading simulation platform available as both a web application and a desktop application with enhanced features.
+
+## Features
+
+### Web Version
+- Full trading simulation capabilities
+- Portfolio tracking and management
+- Risk management tools
+- Trading bots and strategies
+
+### Desktop Version (Beta)
+All web features plus:
+- **Offline Mode**: Trade even without internet connection
+- **Moonshot Sniper**: Identify and invest in high-potential new coin listings
+- **AI-Driven Auto-Trading**: Let our AI find and execute profitable trades
+- **Integrated Feedback System**: Submit bug reports with auto-patching capability
+- **System Tray Integration**: Quick access to features without opening the main window
 
 ## Getting Started
 
-First, run the development server:
+### Web Version
+
+Run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3008](http://localhost:3008) with your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Desktop Version
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### Development
 
-## Learn More
+To run the desktop app in development mode:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Run in development mode
+npm run electron
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Build for your platform
+npm run electron:build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Build for specific platforms
+npm run electron:win    # Windows
+npm run electron:mac    # macOS
+npm run electron:linux  # Linux
+```
 
-## Deploy on Vercel
+#### Installation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Download the latest desktop app installer for your platform:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Windows**: Download the .exe installer and follow the installation wizard
+- **macOS**: Download the .dmg file, open it, and drag the app to your Applications folder
+- **Linux**: 
+  - AppImage: Download, make executable (`chmod +x embassy-trade-desktop-*.AppImage`), and run
+  - Debian: Download the .deb file and install with `sudo dpkg -i embassy-trade-desktop-*.deb`
+
+## Desktop App-Specific Features
+
+### Moonshot Sniper
+
+The Moonshot Sniper feature helps you identify high-potential coins with upcoming listings or major announcements:
+
+1. Click the Moonshot Sniper button in the floating action menu
+2. Browse the list of upcoming coin listings
+3. Choose your investment amount ($5 or $10)
+4. Click "Invest" to snipe the coin before its major listing event
+
+### AI-Driven Auto-Trading
+
+Let our AI algorithm find and execute profitable trades:
+
+1. Click the Auto-Trade button in the floating action menu
+2. Wait for the AI to analyze market conditions
+3. Review the trading opportunities identified by our AI
+4. Choose trades to execute automatically
+
+### Feedback System
+
+The desktop app includes an integrated feedback system:
+
+1. Click the Feedback button in the floating action menu
+2. Select the type of feedback (Bug Report, Feature Request, etc.)
+3. Enter your feedback details
+4. Submit the form
+
+*Bug reports in the desktop app are automatically analyzed and may be patched without requiring an app update.*
+
+### System Tray Features
+
+When minimized, the desktop app continues running in the system tray:
+
+- Right-click the tray icon to access quick actions
+- Toggle auto-trading on/off
+- Open Moonshot Sniper
+- Access the web version directly
+- Quit the application
+
+## Online/Offline Mode
+
+The desktop app is designed to work both online and offline:
+
+- **Online Mode**: Connects to our servers and uses the same interface as the web version
+- **Offline Mode**: Uses local resources to provide trading simulation capabilities even without internet
+
+## Building for Production
+
+To build the desktop app for production:
+
+1. Update version in package.json
+2. Build for all platforms:
+   ```bash
+   npm run electron:build
+   ```
+3. Find installers in the `dist` folder
+
+## Deployment
+
+### Web Version
+
+The web version is automatically deployed on Vercel.
+
+### Desktop Version
+
+Desktop app releases are managed through GitHub Actions. To create a new release:
+
+1. Push to the `desktop-release` branch or create a tag (e.g., `v0.2.0`)
+2. GitHub Actions will build installers for all platforms
+3. A draft release will be created in GitHub
+
+## Technologies Used
+
+- **Frontend**: Next.js, React, TailwindCSS
+- **Backend**: Express, Node.js
+- **Desktop**: Electron, Electron Builder
+- **Trading Algorithms**: Python
+- **Testing**: Jest, Cypress
+
+## License
+
+This project is proprietary software. All rights reserved.

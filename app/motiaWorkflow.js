@@ -6,7 +6,7 @@ const SOL_TOKEN_ADDRESS = 'So11111111111111111111111111111111111111112'; // SOL 
 const EMB_TOKEN_ADDRESS = 'D8U9GxmBGs98geNjWkrYf4GUjHqDvMgG5XdL41TXpump'; // $EMB mint address
 
 // Step 1: Detect installed wallets
-export const detectWallets = () => {
+const detectWallets = () => {
   const wallets = [];
   if (window.solana?.isPhantom) wallets.push('Phantom');
   if (window.solflare?.isSolflare) wallets.push('Solflare');
@@ -14,7 +14,7 @@ export const detectWallets = () => {
 };
 
 // Step 2: Disconnect from wallet
-export const disconnectWalletStep = async () => {
+const disconnectWalletStep = async () => {
   try {
     if (window.solana) {
       await window.solana.disconnect();
@@ -27,7 +27,7 @@ export const disconnectWalletStep = async () => {
 };
 
 // Step 3: Connect to wallet
-export const connectWalletStep = async () => {
+const connectWalletStep = async () => {
   try {
     if (!window.solana) {
       throw new Error('No Solana wallet found. Please install Phantom or Solflare.');
@@ -44,7 +44,7 @@ export const connectWalletStep = async () => {
 };
 
 // Step 4: Fetch SOL and EMB balances
-export const fetchBalancesStep = async (walletAddress) => {
+const fetchBalancesStep = async (walletAddress) => {
   if (!walletAddress) {
     return { solBalance: 0, embBalance: 0, error: 'Wallet not connected' };
   }

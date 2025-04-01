@@ -1,26 +1,179 @@
 {
-  "name": "web",
+  "name": "embassy-trade-desktop",
   "version": "0.1.0",
   "private": true,
+  "main": "main.js",
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "concurrently \"next dev --turbo --port 3008\" \"npm run start-server\"",
     "build": "next build",
+    "export": "next build && next export",
     "start": "next start",
-    "lint": "next lint"
+    "start-server": "node server/index.js",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "node scripts/run-cypress.js",
+    "test:coverage": "jest --coverage",
+    "prepare": "husky install || echo 'Skipping husky setup'",
+    "run-all": "node scripts/run-tests-and-start.js",
+    
+    "electron": "concurrently \"cross-env BROWSER=none npm run dev\" \"wait-on http://localhost:3008 && electron .\"",
+    "electron:build": "npm run export && electron-builder build --win --mac --linux --x64",
+    "electron:win": "npm run export && electron-builder build --win --x64",
+    "electron:mac": "npm run export && electron-builder build --mac --x64",
+    "electron:linux": "npm run export && electron-builder build --linux --x64",
+    "electron:test": "jest --config electron.jest.config.js",
+    "electron:e2e": "xvfb-maybe spectron-test",
+    "beta-release": "node scripts/beta-release.js"
   },
   "dependencies": {
     "@motiadev/core": "^0.1.0-beta.15",
     "@solana/spl-token": "^0.4.13",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-react-ui": "^0.9.34",
+    "@solana/wallet-adapter-wallets": "^0.19.23",
     "@solana/web3.js": "^1.98.0",
+    "axios": "^1.8.4",
+    "better-sqlite3": "^8.5.0",
+    "bs58": "^5.0.0",
+    "chart.js": "^4.3.0",
+    "cors": "^2.8.5",
+    "electron-is-dev": "^2.0.0",
+    "electron-log": "^5.1.0",
+    "ethers": "^5.7.2",
+    "express": "^4.21.2",
+    "kill-port": "^2.0.1",
     "next": "15.2.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "photon-realtime": "^4.3.2",
+    "portfinder": "^1.0.35",
+    "qrcode.react": "^4.2.0",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.15.1",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
+    "winston": "^3.12.0",
+    "ws": "^8.18.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
+    "@playwright/test": "^1.35.1",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "autoprefixer": "^10.4.17",
+    "chalk": "^4.1.2",
+    "concurrently": "^8.2.0",
+    "cross-env": "^7.0.3",
+    "cypress": "^13.6.6",
+    "electron": "^29.0.1",
+    "electron-builder": "^24.9.1",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
-    "tailwindcss": "^4"
+    "husky": "^8.0.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "lint-staged": "^15.2.0",
+    "postcss": "^8.4.35",
+    "postcss-loader": "^8.1.1",
+    "postcss-preset-env": "^10.1.5",
+    "spectron": "^19.0.0",
+    "tailwindcss": "^3.4.1",
+    "wait-on": "^7.2.0",
+    "xvfb-maybe": "^0.2.1"
+  },
+  "lint-staged": {
+    "*.js": [
+      "jest --findRelatedTests"
+    ]
+  },
+  "build": {
+    "appId": "com.embassytrade.desktop",
+    "productName": "Embassy Trade",
+    "files": [
+      "**/*",
+      "!**/.git/**",
+      "!**/.vscode/**",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/.bin",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__}",
+      "!**/cypress/**",
+      "!**/script/run-cypress.js",
+      "!**/test-reports/**",
+      "!**/tests/**",
+      "!**/jest.config.js",
+      "!**/jest.setup.js",
+      "!**/.next/cache/**",
+      "out/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "trading",
+        "to": "trading",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "server",
+        "to": "server",
+        "filter": ["**/*"]
+      },
+      "requirements.txt"
+    ],
+    "directories": {
+      "buildResources": "public",
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/favicon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/favicon.ico",
+      "category": "public.app-category.finance"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        },
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/favicon.ico",
+      "category": "Finance"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Embassy Trade"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "yourGithubUsername",
+      "repo": "embassy-trade-desktop"
+    }
   }
 }
