@@ -2,10 +2,13 @@
 
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { WalletProvider } from "../lib/WalletProvider";
+import { useWallet } from "@/lib/WalletProvider";
 import TradePromptHandler from "@/components/TradePromptHandler";
 import DesktopAppBanner from "@/components/DesktopAppBanner";
 import AutoTradeModal from "@/components/AutoTradeModal";
 import FeedbackModal from "@/components/FeedbackModal";
+import EmbassyBanner from "@/components/EmbassyBanner";
+import WalletConnectModal from "@/components/WalletConnectModal";
 import useElectron from '@/lib/useElectron';
 
 // Lazy load the MoonshotSniper component
@@ -24,6 +27,40 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Wallet connection button component
+const WalletButton = () => {
+  const { connected, wallet } = useWallet();
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  
+  return (
+    <>
+      <button
+        onClick={() => setShowWalletModal(true)}
+        className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white p-3 rounded-full shadow-lg flex items-center justify-center tooltip"
+        aria-label={connected ? "Wallet Connected" : "Connect Wallet"}
+        data-tooltip={connected ? `Connected: ${wallet?.adapter?.name || 'Wallet'}` : "Connect to Solana Wallet"}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+        </svg>
+        {connected && (
+          <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-green-400 ring-2 ring-blue-600"></span>
+        )}
+      </button>
+      
+      <WalletConnectModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        onConnect={(walletName) => {
+          console.log(`Connected to ${walletName} wallet`);
+          setShowWalletModal(false);
+        }}
+      />
+    </>
+  );
+};
+
+// Client layout component
 export default function ClientLayout({ children }) {
   // Use state to track if we're on the client
   const [isMounted, setIsMounted] = useState(false);
@@ -31,6 +68,7 @@ export default function ClientLayout({ children }) {
   const [showAutoTradeModal, setShowAutoTradeModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [isAutoTrading, setIsAutoTrading] = useState(false);
+  const [showBanner, setShowBanner] = useState(true);
   const { isElectron, isDesktopApp, onAutoTradingToggle } = useElectron();
 
   // Only render wallet components after initial mount to avoid hydration errors
@@ -66,6 +104,9 @@ export default function ClientLayout({ children }) {
 
   return (
     <WalletProvider>
+      {/* Embassy Banner */}
+      {isMounted && showBanner && <EmbassyBanner onClose={() => setShowBanner(false)} />}
+      
       {/* Desktop App Banner */}
       {isMounted && <DesktopAppBanner />}
       
@@ -76,6 +117,9 @@ export default function ClientLayout({ children }) {
         {/* Fixed Action Bar */}
         {isMounted && (
           <div className="fixed bottom-4 right-4 flex flex-col space-y-3">
+            {/* Wallet Connect Button */}
+            {isMounted && <WalletButton />}
+            
             {/* Feedback Button */}
             <button
               onClick={() => setShowFeedbackModal(true)}

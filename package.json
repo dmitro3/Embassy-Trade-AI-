@@ -29,9 +29,12 @@
   "dependencies": {
     "@motiadev/core": "^0.1.0-beta.15",
     "@solana/spl-token": "^0.4.13",
+    "@solana/wallet-adapter-backpack": "^0.1.14",
     "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-phantom": "^0.9.25",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-react-ui": "^0.9.34",
+    "@solana/wallet-adapter-solflare": "^0.6.29",
     "@solana/wallet-adapter-wallets": "^0.19.23",
     "@solana/web3.js": "^1.98.0",
     "axios": "^1.8.4",
@@ -92,6 +95,12 @@
     "*.js": [
       "jest --findRelatedTests --passWithNoTests"
     ]
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(uuid|@solana|@project-serum|superstruct|bs58|jayson)/)"
+    ],
+    "testEnvironment": "jsdom"
   },
   "build": {
     "appId": "com.embassyai.app",

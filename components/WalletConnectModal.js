@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import Image from 'next/image';
 import { EMB_TOKEN_CONFIG } from '@/lib/embToken';
+import { useWallet } from '@/lib/WalletProvider';
 
 /**
  * Specialized modal for wallet connection using the new design
@@ -11,6 +12,37 @@ import { EMB_TOKEN_CONFIG } from '@/lib/embToken';
  */
 const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
   const [activeTab, setActiveTab] = useState('connect'); // 'connect' or 'buy'
+  const { select, connect, connecting, connected, wallet } = useWallet();
+  
+  // Handle wallet connection
+  const handleConnectWallet = async (walletName) => {
+    try {
+      // Select the wallet adapter
+      select(walletName);
+      
+      // Connect to the selected wallet
+      await connect();
+      
+      // Call the onConnect callback if provided
+      if (onConnect) {
+        onConnect(walletName);
+      }
+      
+      // Close the modal after successful connection
+      if (connected) {
+        onClose();
+      }
+    } catch (error) {
+      console.error(`Error connecting to ${walletName}:`, error);
+    }
+  };
+  
+  // If already connected, close modal
+  useEffect(() => {
+    if (connected && wallet) {
+      onClose();
+    }
+  }, [connected, wallet, onClose]);
   
   return (
     <Modal
@@ -20,7 +52,7 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
       primaryAction={{
         label: activeTab === 'connect' ? "Connect Wallet" : "Buy EMB Tokens",
         onClick: activeTab === 'connect' 
-          ? () => onConnect('phantom')
+          ? () => handleConnectWallet('phantom') // Default to phantom if no selection
           : () => window.open(EMB_TOKEN_CONFIG.links.pump, '_blank'),
       }}
       secondaryAction={{
@@ -65,22 +97,47 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
                 <WalletOption
                   name="Phantom"
                   image="/phantom.png" 
-                  onClick={() => onConnect('phantom')} 
+                  onClick={() => handleConnectWallet('phantom')} 
                 />
                 <WalletOption
                   name="Solflare"
-                  image="/file.svg" 
-                  onClick={() => onConnect('solflare')} 
-                  disabled
+                  image="/images/wallets/solflare.png" 
+                  onClick={() => handleConnectWallet('solflare')} 
                 />
                 <WalletOption
                   name="Backpack"
-                  image="/file.svg" 
-                  onClick={() => onConnect('backpack')} 
+                  image="/images/wallets/backpack.png" 
+                  onClick={() => handleConnectWallet('backpack')} 
+                />
+                <WalletOption
+                  name="Pumpfun"
+                  image="/images/wallets/pumpfun.png" 
+                  onClick={() => handleConnectWallet('pumpfun')}
+                  disabled 
+                />
+                <WalletOption
+                  name="Moby"
+                  image="/images/wallets/moby.png" 
+                  onClick={() => handleConnectWallet('moby')} 
+                  disabled
+                />
+                <WalletOption
+                  name="Axibt"
+                  image="/images/wallets/axibt.png" 
+                  onClick={() => handleConnectWallet('axibt')} 
                   disabled
                 />
               </div>
             </div>
+            
+            {connecting && (
+              <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-700/40">
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-3"></div>
+                  <span className="text-blue-300">Connecting to wallet...</span>
+                </div>
+              </div>
+            )}
             
             <div className="bg-gray-800/50 p-4 rounded-lg">
               <h4 className="text-white font-medium mb-2">Account Requirements</h4>
