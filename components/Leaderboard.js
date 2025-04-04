@@ -1,178 +1,305 @@
-import { useState, useEffect } from 'react';
+'use client';
 
-export default function Leaderboard({ walletAddress, userStats }) {
-  const [timeframe, setTimeframe] = useState('week');
+import React, { useState, useEffect } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import Link from 'next/link';
+
+const Leaderboard = () => {
+  const { publicKey } = useWallet();
   const [loading, setLoading] = useState(true);
-  const [leaderboardData, setLeaderboardData] = useState([]);
-  const [userRank, setUserRank] = useState(null);
-
+  const [traders, setTraders] = useState([]);
+  const [timeframe, setTimeframe] = useState('week'); // day, week, month, all
+  const [category, setCategory] = useState('pnl'); // pnl, winRate, volume
+  
   useEffect(() => {
     const fetchLeaderboard = async () => {
-      setLoading(true);
       try {
-        // In production, this would be an API call
-        // Mock data for demonstration
-        const mockData = [
-          {
-            address: '0x1234...5678',
-            name: 'Trading Master',
-            profit: 12500,
-            trades: 45,
-            winRate: 0.78,
-            ranking: 1
-          },
-          {
-            address: '0x8765...4321',
-            name: 'Crypto Wizard',
-            profit: 8900,
-            trades: 32,
-            winRate: 0.72,
-            ranking: 2
-          },
-          {
-            address: '0x9876...5432',
-            name: 'EMB Trader',
-            profit: 6700,
-            trades: 28,
-            winRate: 0.68,
-            ranking: 3
-          },
-          {
-            address: walletAddress || '0x5432...9876',
-            name: 'You',
-            profit: userStats?.totalProfit || 5400,
-            trades: userStats?.trades || 25,
-            winRate: userStats?.winRate || 0.65,
-            ranking: 4
-          }
-        ];
-
-        setLeaderboardData(mockData);
-        const userPosition = mockData.findIndex(user => user.address === walletAddress);
-        setUserRank(userPosition >= 0 ? userPosition + 1 : null);
-      } catch (err) {
-        console.error('Failed to fetch leaderboard:', err);
-      } finally {
+        setLoading(true);
+        
+        // In a real implementation, we would fetch data from an API
+        // For now, generate mock data
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 700));
+        
+        // Create mock trader data with different performance metrics
+        const mockTraders = Array(20).fill().map((_, i) => {
+          const winRate = Math.floor(Math.random() * 30) + 50; // 50-80%
+          const trades = Math.floor(Math.random() * 100) + 20; // 20-120 trades
+          const wins = Math.floor(trades * (winRate / 100));
+          const pnl = Math.random() > 0.8 ? 
+            Math.floor(Math.random() * 50000) + 10000 : // Outlier high performers 
+            Math.floor(Math.random() * 5000) + 500; // Normal performers
+            
+          return {
+            id: `user_${i + 1}`,
+            rank: i + 1,
+            name: `Trader${i + 1}`,
+            avatar: `/images/avatar-${(i % 5) + 1}.png`,
+            pnl,
+            pnlChange: Math.random() > 0.5 ? 
+              Math.floor(Math.random() * 20) + 1 : // Positive change
+              -1 * (Math.floor(Math.random() * 15) + 1), // Negative change
+            winRate,
+            trades,
+            wins,
+            losses: trades - wins,
+            volume: Math.floor(Math.random() * 1000000) + 100000,
+            hasGraduated: Math.random() > 0.3,
+            badges: [
+              Math.random() > 0.7 ? 'Top Trader' : null,
+              Math.random() > 0.8 ? 'Veteran' : null,
+              Math.random() > 0.9 ? 'Whale' : null,
+              Math.random() > 0.9 ? 'Diamond Hands' : null,
+            ].filter(Boolean),
+            isCurrentUser: false,
+          };
+        });
+        
+        // Sort traders based on category
+        let sortedTraders;
+        if (category === 'pnl') {
+          sortedTraders = mockTraders.sort((a, b) => b.pnl - a.pnl);
+        } else if (category === 'winRate') {
+          sortedTraders = mockTraders.sort((a, b) => b.winRate - a.winRate);
+        } else if (category === 'volume') {
+          sortedTraders = mockTraders.sort((a, b) => b.volume - a.volume);
+        }
+        
+        // Assign ranks after sorting
+        sortedTraders = sortedTraders.map((trader, index) => ({
+          ...trader,
+          rank: index + 1,
+        }));
+        
+        // If user is connected, mark their entry
+        if (publicKey) {
+          const userAddress = publicKey.toString();
+          // In a real implementation, we'd check if the user is in the leaderboard
+          // For now, randomly select one trader to represent the current user
+          const userIndex = Math.floor(Math.random() * sortedTraders.length);
+          sortedTraders[userIndex] = {
+            ...sortedTraders[userIndex],
+            isCurrentUser: true,
+            name: userAddress.slice(0, 4) + '...' + userAddress.slice(-4),
+          };
+        }
+        
+        setTraders(sortedTraders);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
         setLoading(false);
       }
     };
-
+    
     fetchLeaderboard();
-    const interval = setInterval(fetchLeaderboard, 300000); // Update every 5 minutes
-    return () => clearInterval(interval);
-  }, [walletAddress, timeframe, userStats]);
-
-  if (loading) {
-    return (
-      <div className="p-4 bg-gray-800 rounded-lg animate-pulse">
-        <div className="h-6 bg-gray-700 rounded w-48 mb-4"></div>
-        <div className="space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-12 bg-gray-700 rounded"></div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
+  }, [publicKey, timeframe, category]);
+  
+  // Format number with commas
+  const formatNumber = (num) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+  
   return (
-    <div className="p-4 bg-gray-800 rounded-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-blue-400">Leaderboard</h2>
-        <div className="flex space-x-2">
-          {['day', 'week', 'month', 'all'].map((tf) => (
+    <div className="p-4 bg-gray-900 text-white rounded-lg">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <h2 className="text-2xl font-bold mb-4 md:mb-0">Leaderboard</h2>
+        
+        <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3 w-full md:w-auto">
+          <div className="flex space-x-2">
             <button
-              key={tf}
-              onClick={() => setTimeframe(tf)}
-              className={`px-3 py-1 rounded-full text-sm ${
-                timeframe === tf ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'
+              onClick={() => setTimeframe('day')}
+              className={`px-3 py-1 rounded text-sm ${
+                timeframe === 'day' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
-              {tf.charAt(0).toUpperCase() + tf.slice(1)}
+              24h
             </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        {leaderboardData.map((trader, index) => {
-          const isUser = trader.address === walletAddress;
-          const rankColors = {
-            1: 'text-yellow-400',
-            2: 'text-gray-400',
-            3: 'text-amber-600'
-          };
-
-          return (
-            <div
-              key={trader.address}
-              className={`p-3 rounded ${
-                isUser ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-gray-700/50'
+            <button
+              onClick={() => setTimeframe('week')}
+              className={`px-3 py-1 rounded text-sm ${
+                timeframe === 'week' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className={`text-lg font-bold ${rankColors[index + 1] || 'text-gray-400'}`}>
-                    #{index + 1}
-                  </span>
-                  <div>
-                    <p className="font-medium">
-                      {trader.name} {isUser && '(You)'}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      {trader.trades} trades • {(trader.winRate * 100).toFixed(1)}% win rate
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className={`font-medium ${trader.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    ${trader.profit.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-gray-400">Profit</p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {userRank && userRank > 4 && (
-        <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-lg font-bold text-gray-400">#{userRank}</span>
-              <div>
-                <p className="font-medium">You</p>
-                <p className="text-sm text-gray-400">
-                  {userStats.trades} trades • {(userStats.winRate * 100).toFixed(1)}% win rate
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className={`font-medium ${userStats.totalProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                ${userStats.totalProfit.toLocaleString()}
-              </p>
-              <p className="text-xs text-gray-400">Profit</p>
-            </div>
+              Week
+            </button>
+            <button
+              onClick={() => setTimeframe('month')}
+              className={`px-3 py-1 rounded text-sm ${
+                timeframe === 'month' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Month
+            </button>
+            <button
+              onClick={() => setTimeframe('all')}
+              className={`px-3 py-1 rounded text-sm ${
+                timeframe === 'all' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              All Time
+            </button>
+          </div>
+          
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setCategory('pnl')}
+              className={`px-3 py-1 rounded text-sm ${
+                category === 'pnl' 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              PnL
+            </button>
+            <button
+              onClick={() => setCategory('winRate')}
+              className={`px-3 py-1 rounded text-sm ${
+                category === 'winRate' 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Win Rate
+            </button>
+            <button
+              onClick={() => setCategory('volume')}
+              className={`px-3 py-1 rounded text-sm ${
+                category === 'volume' 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Volume
+            </button>
           </div>
         </div>
-      )}
-
-      {/* Competition Info */}
-      <div className="mt-6 p-4 bg-gray-700/30 rounded">
-        <h3 className="text-sm font-medium text-gray-300 mb-3">Weekly Competition</h3>
-        <div className="space-y-2 text-sm">
-          <p className="text-gray-400">
-            🏆 Prize Pool: <span className="text-yellow-400">1,000 EMB</span>
-          </p>
-          <p className="text-gray-400">
-            ⏰ Ends in: <span className="text-blue-400">2d 14h 35m</span>
-          </p>
-          <p className="text-gray-400">
-            👥 Participants: <span className="text-blue-400">156</span>
-          </p>
-        </div>
       </div>
+      
+      {loading ? (
+        <div className="flex justify-center my-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-full">
+            <thead>
+              <tr className="bg-gray-800 text-gray-400 text-left text-sm">
+                <th className="px-4 py-3 rounded-tl-lg">Rank</th>
+                <th className="px-4 py-3">Trader</th>
+                <th className="px-4 py-3 text-right">
+                  {category === 'pnl' && 'PnL'}
+                  {category === 'winRate' && 'Win Rate'}
+                  {category === 'volume' && 'Volume'}
+                </th>
+                <th className="px-4 py-3 text-right">Trades</th>
+                <th className="px-4 py-3 text-right rounded-tr-lg">W/L</th>
+              </tr>
+            </thead>
+            <tbody>
+              {traders.map((trader, index) => (
+                <tr 
+                  key={trader.id} 
+                  className={`
+                    ${index % 2 === 0 ? 'bg-gray-800/50' : 'bg-gray-800/30'} 
+                    ${trader.isCurrentUser ? 'bg-blue-900/30 border border-blue-600/30' : ''}
+                    ${trader.rank <= 3 ? 'bg-gradient-to-r from-gray-800 to-gray-800/30' : ''}
+                  `}
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center">
+                      {trader.rank <= 3 ? (
+                        <div className={`
+                          w-6 h-6 rounded-full flex items-center justify-center mr-2
+                          ${trader.rank === 1 ? 'bg-yellow-500' : ''}
+                          ${trader.rank === 2 ? 'bg-gray-400' : ''}
+                          ${trader.rank === 3 ? 'bg-amber-700' : ''}
+                          text-black font-bold
+                        `}>
+                          {trader.rank}
+                        </div>
+                      ) : (
+                        <span className="w-6 text-center mr-2">{trader.rank}</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link href={`/profile/${trader.id}`} className="flex items-center hover:opacity-80">
+                      <img 
+                        src={trader.avatar} 
+                        alt={trader.name}
+                        className="h-8 w-8 rounded-full mr-3"
+                      />
+                      <div>
+                        <div className="flex items-center">
+                          <span className="font-medium">
+                            {trader.name} {trader.isCurrentUser && '(You)'}
+                          </span>
+                          {trader.hasGraduated && (
+                            <span className="ml-2 w-3 h-3 rounded-full bg-purple-500"></span>
+                          )}
+                        </div>
+                        {trader.badges.length > 0 && (
+                          <div className="flex space-x-1 mt-1">
+                            {trader.badges.map((badge, i) => (
+                              <span 
+                                key={i} 
+                                className="text-xs text-yellow-400 bg-yellow-900/30 px-1.5 rounded-sm"
+                              >
+                                {badge}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {category === 'pnl' && (
+                      <div>
+                        <span className={trader.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
+                          ${formatNumber(trader.pnl)}
+                        </span>
+                        <div className="text-xs flex items-center justify-end">
+                          <span className={trader.pnlChange >= 0 ? 'text-green-400' : 'text-red-400'}>
+                            {trader.pnlChange >= 0 ? '+' : ''}{trader.pnlChange}%
+                          </span>
+                          <span className="text-gray-500 ml-1">{timeframe}</span>
+                        </div>
+                      </div>
+                    )}
+                    {category === 'winRate' && (
+                      <span className="font-medium">{trader.winRate}%</span>
+                    )}
+                    {category === 'volume' && (
+                      <span>${formatNumber(trader.volume)}</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {trader.trades}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <span className="text-green-400">{trader.wins}</span>
+                    {' / '}
+                    <span className="text-red-400">{trader.losses}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default Leaderboard;

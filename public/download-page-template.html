@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embassy AI - Download</title>
+  <style>
+    :root {
+      --bg-dark: #12131e;
+      --bg-card: #1f2037;
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      margin: 20px 0;
+      background: linear-gradient(90deg, #3b82f6, #a855f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
+    }
+    
+    .download-section {
+      background-color: var(--bg-card);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      margin-bottom: 60px;
+    }
+    
+    .download-title {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2rem;
+    }
+    
+    .download-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    
+    .download-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--bg-dark);
+      border-radius: 12px;
+      padding: 30px;
+      text-decoration: none;
+      color: var(--text-primary);
+      width: 200px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+    
+    .download-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+    }
+    
+    .download-button::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 15%;
+      right: 15%;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #a855f7);
+      border-radius: 2px;
+      transition: left 0.3s, right 0.3s;
+    }
+    
+    .download-button:hover::after {
+      left: 5%;
+      right: 5%;
+    }
+    
+    .download-button img {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 15px;
+    }
+    
+    .download-button-text {
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+    
+    .version {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    
+    .web-version {
+      text-align: center;
+      margin: 40px 0;
+    }
+    
+    .web-link {
+      display: inline-block;
+      background-color: var(--accent-blue);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    
+    .web-link:hover {
+      background-color: var(--accent-blue-hover);
+    }
+    
+    .features {
+      margin-top: 80px;
+    }
+    
+    .features h2 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2rem;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    
+    .feature {
+      background-color: var(--bg-card);
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature h3 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      color: #a855f7;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .download-section {
+        padding: 25px;
+      }
+      
+      .download-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .download-button {
+        width: 100%;
+        max-width: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="favicon.ico" alt="Embassy AI Logo" class="logo">
+      <h1>Embassy AI Trading Platform</h1>
+      <p class="subtitle">
+        Advanced Web3-ready trading simulation platform for cryptocurrency markets with AI-powered signal detection
+      </p>
+    </header>
+    
+    <section class="download-section">
+      <h2 class="download-title">Download Embassy AI</h2>
+      <div class="download-buttons">
+        <a href="https://github.com/embassyai/embassy-trade-motia/releases/download/v1.0.0/Embassy.AI-1.0.0.exe" class="download-button">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" alt="Windows Logo">
+          <span class="download-button-text">Windows</span>
+          <span class="version">64-bit Installer</span>
+        </a>
+        
+        <a href="https://github.com/embassyai/embassy-trade-motia/releases/download/v1.0.0/Embassy.AI-1.0.0.dmg" class="download-button">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Apple_Logo.svg" alt="macOS Logo">
+          <span class="download-button-text">macOS</span>
+          <span class="version">64-bit Installer</span>
+        </a>
+        
+        <a href="https://github.com/embassyai/embassy-trade-motia/releases/download/v1.0.0/Embassy.AI-1.0.0.AppImage" class="download-button">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" alt="Linux Logo">
+          <span class="download-button-text">Linux</span>
+          <span class="version">64-bit AppImage</span>
+        </a>
+      </div>
+    </section>
+    
+    <div class="web-version">
+      <p>Prefer using the web version?</p>
+      <a href="https://trading.embassyai.xyz/simulation" class="web-link">
+        Try the Web Version
+      </a>
+    </div>
+    
+    <section class="features">
+      <h2>Key Features</h2>
+      <div class="features-grid">
+        <div class="feature">
+          <h3>AI-Powered Signals</h3>
+          <p>Leverage cutting-edge artificial intelligence to detect high-confidence trading opportunities across cryptocurrency markets.</p>
+        </div>
+        
+        <div class="feature">
+          <h3>Paper Trading Simulation</h3>
+          <p>Practice your trading strategies in a risk-free environment with realistic market conditions and simulated execution.</p>
+        </div>
+        
+        <div class="feature">
+          <h3>Web3 Integration</h3>
+          <p>Connect your Web3 wallet for a seamless experience with Solana and other blockchain networks.</p>
+        </div>
+        
+        <div class="feature">
+          <h3>Auto-Accept Trading</h3>
+          <p>Configure the platform to automatically accept high-confidence trade signals based on your preferences.</p>
+        </div>
+        
+        <div class="feature">
+          <h3>Portfolio Management</h3>
+          <p>Track your trading performance, profits and losses, and manage your simulated portfolio with comprehensive tools.</p>
+        </div>
+        
+        <div class="feature">
+          <h3>Desktop Experience</h3>
+          <p>Enjoy the full power of Embassy AI with our native desktop application featuring enhanced performance and capabilities.</p>
+        </div>
+      </div>
+    </section>
+    
+    <footer>
+      <p>&copy; 2024 Embassy AI. All rights reserved.</p>
+    </footer>
+  </div>
+</body>
+</html>

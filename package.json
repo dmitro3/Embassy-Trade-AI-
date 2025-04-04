@@ -1,6 +1,6 @@
 {
   "name": "embassy-trade-desktop",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "main": "main.js",
   "scripts": {
@@ -17,14 +17,14 @@
     "test:coverage": "jest --coverage",
     "prepare": "husky install || echo 'Skipping husky setup'",
     "run-all": "node scripts/run-tests-and-start.js",
-    
     "electron": "concurrently \"cross-env BROWSER=none npm run dev\" \"wait-on http://localhost:3008 && electron .\"",
     "electron:build": "npm run export && electron-builder build --win --mac --linux --x64",
     "electron:win": "npm run export && electron-builder build --win --x64",
     "electron:mac": "npm run export && electron-builder build --mac --x64",
     "electron:linux": "npm run export && electron-builder build --linux --x64",
     "electron:test": "jest --config electron.jest.config.js",
-    "electron:e2e": "xvfb-maybe spectron-test"
+    "electron:e2e": "xvfb-maybe spectron-test",
+    "electron:publish": "npm run export && electron-builder build --win --mac --linux --x64 --publish always"
   },
   "dependencies": {
     "@motiadev/core": "^0.1.0-beta.15",
@@ -36,21 +36,29 @@
     "@solana/web3.js": "^1.98.0",
     "axios": "^1.8.4",
     "bs58": "^5.0.0",
+    "chess.js": "^1.1.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "electron-is-dev": "^2.0.0",
     "electron-log": "^5.1.0",
     "ethers": "^5.7.2",
     "express": "^4.21.2",
     "kill-port": "^2.0.1",
     "next": "15.2.4",
+    "nodemailer": "^6.10.0",
     "photon-realtime": "^4.3.2",
     "portfinder": "^1.0.35",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
+    "react-confetti": "^6.4.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.15.1",
+    "sqlite": "^5.0.1",
+    "sqlite3": "^5.1.6",
+    "three": "^0.175.0",
+    "twitter-api-v2": "^1.22.0",
     "winston": "^3.12.0",
     "ws": "^8.18.1"
   },
@@ -82,12 +90,12 @@
   },
   "lint-staged": {
     "*.js": [
-      "jest --findRelatedTests"
+      "jest --findRelatedTests --passWithNoTests"
     ]
   },
   "build": {
-    "appId": "com.embassytrade.desktop",
-    "productName": "Embassy Trade",
+    "appId": "com.embassyai.app",
+    "productName": "Embassy AI",
     "files": [
       "**/*",
       "!**/.git/**",
@@ -110,12 +118,16 @@
       {
         "from": "trading",
         "to": "trading",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "server",
         "to": "server",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       "requirements.txt"
     ],
@@ -127,7 +139,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "public/favicon.ico"
@@ -136,7 +150,9 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "public/favicon.ico",
@@ -145,12 +161,10 @@
     "linux": {
       "target": [
         {
-          "target": "deb",
-          "arch": ["x64"]
-        },
-        {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "public/favicon.ico",
@@ -161,12 +175,14 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Embassy Trade"
+      "shortcutName": "Embassy AI"
     },
     "publish": {
       "provider": "github",
-      "owner": "yourGithubUsername",
-      "repo": "embassy-trade-desktop"
+      "owner": "embassyai",
+      "repo": "embassy-trade-motia",
+      "private": true,
+      "releaseType": "release"
     }
   }
 }

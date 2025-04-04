@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useElectron from '../lib/useElectron';
 import AutoTradeModal from './AutoTradeModal';
+import useTradeWebSocket from '../lib/useTradeWebSocket';
 
 /**
  * AutoTrader component that provides AI-driven trading capabilities
@@ -16,6 +17,7 @@ const AutoTrader = () => {
     lastUpdated: null
   });
   const { isDesktopApp, autoTrader, showNotification } = useElectron();
+  const { autoAccept, toggleAutoAccept } = useTradeWebSocket();
   
   // Initialize trader on mount
   useEffect(() => {
@@ -129,6 +131,25 @@ const AutoTrader = () => {
         >
           Find Trades
         </button>
+      </div>
+      
+      {/* Auto Accept Toggle */}
+      <div className="p-4 bg-gray-50 border-b border-gray-200 dark:bg-gray-700/30 dark:border-gray-700 flex items-center justify-between">
+        <label htmlFor="autoAcceptToggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Auto-accept future trades (24/7 trading)
+        </label>
+        <div className="relative inline-block w-12 align-middle select-none">
+          <input 
+            type="checkbox" 
+            name="autoAcceptToggle" 
+            id="autoAcceptToggle" 
+            className="sr-only"
+            checked={autoAccept}
+            onChange={() => toggleAutoAccept(!autoAccept)} 
+          />
+          <div className={`block w-12 h-6 rounded-full ${autoAccept ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'} transition-colors`}></div>
+          <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${autoAccept ? 'transform translate-x-6' : ''}`}></div>
+        </div>
       </div>
       
       {/* Desktop App Only Notice */}

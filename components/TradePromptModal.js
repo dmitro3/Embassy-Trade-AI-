@@ -1,102 +1,172 @@
-import React, { useEffect, useState } from 'react';
+'use client';
 
-export default function TradePromptModal({ trade, onAccept, onDecline, autoTimeout = 10000, autoAccept, onAutoAcceptToggle }) {
-  const [timeLeft, setTimeLeft] = useState(autoTimeout / 1000);
+import React, { useState } from 'react';
+import Modal from './Modal';
 
-  useEffect(() => {
-    // Reset timer when new trade comes in
-    setTimeLeft(autoTimeout / 1000);
-    
-    // Start countdown
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          onDecline();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+/**
+ * Trade Prompt Modal Component for Embassy Trade AI
+ * This modal allows users to enter trade parameters and execute trades
+ */
+const TradePromptModal = ({ 
+  isOpen, 
+  onClose, 
+  onSubmit,
+  isProcessing = false,
+  defaultValues = {}
+}) => {
+  const [formData, setFormData] = useState({
+    symbol: defaultValues.symbol || '',
+    amount: defaultValues.amount || '',
+    leverage: defaultValues.leverage || '1',
+    stopLoss: defaultValues.stopLoss || '',
+    takeProfit: defaultValues.takeProfit || '',
+    ...defaultValues
+  });
 
-    // Auto-decline after timeout
-    const declineTimer = setTimeout(() => {
-      onDecline();
-    }, autoTimeout);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-    return () => {
-      clearInterval(timer);
-      clearTimeout(declineTimer);
-    };
-  }, [trade, onAccept, onDecline, autoTimeout]);
+  const handleSubmit = () => {
+    onSubmit(formData);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex justify-between items-start mb-4">
-          <h2 className="text-xl font-bold">Trade Opportunity</h2>
-          <div className="text-sm font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded">
-            {timeLeft}s
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Execute Trade"
+      primaryAction={{
+        label: isProcessing ? "Processing..." : "Execute Trade",
+        onClick: handleSubmit,
+      }}
+      secondaryAction={{
+        label: "Cancel",
+        onClick: onClose,
+      }}
+      size="lg"
+    >
+      <div className="space-y-6">
+        <div className="p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg">
+          <p className="text-blue-200 font-medium">
+            Embassy AI's trade scanner has detected a potentially profitable opportunity.
+            Review the details and execute the trade if you wish to proceed.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block mb-1 text-sm text-gray-300">Trading Pair</label>
+            <input
+              type="text"
+              name="symbol"
+              value={formData.symbol}
+              onChange={handleChange}
+              className="w-full p-2 rounded-md bg-gray-800 border border-gray-700 text-white"
+              placeholder="SOL/USD"
+            />
+          </div>
+          
+          <div>
+            <label className="block mb-1 text-sm text-gray-300">Amount (SOL)</label>
+            <input
+              type="number"
+              name="amount"
+              value={formData.amount}
+              onChange={handleChange}
+              className="w-full p-2 rounded-md bg-gray-800 border border-gray-700 text-white"
+              placeholder="1.0"
+              min="0.1"
+              step="0.1"
+            />
+          </div>
+          
+          <div>
+            <label className="block mb-1 text-sm text-gray-300">Leverage</label>
+            <select
+              name="leverage"
+              value={formData.leverage}
+              onChange={handleChange}
+              className="w-full p-2 rounded-md bg-gray-800 border border-gray-700 text-white"
+            >
+              <option value="1">1x (No Leverage)</option>
+              <option value="2">2x</option>
+              <option value="5">5x</option>
+              <option value="10">10x</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block mb-1 text-sm text-gray-300">Trade Direction</label>
+            <select
+              name="direction"
+              value={formData.direction}
+              onChange={handleChange}
+              className="w-full p-2 rounded-md bg-gray-800 border border-gray-700 text-white"
+            >
+              <option value="long">Long</option>
+              <option value="short">Short</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block mb-1 text-sm text-gray-300">Stop Loss (%)</label>
+            <input
+              type="number"
+              name="stopLoss"
+              value={formData.stopLoss}
+              onChange={handleChange}
+              className="w-full p-2 rounded-md bg-gray-800 border border-gray-700 text-white"
+              placeholder="5"
+              min="0"
+            />
+          </div>
+          
+          <div>
+            <label className="block mb-1 text-sm text-gray-300">Take Profit (%)</label>
+            <input
+              type="number"
+              name="takeProfit"
+              value={formData.takeProfit}
+              onChange={handleChange}
+              className="w-full p-2 rounded-md bg-gray-800 border border-gray-700 text-white"
+              placeholder="15"
+              min="0"
+            />
           </div>
         </div>
         
-        <div className="space-y-3 mb-6">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Asset:</span>
-            <span className="font-medium">{trade.asset}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Type:</span>
-            <span className="font-medium">{trade.type}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Quantity:</span>
-            <span className="font-medium">{trade.quantity}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Price:</span>
-            <span className="font-medium">${trade.price.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Confidence:</span>
-            <span className="font-medium">{(trade.confidence * 100).toFixed(1)}%</span>
+        <div className="p-4 bg-gray-800/50 rounded-lg">
+          <h4 className="text-sm font-medium text-white mb-2">Trade Summary</h4>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="text-gray-400">Entry Price:</div>
+            <div className="text-white">$20.45 (estimated)</div>
+            
+            <div className="text-gray-400">Trading Fee:</div>
+            <div className="text-white">0.05 SOL</div>
+            
+            <div className="text-gray-400">Network Fee:</div>
+            <div className="text-white">~0.000005 SOL</div>
+            
+            <div className="text-gray-400">Max Profit:</div>
+            <div className="text-green-400">+${formData.takeProfit ? (Number(formData.amount) * Number(formData.takeProfit) / 100).toFixed(2) : '0.00'}</div>
+            
+            <div className="text-gray-400">Max Loss:</div>
+            <div className="text-red-400">-${formData.stopLoss ? (Number(formData.amount) * Number(formData.stopLoss) / 100).toFixed(2) : '0.00'}</div>
           </div>
         </div>
-
-        {/* Auto Accept Toggle */}
-        <div className="flex items-center justify-between px-2 py-3 mb-4 bg-gray-100 rounded-lg">
-          <label htmlFor="autoAcceptToggle" className="text-sm font-medium text-gray-700">
-            Auto-accept future trades (24/7 trading)
-          </label>
-          <div className="relative inline-block w-12 align-middle select-none">
-            <input 
-              type="checkbox" 
-              name="autoAcceptToggle" 
-              id="autoAcceptToggle" 
-              className="sr-only"
-              checked={autoAccept}
-              onChange={() => onAutoAcceptToggle(!autoAccept)} 
-            />
-            <div className={`block w-12 h-6 rounded-full ${autoAccept ? 'bg-green-500' : 'bg-gray-300'} transition-colors`}></div>
-            <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${autoAccept ? 'transform translate-x-6' : ''}`}></div>
-          </div>
-        </div>
-
-        <div className="flex space-x-4">
-          <button
-            onClick={onAccept}
-            className="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded transition-colors"
-          >
-            Accept
-          </button>
-          <button
-            onClick={onDecline}
-            className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-colors"
-          >
-            Decline
-          </button>
+        
+        <div className="text-xs text-gray-400">
+          All trades are executed through the Solana blockchain. Embassy AI will never have access to your funds. 
+          Trading cryptocurrency carries significant risk. Only trade with funds you can afford to lose.
         </div>
       </div>
-    </div>
+    </Modal>
   );
-}
+};
+
+export default TradePromptModal;
