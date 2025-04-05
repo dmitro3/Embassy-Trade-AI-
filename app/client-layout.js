@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { WalletProvider } from "../lib/WalletProvider";
-import { useWallet } from "@/lib/WalletProvider";
+import { useWallet, WalletConnectionButton } from "@/lib/WalletProvider";
 import TradePromptHandler from "@/components/TradePromptHandler";
 import DesktopAppBanner from "@/components/DesktopAppBanner";
 import AutoTradeModal from "@/components/AutoTradeModal";
@@ -34,19 +34,14 @@ const WalletButton = () => {
   
   return (
     <>
-      <button
-        onClick={() => setShowWalletModal(true)}
-        className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white p-3 rounded-full shadow-lg flex items-center justify-center tooltip"
-        aria-label={connected ? "Wallet Connected" : "Connect Wallet"}
-        data-tooltip={connected ? `Connected: ${wallet?.adapter?.name || 'Wallet'}` : "Connect to Solana Wallet"}
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-        </svg>
+      <div className="wallet-button-wrapper tooltip" 
+        data-tooltip={connected ? `Connected: ${wallet?.adapter?.name || 'Wallet'}` : "Connect to Solana Wallet"}>
+        <WalletConnectionButton />
+        
         {connected && (
           <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-green-400 ring-2 ring-blue-600"></span>
         )}
-      </button>
+      </div>
       
       <WalletConnectModal
         isOpen={showWalletModal}
@@ -171,6 +166,18 @@ export default function ClientLayout({ children }) {
                 </svg>
               </a>
             )}
+
+            {/* Swap Tokens Button */}
+            <a
+              href="/trade?tab=swap"
+              className="bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-full shadow-lg flex items-center justify-center tooltip"
+              aria-label="Swap Tokens"
+              data-tooltip="Swap tokens and get EMB"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+            </a>
           </div>
         )}
       </div>
@@ -236,6 +243,36 @@ export default function ClientLayout({ children }) {
           .tooltip::after {
             display: none;
           }
+        }
+
+        /* Custom wallet button styles */
+        .wallet-button-wrapper {
+          position: relative;
+        }
+        
+        .wallet-button-wrapper :global(.wallet-adapter-button) {
+          background: linear-gradient(to right, #3b82f6, #4f46e5);
+          color: white;
+          border-radius: 9999px;
+          padding: 0.75rem;
+          height: auto;
+          width: auto;
+          min-width: auto;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .wallet-button-wrapper :global(.wallet-adapter-button:hover) {
+          background: linear-gradient(to right, #2563eb, #4338ca);
+        }
+        
+        .wallet-button-wrapper :global(.wallet-adapter-button-start-icon) {
+          margin: 0;
+          width: 20px;
+          height: 20px;
+        }
+        
+        .wallet-button-wrapper :global(.wallet-adapter-button-text) {
+          display: none;
         }
       `}</style>
     </WalletProvider>

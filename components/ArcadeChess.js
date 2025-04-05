@@ -1,44 +1,75 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import Modal from './Modal'; // Import our custom Modal component
+import Modal from './Modal';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { usePhotonApi } from '@/lib/usePhotonApi';
+import { useChessRewards } from '@/lib/useChessRewards'; 
+import { WalletConnectionButton } from '@/lib/WalletProvider';
 
 // Properly import ChessGame component with dynamic loading and no SSR
 const ChessGame = dynamic(() => import('./ChessGame'), { 
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center w-full h-full bg-gray-800 rounded-xl">
+    <div className="flex items-center justify-center w-full h-full bg-gray-900/80 rounded-xl">
       <div className="flex flex-col items-center justify-center">
-        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <div className="text-blue-400">Loading 3D chess...</div>
+        <div className="w-12 h-12 border-4 border-[#9945FF] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div className="text-[#9945FF] font-medium">Loading 3D chess...</div>
+      </div>
+    </div>
+  )
+});
+
+// Fallback 2D component in case 3D fails - also dynamic loaded
+const ChessIsolated = dynamic(() => import('./ChessIsolated'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center w-full h-full bg-gray-900/80 rounded-xl">
+      <div className="flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[#00FFA3] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div className="text-[#00FFA3] font-medium">Loading 2D chess...</div>
       </div>
     </div>
   )
 });
 
 // Fallback component in case ChessGame loading fails
-const ChessFallback = ({ onRetry }) => (
-  <div className="flex items-center justify-center w-full h-full bg-gray-800/90 rounded-xl">
-    <div className="flex flex-col items-center justify-center text-center max-w-md p-6">
-      <svg className="w-16 h-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-      <h3 className="text-xl font-medium text-white mb-2">Failed to load 3D Chess</h3>
-      <p className="text-gray-300 mb-4">
+const ChessFallback = ({ onRetry, onSwitchTo2D }) => (
+  <div className="flex items-center justify-center w-full h-full bg-gray-900/90 rounded-xl">
+    <div className="flex flex-col items-center justify-center text-center max-w-md p-8">
+      <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-5">
+        <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h3 className="text-xl font-medium text-white mb-3">Failed to load 3D Chess</h3>
+      <p className="text-gray-300 mb-6">
         There was a problem loading the 3D chess game. This could be due to WebGL not being supported in your browser, 
         or insufficient system resources.
       </p>
       <div className="space-y-3">
         <button 
           onClick={onRetry}
-          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+          className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 hover:opacity-90 text-white rounded-lg transition transform hover:scale-105"
         >
           Try Again
+        </button>
+        <button
+          onClick={onSwitchTo2D}
+          className="w-full py-3 px-4 bg-gradient-to-r from-[#00FFA3]/80 to-[#00FFA3] hover:opacity-90 text-gray-900 font-medium rounded-lg transition transform hover:scale-105"
+        >
+          Switch to 2D Mode
         </button>
       </div>
     </div>
   </div>
 );
+
+// Helper function to generate truly unique IDs
+const generateUniqueId = () => {
+  return `id-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`;
+};
 
 /**
  * ArcadeChess component for the Embassy AI platform
@@ -56,12 +87,15 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
   const [selectedMode, setSelectedMode] = useState('free'); // 'free' or 'premium'
   const [tradeSignal, setTradeSignal] = useState(null);
   const [loadError, setLoadError] = useState(false);
+  const [use2DMode, setUse2DMode] = useState(false);
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
   const { getWhaleActivity } = usePhotonApi();
+  const { connected, publicKey } = useWallet();
+  const chessRewards = useChessRewards();
   
   // For demo purposes, use these fixed values
-  const _embBalance = embBalance || 100; // Use the passed balance or a default of 100
+  const _embBalance = embBalance || (connected ? 100 : 0); // Use the passed balance, wallet balance, or a default
   
   // Clean up timer on unmount
   useEffect(() => {
@@ -74,7 +108,7 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
 
   // Custom notification system that we can fully control
   const showNotification = (title, message) => {
-    const id = Date.now();
+    const id = generateUniqueId();
     const notification = { id, title, message };
     setNotifications(prev => [...prev, notification]);
     
@@ -100,6 +134,17 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
   // Handle chess game retry
   const handleChessRetry = () => {
     setLoadError(false);
+    // Force remount of the component
+    setIsPlaying(false);
+    setTimeout(() => {
+      handleStartGame();
+    }, 500);
+  };
+  
+  // Handle switching to 2D mode
+  const handleSwitchTo2D = () => {
+    setLoadError(false);
+    setUse2DMode(true);
     // Force remount of the component
     setIsPlaying(false);
     setTimeout(() => {
@@ -141,9 +186,36 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
     }
   ];
 
+  // Calculate premium rewards bonus
+  const getPremiumBonus = (result) => {
+    if (selectedMode !== 'premium') return { xpBonus: 0, tokenBonus: 0 };
+    
+    let xpBonus = 0;
+    let tokenBonus = 0;
+    
+    if (result === 'win') {
+      xpBonus = 0.25; // 25% bonus
+      tokenBonus = 0.2; // 20% token bonus
+    } else if (result === 'draw') {
+      xpBonus = 0.1; // 10% bonus
+      tokenBonus = 0.1; // 10% token bonus
+    } else if (result === 'loss') {
+      xpBonus = -0.5; // 50% protection
+      tokenBonus = 0; // No token bonus for loss
+    }
+    
+    return { xpBonus, tokenBonus };
+  };
+
   // Handle starting a new game
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     if (selectedMode === 'premium') {
+      if (!connected) {
+        showNotification('Wallet Not Connected', 'Connect your wallet to play in premium mode');
+        setSelectedMode('free');
+        return;
+      }
+      
       if (_embBalance >= 1) {
         // Burn 1 EMB token
         try {
@@ -152,7 +224,7 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
           setTokensBurned(prev => prev + 1);
           onTokenBurn(1);
           
-          showNotification('Premium Game Started', 'Playing 3D Chess in Premium Mode (1 EMB token burned)');
+          showNotification('Premium Game Started', 'Playing Chess in Premium Mode (1 EMB token burned)');
         } catch (error) {
           console.error("Error burning token:", error);
           showNotification('Error', 'Failed to burn EMB token. Switching to free mode.');
@@ -164,7 +236,7 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
       }
     } else {
       // Free mode notification
-      showNotification('Game Started', 'Playing 3D Chess (Free Mode)');
+      showNotification('Game Started', 'Playing Chess (Free Mode)');
     }
     
     // Start the game
@@ -184,7 +256,7 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
   };
 
   // Handle ending a game
-  const handleGameEnd = (result) => {
+  const handleGameEnd = async (result) => {
     // Stop timer
     clearInterval(timerRef.current);
     
@@ -193,9 +265,16 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
       return;
     }
     
+    if (result === 'restart') {
+      setUse2DMode(false);
+      setLoadError(false);
+      setIsPlaying(false);
+      return;
+    }
+    
     // Record game in history
     const gameRecord = {
-      id: `game-${Date.now()}`,
+      id: generateUniqueId(),
       date: new Date().toISOString(),
       difficulty,
       result,
@@ -207,14 +286,49 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
     setPlayHistory(prev => [gameRecord, ...prev]);
     setIsPlaying(false);
     
+    // Calculate bonus percentages
+    const { xpBonus, tokenBonus } = getPremiumBonus(result);
+    
     // Show notification with bonus for premium mode
     const resultMessage = result === 'win' 
-      ? `Congratulations! You won the chess game. ${selectedMode === 'premium' ? 'Premium win bonus: +25% XP!' : ''}` 
+      ? `Congratulations! You won the chess game. ${selectedMode === 'premium' ? `Premium win bonus: +${xpBonus * 100}% XP!` : ''}` 
       : result === 'draw' 
-        ? `The game ended in a draw. ${selectedMode === 'premium' ? 'Premium draw bonus: +10% XP!' : ''}`
-        : `Better luck next time. The AI won this round. ${selectedMode === 'premium' ? 'Premium loss protection: -50% XP loss!' : ''}`;
+        ? `The game ended in a draw. ${selectedMode === 'premium' ? `Premium draw bonus: +${xpBonus * 100}% XP!` : ''}`
+        : `Better luck next time. The AI won this round. ${selectedMode === 'premium' ? `Premium loss protection: ${xpBonus * 100}% XP loss!` : ''}`;
     
     showNotification('Game Ended', resultMessage);
+    
+    // Process rewards if connected to wallet
+    if (connected && publicKey && chessRewards.isInitialized) {
+      try {
+        let rewardResult;
+        
+        if (result === 'win') {
+          rewardResult = await chessRewards.rewardForWin(difficulty);
+          // Apply premium bonus if applicable
+          if (selectedMode === 'premium' && rewardResult.success) {
+            rewardResult.xpAmount = Math.floor(rewardResult.xpAmount * (1 + xpBonus));
+            rewardResult.rewardAmount = rewardResult.rewardAmount * (1 + tokenBonus);
+          }
+        } else if (result === 'draw') {
+          rewardResult = await chessRewards.rewardForDraw(difficulty);
+          // Apply premium bonus if applicable
+          if (selectedMode === 'premium' && rewardResult.success) {
+            rewardResult.xpAmount = Math.floor(rewardResult.xpAmount * (1 + xpBonus));
+            rewardResult.rewardAmount = rewardResult.rewardAmount * (1 + tokenBonus);
+          }
+        }
+        
+        if (rewardResult && rewardResult.success) {
+          showNotification(
+            'Rewards Earned!',
+            `You earned ${rewardResult.rewardAmount.toFixed(3)} EMB tokens and ${rewardResult.xpAmount} XP`
+          );
+        }
+      } catch (err) {
+        console.error("Error processing rewards:", err);
+      }
+    }
     
     // Generate trading signal for winning in premium mode or sometimes in free mode
     if (result === 'win' && (selectedMode === 'premium' || Math.random() < 0.3)) {
@@ -256,30 +370,30 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
       }
     };
 
-    if (isPlaying && !checkWebGLSupport()) {
+    if (isPlaying && !use2DMode && !checkWebGLSupport()) {
       showNotification('WebGL Not Supported', 'Your browser does not support WebGL, which is required for 3D chess.');
       setLoadError(true);
     }
-  }, [isPlaying]);
+  }, [isPlaying, use2DMode]);
 
   return (
-    <div className="bg-gray-800 rounded-xl shadow-xl p-6">
+    <div className="relative bg-gray-900/40 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-gray-700/30">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-white">3D Chess Arcade</h2>
+        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#00FFA3] to-[#9945FF]">3D Chess Arcade</h2>
         
         {isPlaying && (
           <div className="flex items-center space-x-4">
-            <div className="bg-gray-700 px-3 py-1 rounded-md">
+            <div className="bg-gray-800/60 px-4 py-1.5 rounded-lg">
               <span className="text-gray-300">Time: </span>
-              <span className="text-blue-400 font-medium">{formatTime(timeSpent)}</span>
+              <span className="text-[#00FFA3] font-medium">{formatTime(timeSpent)}</span>
             </div>
             {selectedMode === 'premium' ? (
-              <div className="bg-purple-700/30 px-3 py-1 rounded-md">
-                <span className="text-purple-400 font-medium">Premium Mode</span>
+              <div className="bg-[#9945FF]/30 px-4 py-1.5 rounded-lg border border-[#9945FF]/30">
+                <span className="text-[#9945FF] font-medium">Premium Mode</span>
               </div>
             ) : (
-              <div className="bg-gray-700/50 px-3 py-1 rounded-md">
-                <span className="text-gray-400 font-medium">Free Mode</span>
+              <div className="bg-gray-800/50 px-4 py-1.5 rounded-lg">
+                <span className="text-gray-300 font-medium">Free Mode</span>
               </div>
             )}
           </div>
@@ -287,22 +401,22 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
       </div>
 
       {/* New Banner for Trade Signal Integration */}
-      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 p-4 rounded-xl border border-blue-800/30 mb-6">
+      <div className="bg-gradient-to-r from-[#9945FF]/10 to-[#00FFA3]/10 p-6 rounded-xl border border-[#9945FF]/20 mb-6">
         <div className="flex items-start">
-          <div className="flex-shrink-0 bg-blue-800/30 p-2 rounded-lg mr-4">
-            <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex-shrink-0 bg-[#9945FF]/20 p-3 rounded-lg mr-4">
+            <svg className="w-8 h-8 text-[#9945FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-blue-300 font-semibold text-lg mb-1">Play Chess, Earn Trading Signals!</h3>
-            <p className="text-gray-300 text-sm">
+            <h3 className="text-[#00FFA3] font-semibold text-lg mb-2">Play Chess, Earn Trading Signals!</h3>
+            <p className="text-gray-300">
               Win games to unlock exclusive AIXBT trading signals. Premium mode players get higher chance 
               of receiving whale movement alerts directly from @mobyagent.
             </p>
-            <div className="mt-2 flex items-center space-x-2">
-              <div className="bg-blue-800/40 px-2 py-1 rounded text-xs text-blue-300">Win in Premium = 100% Signal</div>
-              <div className="bg-blue-800/40 px-2 py-1 rounded text-xs text-blue-300">Win in Free = 30% Signal</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <div className="bg-[#9945FF]/20 px-3 py-1.5 rounded-lg text-xs text-[#9945FF]">Win in Premium = 100% Signal</div>
+              <div className="bg-[#00FFA3]/20 px-3 py-1.5 rounded-lg text-xs text-[#00FFA3]">Win in Free = 30% Signal</div>
             </div>
           </div>
         </div>
@@ -313,15 +427,17 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
         {notifications.map(notification => (
           <div 
             key={notification.id} 
-            className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-4 flex flex-col animate-fade-in"
+            className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg shadow-xl p-4 flex flex-col animate-fade-in"
           >
             <div className="flex justify-between items-start">
               <h4 className="font-medium text-white">{notification.title}</h4>
               <button 
                 onClick={() => dismissNotification(notification.id)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white transition-colors"
               >
-                &times;
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             <p className="text-gray-300 text-sm mt-1">{notification.message}</p>
@@ -331,25 +447,25 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
       
       {!isPlaying ? (
         <div className="flex flex-col items-center justify-center py-10">
-          <div className="bg-gray-700/50 p-6 rounded-xl max-w-md w-full">
-            <h3 className="text-xl font-medium text-white mb-4">Start a New Game</h3>
+          <div className="bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl max-w-md w-full border border-gray-700/30">
+            <h3 className="text-xl font-medium text-white mb-5">Start a New Game</h3>
             
-            <div className="p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg mb-6">
-              <p className="text-blue-100">
-                Enhance your gameplay with <span className="font-bold">Premium Mode</span>. Burn 1 EMB token 
+            <div className="p-5 bg-gradient-to-r from-[#9945FF]/10 to-[#00FFA3]/10 border border-[#9945FF]/20 rounded-xl mb-6">
+              <p className="text-white">
+                Enhance your gameplay with <span className="font-bold text-[#00FFA3]">Premium Mode</span>. Burn 1 EMB token 
                 for win bonuses, loss protection, and advanced AI strategies!
               </p>
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-300 mb-2">Select Mode:</label>
-              <div className="flex space-x-3">
+              <label className="block text-gray-300 mb-3 font-medium">Select Mode:</label>
+              <div className="flex space-x-4">
                 <button
                   onClick={() => setSelectedMode('free')}
-                  className={`flex-1 py-2 px-4 rounded-md transition-colors ${
+                  className={`flex-1 py-3 px-4 rounded-xl transition ${
                     selectedMode === 'free' 
-                      ? 'bg-gray-600 text-white border border-gray-500' 
-                      : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700'
+                      ? 'bg-gray-800 text-white border-2 border-[#00FFA3]' 
+                      : 'bg-gray-800/50 text-gray-300 border border-gray-700/50 hover:border-gray-600'
                   }`}
                 >
                   <span className="block text-sm mb-1">Free Play</span>
@@ -357,20 +473,20 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
                 </button>
                 <button
                   onClick={() => setSelectedMode('premium')}
-                  className={`flex-1 py-2 px-4 rounded-md transition-colors ${
+                  className={`flex-1 py-3 px-4 rounded-xl transition ${
                     selectedMode === 'premium' 
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-700 text-white border border-purple-500' 
-                      : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700'
+                      ? 'bg-gradient-to-r from-[#9945FF]/60 to-[#9945FF]/80 text-white border border-[#9945FF]' 
+                      : 'bg-gray-800/50 text-gray-300 border border-gray-700/50 hover:border-gray-600'
                   }`}
                 >
                   <span className="block text-sm mb-1">Premium</span>
                   <span className="block text-xs text-gray-300">1 EMB token (25% bonus)</span>
                 </button>
               </div>
-              <div className="text-xs text-right mt-1">
+              <div className="text-xs text-right mt-2">
                 <button 
                   onClick={openPremiumModal}
-                  className="text-blue-400 hover:text-blue-300"
+                  className="text-[#00FFA3] hover:text-[#00FFA3]/80 transition-colors"
                 >
                   View premium benefits
                 </button>
@@ -378,16 +494,16 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-300 mb-2">Select Difficulty:</label>
+              <label className="block text-gray-300 mb-3 font-medium">Select Difficulty:</label>
               <div className="flex space-x-3">
                 {['easy', 'medium', 'hard'].map(level => (
                   <button
                     key={level}
                     onClick={() => setDifficulty(level)}
-                    className={`flex-1 py-2 px-4 rounded-md capitalize transition-colors ${
+                    className={`flex-1 py-3 px-4 rounded-lg capitalize transition ${
                       difficulty === level 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                        ? 'bg-gradient-to-r from-[#00FFA3]/80 to-[#00FFA3] text-gray-900 font-medium' 
+                        : 'bg-gray-800/60 text-gray-300 hover:bg-gray-800/90'
                     }`}
                   >
                     {level}
@@ -396,9 +512,54 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
               </div>
             </div>
             
+            <div className="mb-6">
+              <label className="block text-gray-300 mb-3 font-medium">Rendering Mode:</label>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setUse2DMode(false)}
+                  className={`flex-1 py-3 px-4 rounded-lg transition ${
+                    !use2DMode 
+                      ? 'bg-gradient-to-r from-[#9945FF]/80 to-[#9945FF] text-white' 
+                      : 'bg-gray-800/60 text-gray-300 hover:bg-gray-800/90'
+                  }`}
+                >
+                  <span className="block text-sm mb-1">3D Mode</span>
+                  <span className="block text-xs text-gray-300">Immersive experience</span>
+                </button>
+                <button
+                  onClick={() => setUse2DMode(true)}
+                  className={`flex-1 py-3 px-4 rounded-lg transition ${
+                    use2DMode 
+                      ? 'bg-gradient-to-r from-[#00FFA3]/80 to-[#00FFA3] text-gray-900 font-medium' 
+                      : 'bg-gray-800/60 text-gray-300 hover:bg-gray-800/90'
+                  }`}
+                >
+                  <span className="block text-sm mb-1">2D Mode</span>
+                  <span className="block text-xs text-gray-300">Compatibility mode</span>
+                </button>
+              </div>
+            </div>
+            
+            {selectedMode === 'premium' && !connected && (
+              <div className="mb-6 p-5 bg-yellow-900/20 backdrop-blur-sm border border-yellow-700/30 rounded-xl">
+                <div className="flex items-center space-x-3 mb-3">
+                  <svg className="w-6 h-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <p className="text-yellow-200 font-medium">Connect your wallet to play in premium mode</p>
+                </div>
+                <div>
+                  <WalletConnectionButton 
+                    className="w-full py-3 border border-[#9945FF]/50 shadow-lg"
+                  />
+                </div>
+              </div>
+            )}
+            
             <button
               onClick={handleStartGame}
-              className="w-full py-3 px-4 rounded-lg font-medium transition-colors bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white"
+              className="w-full py-4 px-6 rounded-xl font-medium transition transform hover:scale-105 
+                bg-gradient-to-r from-[#00FFA3] to-[#9945FF] hover:from-[#00FFA3]/90 hover:to-[#9945FF]/90 text-gray-900"
             >
               {selectedMode === 'premium' 
                 ? `Start Premium Game (1 EMB)` 
@@ -407,7 +568,7 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
             
             <div className="mt-4 text-center text-sm text-gray-400">
               {selectedMode === 'premium' ? (
-                <span>Your balance: <span className="text-purple-400 font-medium">{_embBalance} EMB</span></span>
+                <span>Your balance: <span className="text-[#9945FF] font-medium">{_embBalance} EMB</span></span>
               ) : (
                 <span>Upgrade to premium mode for better rewards!</span>
               )}
@@ -416,293 +577,241 @@ const ArcadeChess = ({ embBalance = 0, onTokenBurn = () => {}, isSimulationMode 
         </div>
       ) : (
         <div className="relative">
-          {/* Contain our ChessGame component in a fixed height container */}
-          <div className="h-[600px] w-full bg-black/20 rounded-xl overflow-hidden">
+          {/* Chess Game Container */}
+          <div className="h-[600px] w-full bg-black/40 rounded-xl overflow-hidden border border-gray-700/30">
             {loadError ? (
-              <ChessFallback onRetry={handleChessRetry} />
+              <ChessFallback 
+                onRetry={handleChessRetry}
+                onSwitchTo2D={handleSwitchTo2D}
+              />
+            ) : use2DMode ? (
+              <ChessIsolated 
+                difficulty={difficulty} 
+                onGameEnd={handleGameEnd}
+              />
             ) : (
               <ChessGame 
                 difficulty={difficulty} 
                 onGameEnd={handleGameEnd}
-                isIsolated={true} 
+                isIsolated={true}
+                isPremium={selectedMode === 'premium'} 
               />
             )}
           </div>
           
           {/* Game controls */}
-          <div className="absolute top-4 right-4 bg-gray-800/80 p-3 rounded-lg backdrop-blur-sm">
-            <div className="text-sm text-gray-300 mb-2">Difficulty: <span className="text-blue-400 capitalize">{difficulty}</span></div>
+          <div className="absolute top-4 right-4 bg-gray-900/80 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-gray-700/30">
+            <div className="text-sm text-gray-300 mb-3">
+              Difficulty: <span className="text-[#00FFA3] capitalize">{difficulty}</span>
+            </div>
             <button 
               onClick={() => {
                 clearInterval(timerRef.current);
                 setIsPlaying(false);
                 showNotification('Game Forfeited', 'You forfeited the current game.');
               }}
-              className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded"
+              className="bg-red-600/90 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg transition"
             >
               Forfeit Game
             </button>
           </div>
-          
-          {/* Premium badge */}
-          {selectedMode === 'premium' && !loadError && (
-            <div className="absolute top-4 left-4 bg-gradient-to-r from-purple-600 to-indigo-700 px-3 py-1 rounded-lg text-white text-sm font-medium flex items-center">
-              <svg className="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-              </svg>
-              Premium Mode
-            </div>
-          )}
         </div>
       )}
       
-      {/* Game history */}
-      {playHistory.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-xl font-medium text-white mb-4">Game History</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-gray-400 border-b border-gray-700">
-                  <th className="pb-2 text-left">Date</th>
-                  <th className="pb-2 text-left">Difficulty</th>
-                  <th className="pb-2 text-left">Result</th>
-                  <th className="pb-2 text-left">Duration</th>
-                  <th className="pb-2 text-right">Mode</th>
-                </tr>
-              </thead>
-              <tbody>
-                {playHistory.map(game => (
-                  <tr key={game.id} className="border-b border-gray-700 hover:bg-gray-700/30">
-                    <td className="py-2">{new Date(game.date).toLocaleDateString()}</td>
-                    <td className="py-2 capitalize">{game.difficulty}</td>
-                    <td className={`py-2 ${
-                      game.result === 'win' ? 'text-green-500' : 
-                      game.result === 'draw' ? 'text-yellow-500' : 'text-red-500'
-                    }`}>
-                      {game.result === 'win' ? 'Victory' : 
-                       game.result === 'draw' ? 'Draw' : 'Defeat'}
-                    </td>
-                    <td className="py-2">{formatTime(game.duration)}</td>
-                    <td className="py-2 text-right">
-                      {game.mode === 'premium' ? (
-                        <span className="text-purple-400">Premium</span>
-                      ) : (
-                        <span className="text-gray-400">Free</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Premium Benefits Modal */}
-      <Modal 
+      {/* Premium Features Modal */}
+      <Modal
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-        title="Premium Chess Benefits"
-        primaryAction={{
-          label: "Get Premium",
-          onClick: () => {
-            setSelectedMode('premium');
-            setShowPremiumModal(false);
-          }
-        }}
-        secondaryAction={{
-          label: "Maybe Later",
-          onClick: () => setShowPremiumModal(false)
-        }}
+        title="Premium Chess Features"
       >
-        <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 bg-purple-900/30 p-2 rounded-lg">
-              <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-white font-medium">Enhanced XP Rewards</h4>
-              <p className="text-gray-300 text-sm">Earn 25% more XP when you win games in premium mode.</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 bg-purple-900/30 p-2 rounded-lg">
-              <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-white font-medium">Advanced AI Strategies</h4>
-              <p className="text-gray-300 text-sm">Premium mode AI uses enhanced opening book strategies.</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 bg-purple-900/30 p-2 rounded-lg">
-              <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M6.625 2.655A9 9 0 0119 11a1 1 0 11-2 0 7 7 0 00-9.625-6.492 1 1 0 11-.75-1.853zM4.662 4.959A1 1 0 014.75 6.37 6.97 6.97 0 003 11a1 1 0 11-2 0 8.97 8.97 0 012.25-5.953 1 1 0 011.412-.088z" clipRule="evenodd" />
-                <path fillRule="evenodd" d="M5 11a5 5 0 1110 0 1 1 0 11-2 0 3 3 0 10-6 0c0 1.677-.345 3.276-.968 4.729a1 1 0 11-1.838-.789A9.964 9.964 0 005 11z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-white font-medium">Loss Protection</h4>
-              <p className="text-gray-300 text-sm">When you lose in premium mode, you only lose 50% of the normal XP.</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 bg-purple-900/30 p-2 rounded-lg">
-              <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-white font-medium">Support Development</h4>
-              <p className="text-gray-300 text-sm">Your EMB tokens help us improve Embassy AI's trading algorithms.</p>
-            </div>
-          </div>
-          
-          {/* New benefit section for trading signals */}
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 bg-blue-900/30 p-2 rounded-lg">
-              <svg className="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-white font-medium">Premium Trading Signals</h4>
-              <p className="text-gray-300 text-sm">100% chance to receive an AIXBT trading signal when you win in premium mode.</p>
-            </div>
-          </div>
-          
-          <div className="mt-4 p-4 bg-gray-800 rounded-lg">
-            <h4 className="text-white font-medium mb-1">Premium cost:</h4>
-            <div className="flex items-center">
-              <span className="text-purple-400 font-bold text-2xl">1</span>
-              <span className="text-purple-300 ml-2">EMB token per game</span>
-            </div>
-            <p className="text-gray-400 text-xs mt-2">
-              EMB tokens are used to access premium features across the Embassy AI platform.
+        <div className="p-4">
+          <div className="bg-gradient-to-r from-[#9945FF]/20 to-[#9945FF]/10 p-5 rounded-xl mb-6">
+            <h3 className="text-xl font-semibold text-[#9945FF] mb-2">Premium Mode Benefits</h3>
+            <p className="text-gray-300">
+              Enhance your chess experience with premium mode. Burn 1 EMB token per game to unlock special features.
             </p>
+          </div>
+          
+          <div className="space-y-5">
+            <BenefitItem
+              title="25% XP Bonus for Wins"
+              description="Receive 25% more XP when you win a chess game in premium mode."
+              icon={<svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
+              </svg>}
+            />
+            
+            <BenefitItem
+              title="20% EMB Token Bonus"
+              description="Earn 20% more EMB tokens from game rewards when playing in premium mode."
+              icon={<svg className="w-6 h-6 text-[#00FFA3]" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
+              </svg>}
+            />
+            
+            <BenefitItem
+              title="Loss Protection"
+              description="50% reduction in XP loss when losing a game in premium mode."
+              icon={<svg className="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+              </svg>}
+            />
+            
+            <BenefitItem
+              title="Guaranteed Trade Signal"
+              description="100% chance to receive a trading signal when winning in premium mode."
+              icon={<svg className="w-6 h-6 text-[#9945FF]" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+              </svg>}
+            />
+            
+            <BenefitItem
+              title="Advanced AI"
+              description="Experience smarter AI moves with better positional understanding."
+              icon={<svg className="w-6 h-6 text-cyan-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clipRule="evenodd" />
+              </svg>}
+            />
+          </div>
+          
+          <div className="mt-6 p-4 bg-[#00FFA3]/10 border border-[#00FFA3]/30 rounded-lg text-sm text-gray-300">
+            <p className="flex items-center">
+              <svg className="w-4 h-4 text-[#00FFA3] mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              Premium mode costs 1 EMB token per game and provides enhanced rewards and benefits.
+            </p>
+          </div>
+          
+          <div className="mt-5 flex justify-end">
+            <button
+              onClick={() => setShowPremiumModal(false)}
+              className="px-6 py-2.5 bg-gradient-to-r from-[#9945FF] to-[#00FFA3] text-gray-900 font-medium rounded-lg transform transition hover:scale-105"
+            >
+              Got it
+            </button>
           </div>
         </div>
       </Modal>
       
-      {/* New Trade Signal Modal */}
+      {/* Trade Signal Modal */}
       <Modal
         isOpen={showTradeSignalModal}
         onClose={() => setShowTradeSignalModal(false)}
         title="Trading Signal Unlocked!"
-        primaryAction={{
-          label: "View in Trade Tab",
-          onClick: () => {
-            window.location.href = '/trade';
-            setShowTradeSignalModal(false);
-          }
-        }}
-        secondaryAction={{
-          label: "Close",
-          onClick: () => setShowTradeSignalModal(false)
-        }}
       >
         {tradeSignal && (
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 bg-blue-900/30 p-3 rounded-lg mr-4">
-                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-blue-300 font-semibold text-lg mb-1">
-                  AIXBT Trading Signal
-                </h3>
-                <p className="text-gray-300 text-sm">
-                  Your chess victory has unlocked a high-confidence trading opportunity!
-                </p>
-              </div>
-            </div>
-            
-            <div className={`p-4 rounded-lg border ${
-              tradeSignal.direction === 'long' 
-                ? 'bg-green-900/20 border-green-700/30' 
-                : 'bg-red-900/20 border-red-700/30'
-            }`}>
-              <div className="flex justify-between items-center mb-3">
-                <div className="flex items-center">
-                  <div className={`w-2 h-10 rounded-full mr-3 ${
-                    tradeSignal.direction === 'long' ? 'bg-green-500' : 'bg-red-500'
-                  }`}></div>
-                  <div>
-                    <h4 className="text-white font-medium">{tradeSignal.market} {tradeSignal.direction.toUpperCase()}</h4>
-                    <p className="text-xs text-gray-400">
-                      {tradeSignal.confidence}% confidence • Generated now
-                    </p>
-                  </div>
-                </div>
-                <div className={`text-sm font-mono px-2 py-1 rounded ${
-                  tradeSignal.direction === 'long' ? 'bg-green-900/40 text-green-400' : 'bg-red-900/40 text-red-400'
+          <div className="p-4">
+            <div className="bg-gradient-to-r from-[#00FFA3]/20 to-[#9945FF]/20 p-6 rounded-xl mb-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-[#00FFA3]">{tradeSignal.market}</h3>
+                <span className={`uppercase font-bold px-4 py-1 rounded-full text-sm ${
+                  tradeSignal.direction === 'long' 
+                    ? 'bg-[#00FFA3]/20 text-[#00FFA3]' 
+                    : 'bg-red-500/20 text-red-400'
                 }`}>
-                  {tradeSignal.direction === 'long' ? '↗ BUY' : '↘ SELL'}
-                </div>
-              </div>
-              
-              <p className="text-gray-300 text-sm mb-3">{tradeSignal.reason}</p>
-              
-              <div className="grid grid-cols-3 gap-2 mb-3 text-sm">
-                <div className="bg-gray-800/60 p-2 rounded">
-                  <div className="text-gray-400">Entry</div>
-                  <div className="text-white font-medium">${tradeSignal.suggestedEntry.toFixed(2)}</div>
-                </div>
-                <div className="bg-gray-800/60 p-2 rounded">
-                  <div className="text-gray-400">Target</div>
-                  <div className={`font-medium ${tradeSignal.direction === 'long' ? 'text-green-400' : 'text-red-400'}`}>
-                    ${tradeSignal.target.toFixed(2)}
-                  </div>
-                </div>
-                <div className="bg-gray-800/60 p-2 rounded">
-                  <div className="text-gray-400">Stop Loss</div>
-                  <div className="text-red-400 font-medium">${tradeSignal.stopLoss.toFixed(2)}</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-800/60 p-3 rounded-lg">
-              <p className="text-sm text-gray-300">
-                This signal has been added to your Trade Tab. Visit the trading section to execute this trade 
-                through Photon or set up auto-trading.
-              </p>
-            </div>
-            
-            <div className="p-3 border border-blue-900/30 rounded-lg bg-gradient-to-r from-blue-900/20 to-indigo-900/20">
-              <div className="flex items-center text-sm">
-                <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-blue-300">
-                  Win more chess games in premium mode to unlock more trading signals!
+                  {tradeSignal.direction}
                 </span>
               </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <div className="bg-[#9945FF]/20 px-3 py-1.5 rounded-lg text-xs text-[#9945FF]">
+                  Confidence: {tradeSignal.confidence}%
+                </div>
+                <div className="bg-gray-800/60 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs text-gray-300">
+                  Generated: Just now
+                </div>
+              </div>
             </div>
+            
+            <div className="space-y-5">
+              <div>
+                <h4 className="text-gray-300 font-medium mb-2">Signal Analysis:</h4>
+                <p className="text-gray-400 bg-gray-800/40 p-4 rounded-lg">{tradeSignal.reason}</p>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-gray-800/50 backdrop-blur-sm p-4 rounded-xl border border-gray-700/30">
+                  <div className="text-sm text-gray-400">Entry Point</div>
+                  <div className="text-xl font-semibold text-white">${tradeSignal.suggestedEntry.toFixed(2)}</div>
+                </div>
+                
+                <div className="bg-gray-800/50 backdrop-blur-sm p-4 rounded-xl border border-gray-700/30">
+                  <div className="text-sm text-gray-400">Target Price</div>
+                  <div className="text-xl font-semibold text-[#00FFA3]">${tradeSignal.target.toFixed(2)}</div>
+                </div>
+                
+                <div className="bg-gray-800/50 backdrop-blur-sm p-4 rounded-xl border border-gray-700/30">
+                  <div className="text-sm text-gray-400">Stop Loss</div>
+                  <div className="text-xl font-semibold text-red-400">${tradeSignal.stopLoss.toFixed(2)}</div>
+                </div>
+              </div>
+              
+              <div className="p-5 bg-[#9945FF]/10 border border-[#9945FF]/20 rounded-xl">
+                <h4 className="text-[#9945FF] font-medium flex items-center mb-3">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  Risk Management
+                </h4>
+                <ul className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <li className="bg-gray-800/30 p-3 rounded-lg text-sm">
+                    <div className="text-xs text-gray-400">Potential profit</div>
+                    <div className="text-[#00FFA3] font-medium">{((tradeSignal.target - tradeSignal.suggestedEntry) / tradeSignal.suggestedEntry * 100).toFixed(2)}%</div>
+                  </li>
+                  <li className="bg-gray-800/30 p-3 rounded-lg text-sm">
+                    <div className="text-xs text-gray-400">Potential loss</div>
+                    <div className="text-red-400 font-medium">{((tradeSignal.stopLoss - tradeSignal.suggestedEntry) / tradeSignal.suggestedEntry * 100).toFixed(2)}%</div>
+                  </li>
+                  <li className="bg-gray-800/30 p-3 rounded-lg text-sm">
+                    <div className="text-xs text-gray-400">Risk-reward ratio</div>
+                    <div className="text-[#9945FF] font-medium">{Math.abs((tradeSignal.target - tradeSignal.suggestedEntry) / (tradeSignal.stopLoss - tradeSignal.suggestedEntry)).toFixed(2)}</div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-between">
+              <button
+                onClick={() => setShowTradeSignalModal(false)}
+                className="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition"
+              >
+                Close
+              </button>
+              
+              <a
+                href="/trade"
+                className="px-5 py-2.5 bg-gradient-to-r from-[#00FFA3] to-[#00FFA3]/80 text-gray-900 font-medium rounded-lg flex items-center transform transition hover:scale-105"
+              >
+                <span>Open Trading Panel</span>
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+            
+            <p className="mt-4 text-xs text-gray-500 text-center">
+              This signal was generated by AIXBT based on your chess game victory.
+              {selectedMode === 'premium' && ' Premium mode users receive high-quality signals with every win!'}
+            </p>
           </div>
         )}
       </Modal>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };
+
+// Benefit item component for Premium modal
+const BenefitItem = ({ title, description, icon }) => (
+  <div className="flex p-3 bg-gray-800/30 rounded-lg border border-gray-700/30">
+    <div className="flex-shrink-0 w-10 h-10 bg-gray-700/40 rounded-lg flex items-center justify-center">
+      {icon}
+    </div>
+    <div className="ml-4">
+      <h4 className="text-white font-medium">{title}</h4>
+      <p className="text-gray-400 text-sm mt-1">{description}</p>
+    </div>
+  </div>
+);
 
 export default ArcadeChess;

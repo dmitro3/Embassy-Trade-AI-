@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
-import Image from 'next/image';
 import { EMB_TOKEN_CONFIG } from '@/lib/embToken';
-import { useWallet } from '@/lib/WalletProvider';
+import { WalletConnectionButton } from '@/lib/WalletProvider';
 
 /**
  * Specialized modal for wallet connection using the new design
@@ -12,13 +11,46 @@ import { useWallet } from '@/lib/WalletProvider';
  */
 const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
   const [activeTab, setActiveTab] = useState('connect'); // 'connect' or 'buy'
-  const { select, connect, connecting, connected, wallet } = useWallet();
+  const [walletError, setWalletError] = useState(null);
+  
+  // Safely get the wallet context
+  const getWalletContext = () => {
+    try {
+      // Import and use the wallet hook only when needed
+      const { useWallet } = require('@/lib/WalletProvider');
+      return useWallet();
+    } catch (error) {
+      console.error("Error accessing wallet context:", error);
+      return {
+        connected: false,
+        connecting: false,
+        select: () => {},
+        connect: async () => {},
+        wallet: null,
+        wallets: []
+      };
+    }
+  };
+  
+  const walletContext = getWalletContext();
+  const { select, connect, connecting, connected, wallet, wallets = [] } = walletContext;
   
   // Handle wallet connection
   const handleConnectWallet = async (walletName) => {
     try {
+      setWalletError(null);
+      
+      // Find the wallet adapter by name
+      const walletAdapter = wallets.find(w => 
+        w?.adapter?.name?.toLowerCase() === walletName.toLowerCase()
+      );
+      
+      if (!walletAdapter) {
+        throw new Error(`Wallet ${walletName} not found or not installed`);
+      }
+      
       // Select the wallet adapter
-      select(walletName);
+      select(walletAdapter.adapter.name);
       
       // Connect to the selected wallet
       await connect();
@@ -34,6 +66,7 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
       }
     } catch (error) {
       console.error(`Error connecting to ${walletName}:`, error);
+      setWalletError(`Failed to connect: ${error.message || 'Unknown error'}`);
     }
   };
   
@@ -43,18 +76,22 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
       onClose();
     }
   }, [connected, wallet, onClose]);
+
+  // Check if wallet is installed
+  const isWalletAvailable = (name) => {
+    if (!wallets || !Array.isArray(wallets)) return false;
+    
+    return wallets.some(w => 
+      w?.adapter?.name?.toLowerCase() === name.toLowerCase() && 
+      w.readyState === 'Installed'
+    );
+  };
   
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={activeTab === 'connect' ? "Connect Your Wallet" : "Get EMB Tokens"}
-      primaryAction={{
-        label: activeTab === 'connect' ? "Connect Wallet" : "Buy EMB Tokens",
-        onClick: activeTab === 'connect' 
-          ? () => handleConnectWallet('phantom') // Default to phantom if no selection
-          : () => window.open(EMB_TOKEN_CONFIG.links.pump, '_blank'),
-      }}
       secondaryAction={{
         label: "Cancel",
         onClick: onClose,
@@ -91,41 +128,25 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
               Connect your wallet to access all features and manage your trades.
             </p>
             
+            {/* Direct wallet adapter integration */}
+            <div className="my-4">
+              <WalletConnectionButton />
+            </div>
+
             <div className="bg-gray-800/50 p-4 rounded-lg">
               <h4 className="text-white font-medium mb-2">Supported Wallets</h4>
               <div className="flex flex-wrap gap-3">
                 <WalletOption
                   name="Phantom"
-                  image="/phantom.png" 
+                  image="/images/tokens/sol.png" 
                   onClick={() => handleConnectWallet('phantom')} 
+                  disabled={!isWalletAvailable('phantom')}
                 />
                 <WalletOption
                   name="Solflare"
-                  image="/images/wallets/solflare.png" 
+                  image="/images/tokens/sol.png" 
                   onClick={() => handleConnectWallet('solflare')} 
-                />
-                <WalletOption
-                  name="Backpack"
-                  image="/images/wallets/backpack.png" 
-                  onClick={() => handleConnectWallet('backpack')} 
-                />
-                <WalletOption
-                  name="Pumpfun"
-                  image="/images/wallets/pumpfun.png" 
-                  onClick={() => handleConnectWallet('pumpfun')}
-                  disabled 
-                />
-                <WalletOption
-                  name="Moby"
-                  image="/images/wallets/moby.png" 
-                  onClick={() => handleConnectWallet('moby')} 
-                  disabled
-                />
-                <WalletOption
-                  name="Axibt"
-                  image="/images/wallets/axibt.png" 
-                  onClick={() => handleConnectWallet('axibt')} 
-                  disabled
+                  disabled={!isWalletAvailable('solflare')}
                 />
               </div>
             </div>
@@ -135,6 +156,17 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-3"></div>
                   <span className="text-blue-300">Connecting to wallet...</span>
+                </div>
+              </div>
+            )}
+
+            {walletError && (
+              <div className="bg-red-900/30 p-4 rounded-lg border border-red-700/40">
+                <div className="flex items-center">
+                  <svg className="h-5 w-5 text-red-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-red-300">{walletError}</span>
                 </div>
               </div>
             )}
@@ -213,17 +245,32 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
                   </svg>
                 </a>
                 
-                <div className="p-3 bg-gray-700/30 rounded-lg border border-gray-700">
+                {/* Direct link to the SwapToEMB component */}
+                <a 
+                  href="/trade?tab=swap" 
+                  className="flex items-center justify-between p-3 bg-blue-900/30 hover:bg-blue-800/40 rounded-lg border border-blue-800/40 transition-colors"
+                  onClick={(e) => {
+                    // If not connected, prevent navigation and show warning
+                    if (!connected) {
+                      e.preventDefault();
+                      setWalletError("Please connect your wallet first to swap tokens");
+                      setActiveTab('connect');
+                    }
+                  }}
+                >
                   <div className="flex items-center">
-                    <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center mr-3">
-                      <span className="text-gray-400 text-lg font-bold">J</span>
+                    <div className="w-8 h-8 bg-blue-800/60 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-blue-200 text-lg font-bold">E</span>
                     </div>
                     <div>
-                      <div className="font-medium text-white">Jupiter Aggregator</div>
-                      <div className="text-xs text-gray-400">Coming soon</div>
+                      <div className="font-medium text-white">Swap to EMB</div>
+                      <div className="text-xs text-blue-300">Swap tokens directly in app</div>
                     </div>
                   </div>
-                </div>
+                  <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </a>
               </div>
             </div>
             
@@ -260,10 +307,10 @@ const WalletOption = ({ name, image, onClick, disabled = false }) => {
       disabled={disabled}
     >
       <div className="w-6 h-6 relative">
-        <Image src={image} alt={name} width={24} height={24} />
+        <img src={image} alt={name} width={24} height={24} />
       </div>
       <span className={`text-sm ${disabled ? 'text-gray-400' : 'text-blue-200'}`}>
-        {name} {disabled && '(Coming Soon)'}
+        {name} {disabled && '(Not Detected)'}
       </span>
     </button>
   );

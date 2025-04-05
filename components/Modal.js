@@ -3,9 +3,9 @@
 import React, { useEffect, useRef } from 'react';
 
 /**
- * Modern Modal Component for Embassy Trade AI
+ * Modern Modal Component for Embassy Trade AI with Solana-inspired design
  * Features:
- * - Dark background with glowing borders
+ * - Dark background with glowing borders using Solana colors
  * - Modern typography
  * - Responsive design
  * - Keyboard accessibility (Esc to close)
@@ -80,7 +80,7 @@ const Modal = ({
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-md"
       onClick={handleBackdropClick}
       aria-modal="true"
       role="dialog"
@@ -91,16 +91,16 @@ const Modal = ({
         className={`${getSizeClasses()} w-full mx-4 relative animate-modal-fade-in`}
         tabIndex={-1}
       >
-        <div className="relative bg-gray-900 rounded-lg border border-transparent p-0 shadow-2xl">
+        <div className="relative bg-[#1A1F2E]/95 backdrop-blur-sm rounded-xl border border-transparent p-0 shadow-2xl">
           {/* Faux-gradient animated border */}
-          <div className="absolute inset-0 rounded-lg border border-gray-700 overflow-hidden">
-            <div className="glow-border"></div>
+          <div className="absolute inset-0 rounded-xl border border-gray-700/50 overflow-hidden">
+            <div className="solana-glow-border"></div>
           </div>
           
           {/* Modal Header */}
-          <div className="p-5 border-b border-gray-800">
+          <div className="px-6 py-5 border-b border-gray-800/50">
             <h3 
-              className="text-xl font-semibold text-white"
+              className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#00FFA3] to-[#9945FF]"
               id="modal-title"
             >
               {title}
@@ -108,7 +108,7 @@ const Modal = ({
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+              className="absolute top-5 right-5 text-gray-400 hover:text-white transition-colors"
               aria-label="Close modal"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -118,18 +118,18 @@ const Modal = ({
           </div>
           
           {/* Modal Content */}
-          <div className="p-6 max-h-[70vh] overflow-y-auto">
+          <div className="px-6 py-5 max-h-[70vh] overflow-y-auto">
             {children}
           </div>
 
           {/* Modal Footer */}
           {(primaryAction || secondaryAction) && (
-            <div className="p-5 border-t border-gray-800 flex justify-end space-x-3">
+            <div className="px-6 py-5 border-t border-gray-800/50 flex justify-end space-x-3">
               {secondaryAction && (
                 <button
                   type="button"
                   onClick={secondaryAction.onClick}
-                  className="px-4 py-2 bg-gray-700 text-gray-100 rounded-md hover:bg-gray-600 transition-colors"
+                  className="px-5 py-2.5 bg-gray-800/80 text-gray-100 rounded-lg hover:bg-gray-700/80 transition-colors border border-gray-700/50"
                 >
                   {secondaryAction.label}
                 </button>
@@ -138,7 +138,7 @@ const Modal = ({
                 <button
                   type="button"
                   onClick={primaryAction.onClick}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-md font-medium transition-colors"
+                  className="px-5 py-2.5 bg-gradient-to-r from-[#00FFA3] to-[#9945FF] hover:opacity-90 text-gray-900 rounded-lg font-medium transition-all transform hover:scale-105"
                 >
                   {primaryAction.label}
                 </button>
@@ -148,14 +148,14 @@ const Modal = ({
         </div>
       </div>
 
-      {/* Styles for the glowing border effect */}
+      {/* Styles for the glowing border effect with Solana colors */}
       <style jsx global>{`
         @keyframes rotate {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
 
-        .glow-border {
+        .solana-glow-border {
           position: absolute;
           top: -150%;
           left: -150%;
@@ -163,13 +163,13 @@ const Modal = ({
           bottom: -150%;
           background: conic-gradient(
             from 0deg, 
-            rgba(76, 29, 149, 0),
-            rgba(124, 58, 237, 0.3),
-            rgba(59, 130, 246, 0.5),
-            rgba(37, 99, 235, 0.3),
-            rgba(76, 29, 149, 0)
+            rgba(0, 255, 163, 0),
+            rgba(0, 255, 163, 0.3),
+            rgba(153, 69, 255, 0.5),
+            rgba(0, 255, 163, 0.3),
+            rgba(0, 255, 163, 0)
           );
-          animation: rotate 8s linear infinite;
+          animation: rotate 12s linear infinite;
         }
 
         @keyframes modalFadeIn {
@@ -178,7 +178,7 @@ const Modal = ({
         }
 
         .animate-modal-fade-in {
-          animation: modalFadeIn 0.2s ease-out forwards;
+          animation: modalFadeIn 0.25s ease-out forwards;
         }
       `}</style>
     </div>

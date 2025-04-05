@@ -3,8 +3,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { EMB_TOKEN_CONFIG } from '@/lib/embToken';
 import { useChessRewards } from '@/lib/useChessRewards';
+import { useWallet } from '@/lib/WalletProvider';
+import ChessIsolated from './ChessIsolated';
 
-const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false }) => {
+const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false, isPremium = false }) => {
   const mountRef = useRef(null);
   const [gameStatus, setGameStatus] = useState('playing');
   const [thinking, setThinking] = useState(false);
@@ -18,10 +20,23 @@ const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false }) => 
   const [webGLSupported, setWebGLSupported] = useState(null);
   const [webGLError, setWebGLError] = useState(null);
   const [retryAttempted, setRetryAttempted] = useState(false);
+  const [showPremiumOverlay, setShowPremiumOverlay] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [embBalance, setEmbBalance] = useState(0);
+  const [renderMode, setRenderMode] = useState('loading'); // 'loading', '3d', '2d-enhanced', 'isolated'
+  const [graphicsQuality, setGraphicsQuality] = useState('auto'); // 'high', 'medium', 'low', 'auto'
+  const [renderStats, setRenderStats] = useState(null);
   const wsRef = useRef(null);
   const retryCount = useRef(0);
   const maxRetries = 3;
+  const fpsMonitorRef = useRef(null);
+  const lastFrameTimeRef = useRef(0);
+  const frameCountRef = useRef(0);
 
+  // Get wallet connection status
+  const { connected, publicKey } = useWallet();
+  
+  // Get chess rewards functionality
   const chessRewards = useChessRewards();
 
   const sceneRef = useRef(null);
@@ -36,11 +51,33 @@ const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false }) => 
   const animationFrameRef = useRef(null);
   const modulesRef = useRef(null);
   const loadTimeoutRef = useRef(null);
+  const premiumEffectsRef = useRef(null);
 
   const PIECE_COLORS = {
     w: 0xFAF0E6,
     b: 0x3B2507
   };
+
+  // Check if the user has EMB tokens to enable premium features
+  useEffect(() => {
+    const checkPremiumStatus = async () => {
+      if (connected && publicKey) {
+        try {
+          const balance = await chessRewards.getEMBBalance();
+          setEmbBalance(balance);
+          // User is premium if they have any EMB tokens or if premium mode is enabled from parent
+          setIsPremiumUser(balance > 0 || isPremium);
+        } catch (error) {
+          console.error("Error checking EMB balance:", error);
+          setIsPremiumUser(isPremium);
+        }
+      } else {
+        setIsPremiumUser(isPremium);
+      }
+    };
+
+    checkPremiumStatus();
+  }, [connected, publicKey, chessRewards, isPremium]);
 
   const detectWebGLSupport = useCallback(async () => {
     try {
@@ -56,6 +93,7 @@ const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false }) => 
       
       let gl = null;
       let contextType = null;
+      let contextVersion = 1;
       
       for (const context of contexts) {
         try {
@@ -68,6 +106,9 @@ const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false }) => 
           });
           if (gl) {
             contextType = context;
+            if (context.includes('2')) {
+              contextVersion = 2;
+            }
             break;
           }
         } catch (e) {
@@ -76,6 +117,13 @@ const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false }) => 
       }
 
       let realWebGLWorks = false;
+      let capabilities = { 
+        maxTextureSize: 0,
+        maxVertexAttribs: 0,
+        maxVaryingVectors: 0,
+        performance: 'unknown'
+      };
+      
       if (gl) {
         try {
           // Test that WebGL actually works by performing a simple operation
@@ -91,1291 +139,901 @@ const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false }) => 
               gl.deleteShader(vertexShader);
               gl.deleteShader(fragmentShader);
             }
+            
+            // Get capabilities for graphics quality determination
+            capabilities.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+            capabilities.maxVertexAttribs = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+            capabilities.maxVaryingVectors = gl.getParameter(gl.MAX_VARYING_VECTORS);
+            
+            // Performance test - draw a lot of triangles and measure time
+            const performanceTestStart = performance.now();
+            const vertexCount = 10000;
+            const vertices = new Float32Array(vertexCount * 3);
+            for (let i = 0; i < vertexCount * 3; i++) {
+              vertices[i] = Math.random();
+            }
+            
+            const buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+            
+            const performanceTestEnd = performance.now();
+            const testDuration = performanceTestEnd - performanceTestStart;
+            
+            if (testDuration < 50) {
+              capabilities.performance = 'high';
+            } else if (testDuration < 200) {
+              capabilities.performance = 'medium';
+            } else {
+              capabilities.performance = 'low';
+            }
+            
+            gl.deleteBuffer(buffer);
           } catch (shaderError) {
             console.warn("Shader test failed:", shaderError);
+            capabilities.performance = 'low';
           }
           
           realWebGLWorks = true;
         } catch (e) {
           console.error("WebGL available but not functioning:", e);
           realWebGLWorks = false;
-          setWebGLError(`WebGL context creation failed: ${e.message}`);
         }
-        
-        const loseContext = gl.getExtension('WEBGL_lose_context');
-        if (loseContext) loseContext.loseContext();
-      } else {
-        setWebGLError("WebGL context could not be created");
       }
-
-      // Browser detection logic
-      const isBrave = navigator.brave && await navigator.brave.isBrave() || false;
-      const isFirefox = navigator.userAgent.includes('Firefox/');
-      const isChrome = navigator.userAgent.includes('Chrome/');
-      const isSafari = navigator.userAgent.includes('Safari/') && !navigator.userAgent.includes('Chrome/');
-      const isEdge = navigator.userAgent.includes('Edg/');
-      const isHeadless = /\bHeadlessChrome\b/.test(navigator.userAgent);
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       
-      const hasStrictPrivacy = isBrave || isFirefox || isHeadless;
-
-      const browserDetails = {
-        hasWebGL: !!gl && realWebGLWorks,
-        contextType,
-        hasStrictPrivacy,
-        browser: { isBrave, isFirefox, isChrome, isSafari, isEdge, isHeadless, isMobile },
-        rendererType: (!!gl && realWebGLWorks) ? contextType : 'fallback'
+      const result = {
+        supported: !!gl && realWebGLWorks,
+        contextType: contextType || 'none',
+        contextVersion,
+        details: gl ? {
+          vendor: gl.getParameter(gl.VENDOR),
+          renderer: gl.getParameter(gl.RENDERER),
+          version: gl.getParameter(gl.VERSION),
+          shadingLanguageVersion: gl.getParameter(gl.SHADING_LANGUAGE_VERSION),
+          unmaskedVendor: null,
+          unmaskedRenderer: null,
+          maxTextureSize: capabilities.maxTextureSize,
+          performance: capabilities.performance
+        } : null
       };
-
-      console.info("WebGL Detection Results:", browserDetails);
-
-      // Generate specific guidance based on browser
-      let troubleshootingMessage = "";
-      if (!gl || !realWebGLWorks) {
-        if (isBrave) {
-          troubleshootingMessage = "Brave's shields may be blocking WebGL. Click the Brave shield icon in the address bar and set 'Shields' to 'Down' for this site.";
-        } else if (isFirefox) {
-          troubleshootingMessage = "Firefox may have WebGL disabled. Try typing 'about:config' in the address bar, search for 'webgl.disabled', and ensure it's set to 'false'.";
-        } else if (isSafari) {
-          troubleshootingMessage = "Safari requires WebGL to be enabled. Go to Safari > Preferences > Advanced and check 'Show Develop menu in menu bar', then select Develop > Enable WebGL.";
-        } else if (isChrome) {
-          troubleshootingMessage = "Chrome should support WebGL by default. Try typing 'chrome://flags' in the address bar, search for WebGL, and ensure it's enabled.";
+      
+      // Get unmasked info if available
+      try {
+        const ext = gl.getExtension('WEBGL_debug_renderer_info');
+        if (ext) {
+          result.details.unmaskedVendor = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL);
+          result.details.unmaskedRenderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
         }
-        
-        if (troubleshootingMessage) {
-          setWebGLError(troubleshootingMessage);
-        }
+      } catch (e) {
+        console.warn("Could not get unmasked WebGL info:", e);
       }
-
-      return browserDetails;
-    } catch (e) {
-      console.error('Error detecting WebGL support:', e);
-      setWebGLError(`Error detecting WebGL support: ${e.message}`);
-      return {
-        hasWebGL: false,
-        hasStrictPrivacy: false,
-        rendererType: 'fallback',
-        error: e.message
-      };
-    }
-  }, []);
-
-  const connectToWebSocket = useCallback(() => {
-    if (isIsolated || !window.WebSocket) return;
-
-    try {
-      if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
-        wsRef.current.close();
+      
+      setWebGLSupported(result.supported);
+      
+      if (!result.supported) {
+        setWebGLError(`WebGL not properly supported in your browser or hardware. Context: ${result.contextType}`);
+        console.warn("WebGL not supported:", result);
+        setRenderMode('2d-enhanced');
+        return false;
       }
-
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const hostname = window.location.hostname;
-      const port = hostname === 'localhost' ? ':3001' : '';
-      const wsUrl = `${protocol}//${hostname}${port}/chess`;
-
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        console.log('WebSocket connection established for chess game');
-        setIsConnectedToShyft(true);
-        
-        try {
-          ws.send(JSON.stringify({
-            type: 'chess_connect',
-            difficulty,
-            mode: '3d',
-            clientInfo: {
-              browser: navigator.userAgent,
-              webGL: webGLSupported
-            }
-          }));
-        } catch (e) {
-          console.error('Error sending initial data to WebSocket:', e);
-        }
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          console.log('Received WebSocket message:', data);
-          
-          if (data.type === 'chess_ping') {
-            ws.send(JSON.stringify({ type: 'chess_pong' }));
-          }
-        } catch (e) {
-          console.error('Error processing WebSocket message:', e);
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        setIsConnectedToShyft(false);
-      };
-
-      ws.onclose = () => {
-        console.log('WebSocket connection closed');
-        setIsConnectedToShyft(false);
-        
-        setTimeout(() => {
-          if (wsRef.current === ws) {
-            connectToWebSocket();
-          }
-        }, 5000);
-      };
-    } catch (e) {
-      console.error('Error establishing WebSocket connection:', e);
-      setIsConnectedToShyft(false);
-    }
-  }, [difficulty, isIsolated, webGLSupported]);
-
-  const handleBoardClick = useCallback((event) => {
-    if (!mountRef.current || !sceneRef.current || !cameraRef.current || !raycasterRef.current || !chessRef.current || thinking) return;
-
-    try {
-      const rect = mountRef.current.getBoundingClientRect();
-      mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-      raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
-
-      const pieceObjects = Object.values(chessPiecesRef.current);
-      const allMeshes = [];
-
-      pieceObjects.forEach(piece => {
-        if (piece && piece.children && piece.children.forEach) {
-          piece.children.forEach(child => {
-            if (child && child.isMesh) {
-              allMeshes.push(child);
-            }
-          });
-        } else if (piece && piece.isMesh) {
-          allMeshes.push(piece);
-        }
-      });
-
-      if (boardSquaresRef.current && boardSquaresRef.current.length) {
-        allMeshes.push(...boardSquaresRef.current);
-      }
-
-      const intersects = raycasterRef.current.intersectObjects(allMeshes, true);
-
-      if (intersects.length > 0) {
-        const intersected = intersects[0].object;
-
-        const isPiece = !boardSquaresRef.current.includes(intersected);
-
-        let squareName;
-        if (isPiece) {
-          const pieceObj = intersected.userData.parent || intersected;
-          const piecePos = pieceObj.position;
-
-          const squareX = Math.round(piecePos.x + 3.5);
-          const squareZ = Math.round(piecePos.z + 3.5);
-
-          if (squareX >= 0 && squareX < 8 && squareZ >= 0 && squareZ < 8) {
-            const file = String.fromCharCode(97 + squareX);
-            const rank = 8 - squareZ;
-            squareName = file + rank;
+      
+      // Set graphics quality based on capabilities
+      if (graphicsQuality === 'auto') {
+        if (result.details && result.details.performance) {
+          switch (result.details.performance) {
+            case 'high':
+              setGraphicsQuality('high');
+              break;
+            case 'medium':
+              setGraphicsQuality('medium');
+              break;
+            case 'low':
+              setGraphicsQuality('low');
+              break;
+            default:
+              // Default to medium if we can't determine
+              setGraphicsQuality('medium');
           }
         } else {
-          squareName = intersected.userData.square;
-        }
-
-        if (squareName) {
-          const pieceOnSquare = chessRef.current.get(squareName);
-
-          if (selectedSquare) {
-            if (validMoves.includes(squareName)) {
-              try {
-                const moveResult = chessRef.current.move({
-                  from: selectedSquare,
-                  to: squareName,
-                  promotion: 'q'
-                });
-
-                if (wsRef.current && isConnectedToShyft) {
-                  try {
-                    wsRef.current.send(JSON.stringify({
-                      type: 'chess_move',
-                      from: selectedSquare,
-                      to: squareName,
-                      moveResult
-                    }));
-                  } catch (e) {
-                    console.error('Error sending move to WebSocket:', e);
-                  }
-                }
-
-                updateBoardDisplay();
-
-                setSelectedSquare(null);
-                setValidMoves([]);
-                resetSquareColors();
-
-                checkGameStatus();
-
-                if (!chessRef.current.isGameOver()) {
-                  makeAIMove();
-                }
-              } catch (error) {
-                console.error('Error making move:', error);
-              }
-            } else {
-              if (pieceOnSquare && pieceOnSquare.color === 'w') {
-                setSelectedSquare(squareName);
-                highlightValidMoves(squareName);
-              } else {
-                setSelectedSquare(null);
-                setValidMoves([]);
-                resetSquareColors();
-              }
-            }
-          } else {
-            if (pieceOnSquare && pieceOnSquare.color === 'w') {
-              setSelectedSquare(squareName);
-              highlightValidMoves(squareName);
-            }
-          }
+          setGraphicsQuality('medium');
         }
       }
-    } catch (error) {
-      console.error('Error handling board click:', error);
+      
+      // Check if we support WebGL2 - better performance and effects
+      if (result.contextVersion === 2) {
+        console.log("WebGL2 supported - enabling enhanced graphics options");
+      }
+      
+      setRenderStats(result);
+      return result.supported;
+    } catch (e) {
+      console.error("Error detecting WebGL support:", e);
+      setWebGLSupported(false);
+      setWebGLError(`Error detecting WebGL: ${e.message}`);
+      setRenderMode('2d-enhanced');
+      return false;
     }
-  }, [selectedSquare, validMoves, thinking, gameStatus, isConnectedToShyft]);
+  }, [graphicsQuality]);
 
+  // Initialize the chess board
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    let isMounted = true;
-
-    // Set a loading timeout to prevent infinite loading
-    loadTimeoutRef.current = setTimeout(() => {
-      if (isMounted) {
-        console.error("Loading timeout reached - game initialization took too long");
-        setLoadError(true);
-        setWebGLError("Game initialization timed out. This could be due to slow hardware or browser compatibility issues.");
-        setLoadingMessage("Loading took too long. Your device might not support WebGL or is too slow for this application.");
+    if (isIsolated) {
+      setRenderMode('isolated');
+      return;
+    }
+    
+    let loadingTimeout = setTimeout(() => {
+      setLoadingMessage('Still loading... This may take a moment.');
+    }, 5000);
+    
+    // Check WebGL support first
+    detectWebGLSupport().then(async (supported) => {
+      clearTimeout(loadingTimeout);
+      
+      if (!supported) {
+        console.log("WebGL not supported, using enhanced 2D chess mode");
+        setRenderMode('2d-enhanced');
+        return;
       }
-    }, 15000); // 15 seconds timeout
-
-    const loadDependencies = async () => {
+      
       try {
-        setLoadingMessage('Checking browser compatibility...');
-
-        const support = await detectWebGLSupport();
-        setWebGLSupported(support.hasWebGL);
+        setLoadingMessage('Loading 3D chess engine...');
         
-        if (!support.hasWebGL) {
-          console.warn('WebGL not detected or not functioning. Will attempt to use fallback renderer.');
-          if (retryCount.current === 0) {
-            // First attempt failed - set error but continue with fallback attempt
-            setLoadingMessage('WebGL not available. Attempting to use compatibility mode...');
-          }
-        }
-
-        setLoadingMessage('Loading Three.js library...');
+        // Dynamically import all required 3D libraries
+        const [
+          { Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight, 
+            Raycaster, Vector2, Vector3, Box3, Color, MeshBasicMaterial, Group,
+            SpotLight, PointLight, Fog, FogExp2, HemisphereLight, Clock,
+            BufferGeometryLoader, MeshStandardMaterial, TextureLoader },
+          { OrbitControls },
+          { GLTFLoader },
+          { EffectComposer },
+          { RenderPass },
+          { UnrealBloomPass },
+          { OutlinePass },
+          { Chess }
+        ] = await Promise.all([
+          import('three'),
+          import('three/examples/jsm/controls/OrbitControls.js'),
+          import('three/examples/jsm/loaders/GLTFLoader.js'),
+          import('three/examples/jsm/postprocessing/EffectComposer.js'),
+          import('three/examples/jsm/postprocessing/RenderPass.js'),
+          import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
+          import('three/examples/jsm/postprocessing/OutlinePass.js'),
+          import('chess.js')
+        ]);
         
-        let THREE, OrbitControls, Chess;
-        
-        try {
-          THREE = await Promise.race([
-            import('three').catch(err => {
-              console.error("Failed to load Three.js:", err);
-              throw new Error("Failed to load Three.js library");
-            }),
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('Three.js loading timeout')), 10000)
-            )
-          ]);
-        } catch (err) {
-          console.error("Three.js loading failed:", err);
-          setWebGLError(`Failed to load Three.js: ${err.message}`);
-          throw new Error(`Failed to load Three.js: ${err.message}`);
-        }
-
-        setLoadingMessage('Loading controls...');
-        try {
-          const OrbitControlsModule = await import('three/examples/jsm/controls/OrbitControls');
-          OrbitControls = OrbitControlsModule.OrbitControls;
-        } catch (err) {
-          console.error("Failed to load OrbitControls:", err);
-          setWebGLError("Failed to load 3D controls");
-          throw new Error("Failed to load OrbitControls module");
-        }
-
-        setLoadingMessage('Loading chess engine...');
-        try {
-          const ChessModule = await import('chess.js');
-          Chess = ChessModule.Chess;
-        } catch (err) {
-          console.error("Failed to load chess.js:", err);
-          setWebGLError("Failed to load chess engine");
-          throw new Error("Failed to load chess engine");
-        }
-
         modulesRef.current = {
-          THREE,
+          Scene,
+          PerspectiveCamera,
+          WebGLRenderer,
+          AmbientLight,
+          DirectionalLight,
+          SpotLight,
+          PointLight,
+          Raycaster,
+          Vector2,
+          Vector3,
+          Box3,
+          Color,
+          MeshBasicMaterial,
+          MeshStandardMaterial,
+          Group,
           OrbitControls,
-          Chess,
-          rendererType: support.hasWebGL ? (support.contextType || 'webgl') : 'fallback',
-          hasStrictPrivacy: support.hasStrictPrivacy
+          GLTFLoader,
+          Fog,
+          FogExp2,
+          HemisphereLight,
+          Clock,
+          BufferGeometryLoader,
+          TextureLoader,
+          EffectComposer,
+          RenderPass,
+          UnrealBloomPass,
+          OutlinePass,
+          Chess
         };
-
-        if (!isMounted) return null;
-        setLoadingMessage('Initializing game board...');
-        return { THREE, OrbitControls, Chess };
+        
+        // Initialize 3D scene
+        initializeChess3D();
+        setRenderMode('3d');
+        
+        // Start FPS monitoring for adaptive quality
+        startPerformanceMonitoring();
+        
       } catch (error) {
-        console.error("Failed to load dependencies:", error);
-        if (isMounted) {
-          setLoadError(true);
-          if (retryCount.current < maxRetries) {
-            retryCount.current++;
-            setLoadError(false);
-            setLoadingMessage(`Retrying with compatibility mode (attempt ${retryCount.current}/${maxRetries})...`);
-            return await loadDependencies();
-          }
-        }
-        return null;
+        console.error("Error loading 3D chess:", error);
+        setLoadError(true);
+        setWebGLError(`Error initializing 3D chess: ${error.message}`);
+        setRenderMode('2d-enhanced');
+      } finally {
+        clearTimeout(loadingTimeout);
       }
-    };
-
-    const initGame = async () => {
-      try {
-        const modules = await loadDependencies();
-        if (!modules || !mountRef.current || !isMounted) {
-          if (isMounted) {
-            setLoadError(true);
-            setLoadingMessage('Failed to load game dependencies');
-          }
-          return;
-        }
-
-        if (loadTimeoutRef.current) {
-          clearTimeout(loadTimeoutRef.current);
-          loadTimeoutRef.current = null;
-        }
-
-        const { THREE, OrbitControls, Chess } = modules;
-
-        setLoadingMessage('Creating game scene...');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x121212);
-        sceneRef.current = scene;
-
-        const camera = new THREE.PerspectiveCamera(
-          45,
-          mountRef.current.clientWidth / mountRef.current.clientHeight,
-          0.1,
-          1000
-        );
-        camera.position.set(0, 8, 8);
-        camera.lookAt(0, 0, 0);
-        cameraRef.current = camera;
-
-        setLoadingMessage('Setting up renderer...');
-        try {
-          let renderer;
-          const createRenderer = () => {
-            try {
-              // Progressively reduce quality for compatibility
-              if (retryCount.current > 1) {
-                return new THREE.WebGLRenderer({
-                  antialias: false,
-                  alpha: false,
-                  powerPreference: 'default',
-                  precision: 'lowp',
-                  preserveDrawingBuffer: false,
-                  failIfMajorPerformanceCaveat: false
-                });
-              } else if (retryCount.current > 0) {
-                return new THREE.WebGLRenderer({
-                  antialias: false,
-                  alpha: true,
-                  powerPreference: 'default',
-                  preserveDrawingBuffer: false
-                });
-              }
-              
-              return new THREE.WebGLRenderer({
-                antialias: true,
-                alpha: true,
-                powerPreference: 'high-performance',
-                preserveDrawingBuffer: true
-              });
-            } catch (e) {
-              console.warn("Trying simplified WebGL renderer:", e);
-              return new THREE.WebGLRenderer({
-                antialias: false,
-                alpha: false,
-                powerPreference: 'default',
-                precision: 'lowp'
-              });
-            }
-          };
-
-          try {
-            renderer = createRenderer();
-          } catch (err) {
-            console.warn("WebGL renderer failed, trying fallback:", err);
-            try {
-              renderer = new THREE.WebGLRenderer({
-                canvas: document.createElement('canvas'),
-                context: null,
-                precision: 'lowp',
-                logarithmicDepthBuffer: false,
-                failIfMajorPerformanceCaveat: false
-              });
-            } catch (e) {
-              if (THREE.CanvasRenderer) {
-                renderer = new THREE.CanvasRenderer();
-              } else {
-                throw new Error("No compatible renderer available");
-              }
-            }
-          }
-
-          try {
-            const testGeometry = new THREE.BoxGeometry(1, 1, 1);
-            const testMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const testMesh = new THREE.Mesh(testGeometry, testMaterial);
-            scene.add(testMesh);
-            renderer.render(scene, camera);
-            scene.remove(testMesh);
-            
-            console.log("Renderer test successful");
-          } catch (renderTestError) {
-            console.error("Renderer test failed:", renderTestError);
-            throw new Error("Renderer created but failed test render");
-          }
-
-          renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-
-          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-          const pixelRatio = (isMobile || modulesRef.current?.hasStrictPrivacy || retryCount.current > 0) ? 1 : window.devicePixelRatio;
-          renderer.setPixelRatio(pixelRatio);
-
-          if (retryCount.current === 0) {
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-          }
-
-          if (mountRef.current.childElementCount === 0) {
-            mountRef.current.appendChild(renderer.domElement);
-          }
-          rendererRef.current = renderer;
-        } catch (rendererError) {
-          console.error("WebGL renderer creation failed:", rendererError);
-          setWebGLError("Failed to create WebGL renderer. Your browser may not support WebGL.");
-          throw new Error("Failed to create WebGL renderer. Your browser may not support WebGL.");
-        }
-
-        // Rest of the initialization
-        // ...existing code...
-
-        setLoadingMessage('Initializing controls...');
-        raycasterRef.current = new THREE.Raycaster();
-        mouseRef.current = new THREE.Vector2();
-
-        const controls = new OrbitControls(camera, rendererRef.current.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.1;
-        controls.maxPolarAngle = Math.PI / 2.1;
-        controls.minDistance = 5;
-        controls.maxDistance = 15;
-        controls.target.set(0, 0, 0);
-        controlsRef.current = controls;
-
-        setLoadingMessage('Creating chessboard...');
-        createChessboard(THREE, scene);
-
-        setLoadingMessage('Creating chess pieces...');
-        chessRef.current = new Chess();
-
-        createChessPieces(THREE, scene, chessRef.current);
-
-        connectToWebSocket();
-
-        setLoadingMessage('Starting game...');
-        const animate = () => {
-          if (!isMounted) return;
-
-          animationFrameRef.current = requestAnimationFrame(animate);
-
-          if (controlsRef.current) {
-            controlsRef.current.update();
-          }
-
-          if (rendererRef.current && sceneRef.current && cameraRef.current) {
-            try {
-              rendererRef.current.render(sceneRef.current, cameraRef.current);
-            } catch (renderError) {
-              console.error("Error during rendering:", renderError);
-              if (isMounted && !loadError) {
-                setLoadError(true);
-                setWebGLError("Error during rendering. WebGL might have crashed.");
-              }
-            }
-          }
-        };
-
-        animate();
-
-        const handleResize = () => {
-          if (mountRef.current && rendererRef.current && cameraRef.current) {
-            const width = mountRef.current.clientWidth;
-            const height = mountRef.current.clientHeight;
-
-            cameraRef.current.aspect = width / height;
-            cameraRef.current.updateProjectionMatrix();
-            rendererRef.current.setSize(width, height);
-          }
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        if (mountRef.current) {
-          mountRef.current.addEventListener('click', handleBoardClick);
-        }
-
-        // Clear the error state since initialization succeeded
-        setLoadError(false);
-        setWebGLError(null);
-
-        return () => {
-          window.removeEventListener('resize', handleResize);
-
-          if (mountRef.current) {
-            mountRef.current.removeEventListener('click', handleBoardClick);
-          }
-
-          if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-          }
-
-          if (rendererRef.current && mountRef.current) {
-            if (mountRef.current.contains(rendererRef.current.domElement)) {
-              mountRef.current.removeChild(rendererRef.current.domElement);
-            }
-          }
-
-          if (rendererRef.current) {
-            rendererRef.current.dispose();
-            if (rendererRef.current.renderLists) {
-              rendererRef.current.renderLists.dispose();
-            }
-
-            try {
-              const gl = rendererRef.current.getContext();
-              if (gl) {
-                const extension = gl.getExtension('WEBGL_lose_context');
-                if (extension) extension.loseContext();
-              }
-            } catch (e) {
-              console.warn("Error releasing WebGL context:", e);
-            }
-          }
-          
-          if (wsRef.current) {
-            wsRef.current.close();
-          }
-          
-          if (loadTimeoutRef.current) {
-            clearTimeout(loadTimeoutRef.current);
-          }
-        };
-      } catch (error) {
-        console.error("Error initializing chess game:", error);
-        if (isMounted) {
-          setLoadError(true);
-          setLoadingMessage(`Error: ${error.message || 'Failed to initialize game'}`);
-        }
-        if (onGameEnd) onGameEnd('error');
-      }
-    };
-
-    initGame();
-
+    });
+    
     return () => {
-      isMounted = false;
+      clearTimeout(loadingTimeout);
       if (loadTimeoutRef.current) {
         clearTimeout(loadTimeoutRef.current);
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (fpsMonitorRef.current) {
+        clearInterval(fpsMonitorRef.current);
+      }
+      // Cleanup Three.js resources
+      if (rendererRef.current) {
+        rendererRef.current.dispose();
+      }
     };
-  }, [handleBoardClick, onGameEnd, isIsolated, connectToWebSocket, detectWebGLSupport]);
+  }, [detectWebGLSupport, isIsolated]);
 
-  const highlightValidMoves = (squareName) => {
-    if (!chessRef.current) return;
-
-    resetSquareColors();
-
-    const selectedSquareObj = boardSquaresRef.current.find(s => s.userData.square === squareName);
-    if (selectedSquareObj) {
-      const originalMaterial = selectedSquareObj.userData.originalMaterial.clone();
-      originalMaterial.color.set(0x4CAF50);
-      selectedSquareObj.material = originalMaterial;
-    }
-
-    const moves = chessRef.current.moves({
-      square: squareName,
-      verbose: true
-    });
-
-    const validSquareNames = moves.map(move => move.to);
-    setValidMoves(validSquareNames);
-
-    validSquareNames.forEach(square => {
-      const squareObj = boardSquaresRef.current.find(s => s.userData.square === square);
-      if (squareObj) {
-        const originalMaterial = squareObj.userData.originalMaterial.clone();
-        originalMaterial.color.set(0x2196F3);
-        squareObj.material = originalMaterial;
-      }
-    });
-  };
-
-  const resetSquareColors = () => {
-    if (!boardSquaresRef.current) return;
-
-    boardSquaresRef.current.forEach(square => {
-      if (square && square.userData && square.userData.originalMaterial) {
-        square.material = square.userData.originalMaterial.clone();
-      }
-    });
-  };
-
-  const createChessboard = (THREE, scene) => {
-    const boardGeometry = new THREE.BoxGeometry(8.4, 0.5, 8.4);
-    const boardMaterial = new THREE.MeshStandardMaterial({ color: 0x5D4037 });
-    const board = new THREE.Mesh(boardGeometry, boardMaterial);
-    board.position.y = -0.3;
-    board.receiveShadow = true;
-    scene.add(board);
-
-    boardSquaresRef.current = [];
-
-    const squareGeometry = new THREE.BoxGeometry(1, 0.1, 1);
-
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        const isWhite = (i + j) % 2 === 0;
-        const squareMaterial = new THREE.MeshStandardMaterial({
-          color: isWhite ? 0xF0D9B5 : 0xB58863
-        });
-
-        const square = new THREE.Mesh(squareGeometry, squareMaterial);
-
-        const x = j - 3.5;
-        const z = i - 3.5;
-        square.position.set(x, 0, z);
-
-        const file = String.fromCharCode(97 + j);
-        const rank = 8 - i;
-        const squareName = file + rank;
-
-        square.userData = {
-          square: squareName,
-          isWhite,
-          originalMaterial: squareMaterial.clone()
-        };
-
-        square.receiveShadow = true;
-        scene.add(square);
-
-        boardSquaresRef.current.push(square);
-      }
-    }
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 10, 5);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
-    directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 50;
-    scene.add(directionalLight);
-
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    fillLight.position.set(-5, 8, -5);
-    scene.add(fillLight);
-  };
-
-  const createChessPieces = (THREE, scene, chess) => {
-    if (!chess || !scene) return;
-
-    if (chessPiecesRef.current) {
-      Object.values(chessPiecesRef.current).forEach(piece => {
-        if (piece && piece.parent) {
-          piece.parent.remove(piece);
+  // Setup performance monitoring to adjust graphics quality
+  const startPerformanceMonitoring = () => {
+    // Reset frame counters
+    frameCountRef.current = 0;
+    lastFrameTimeRef.current = performance.now();
+    
+    // Check every 5 seconds
+    fpsMonitorRef.current = setInterval(() => {
+      const now = performance.now();
+      const elapsed = now - lastFrameTimeRef.current;
+      
+      if (elapsed === 0) return;
+      
+      const fps = Math.round((frameCountRef.current / elapsed) * 1000);
+      console.log(`Current FPS: ${fps}`);
+      
+      // Auto-adjust quality if needed
+      if (graphicsQuality === 'auto' || graphicsQuality === 'high') {
+        if (fps < 25) {
+          console.log("Performance issue detected, downgrading graphics quality");
+          if (graphicsQuality === 'high') setGraphicsQuality('medium');
+          else if (graphicsQuality === 'medium') setGraphicsQuality('low');
+          
+          // Apply the new quality settings
+          applyGraphicsQuality();
         }
-      });
+      }
+      
+      // Reset for next interval
+      frameCountRef.current = 0;
+      lastFrameTimeRef.current = now;
+    }, 5000);
+  };
+  
+  // Apply graphics quality settings to the renderer
+  const applyGraphicsQuality = () => {
+    if (!rendererRef.current || !sceneRef.current) return;
+    
+    const renderer = rendererRef.current;
+    
+    switch (graphicsQuality) {
+      case 'high':
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        if (premiumEffectsRef.current && premiumEffectsRef.current.composer) {
+          premiumEffectsRef.current.composer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+        }
+        break;
+      case 'medium':
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.shadowMap.enabled = isPremiumUser;
+        if (premiumEffectsRef.current && premiumEffectsRef.current.composer) {
+          premiumEffectsRef.current.composer.setSize(
+            Math.floor(mountRef.current.clientWidth * 0.8), 
+            Math.floor(mountRef.current.clientHeight * 0.8)
+          );
+        }
+        break;
+      case 'low':
+        renderer.setPixelRatio(1);
+        renderer.shadowMap.enabled = false;
+        if (premiumEffectsRef.current && premiumEffectsRef.current.composer) {
+          premiumEffectsRef.current.composer.setSize(
+            Math.floor(mountRef.current.clientWidth * 0.6), 
+            Math.floor(mountRef.current.clientHeight * 0.6)
+          );
+        }
+        break;
     }
+    
+    // Make sure renderer is resized correctly
+    if (mountRef.current) {
+      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    }
+    
+    // Update camera and other settings as needed
+    if (cameraRef.current) {
+      cameraRef.current.updateProjectionMatrix();
+    }
+  };
 
-    chessPiecesRef.current = {};
-
-    const board = chess.board();
-
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        const piece = board[i][j];
-        if (!piece) continue;
-
-        const { type, color } = piece;
-
-        const file = String.fromCharCode(97 + j);
-        const rank = 8 - i;
-        const squareName = file + rank;
-
-        const pieceObject = createPiece(THREE, type, color);
-
-        pieceObject.userData = {
-          squareName,
-          pieceType: type,
-          pieceColor: color
-        };
-
-        if (pieceObject instanceof THREE.Group) {
-          pieceObject.children.forEach(child => {
-            if (child) {
-              child.userData = {
-                parent: pieceObject,
-                ...pieceObject.userData
-              };
+  // Initialize 3D chess scene
+  const initializeChess3D = () => {
+    if (!mountRef.current || !modulesRef.current) return;
+    
+    const {
+      Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight,
+      SpotLight, Raycaster, Vector2, Vector3, Color, Chess, Clock,
+      EffectComposer, RenderPass, UnrealBloomPass, OutlinePass, PointLight,
+      HemisphereLight, MeshStandardMaterial, Fog
+    } = modulesRef.current;
+    
+    // Create scene
+    const scene = new Scene();
+    scene.background = new Color(isPremiumUser ? 0x0a0a14 : 0x121212);
+    
+    // Add fog for premium users
+    if (isPremiumUser) {
+      scene.fog = new Fog(0x0a0a14, 10, 25);
+    }
+    
+    sceneRef.current = scene;
+    
+    // Create camera
+    const camera = new PerspectiveCamera(
+      45, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 1000
+    );
+    camera.position.set(0, 5, 7);
+    cameraRef.current = camera;
+    
+    // Create renderer with appropriate quality settings
+    const renderer = new WebGLRenderer({ 
+      antialias: graphicsQuality !== 'low',
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    renderer.setPixelRatio(
+      graphicsQuality === 'high' ? window.devicePixelRatio :
+      graphicsQuality === 'medium' ? Math.min(window.devicePixelRatio, 1.5) : 1
+    );
+    renderer.shadowMap.enabled = graphicsQuality !== 'low';
+    mountRef.current.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
+    
+    // Enhanced lighting setup based on quality level and premium status
+    const lightingSetup = () => {
+      // Base ambient light
+      const ambientLight = new AmbientLight(0xffffff, isPremiumUser ? 0.4 : 0.5);
+      scene.add(ambientLight);
+      
+      // Primary directional light (sun)
+      const directionalLight = new DirectionalLight(
+        isPremiumUser ? 0xf5f5ff : 0xffffff, 
+        isPremiumUser ? 0.8 : 1
+      );
+      directionalLight.position.set(5, 10, 7);
+      directionalLight.castShadow = graphicsQuality !== 'low';
+      scene.add(directionalLight);
+      
+      // Premium lighting enhancements
+      if (isPremiumUser) {
+        // Add hemisphere light for more natural lighting
+        const hemisphereLight = new HemisphereLight(0xb3e5fc, 0x3f2806, 0.6);
+        scene.add(hemisphereLight);
+        
+        // Add spot light to highlight the board
+        const spotLight = new SpotLight(0xffffff, 0.7, 15, Math.PI / 4, 0.5);
+        spotLight.position.set(0, 8, 0);
+        spotLight.target.position.set(0, 0, 0);
+        spotLight.castShadow = graphicsQuality !== 'low';
+        scene.add(spotLight);
+        scene.add(spotLight.target);
+        
+        // Accent lights for dramatic effect
+        const redAccent = new PointLight(0xff5252, 0.5, 15);
+        redAccent.position.set(-5, 2, -5);
+        scene.add(redAccent);
+        
+        const blueAccent = new PointLight(0x4fc3f7, 0.5, 15);
+        blueAccent.position.set(5, 2, 5);
+        scene.add(blueAccent);
+      }
+    };
+    
+    // Set up lighting
+    lightingSetup();
+    
+    // Initialize orbit controls
+    const { OrbitControls } = modulesRef.current;
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enablePan = false;
+    controls.minDistance = 3;
+    controls.maxDistance = 10;
+    controls.maxPolarAngle = Math.PI / 2 - 0.1;
+    
+    // Premium users get smoother controls
+    if (isPremiumUser) {
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.1;
+    }
+    
+    controls.update();
+    controlsRef.current = controls;
+    
+    // Initialize chess game
+    const chess = new Chess();
+    chessRef.current = chess;
+    
+    // Initialize raycaster for interaction
+    const raycaster = new Raycaster();
+    const mouse = new Vector2();
+    raycasterRef.current = raycaster;
+    mouseRef.current = mouse;
+    
+    // Setup post-processing effects for premium users
+    if (isPremiumUser && graphicsQuality !== 'low') {
+      setupPremiumEffects(scene, camera, renderer);
+    }
+    
+    // Load the chess board model
+    loadChessBoard();
+    
+    // Create clock for animations
+    const clock = new Clock();
+    
+    // Setup animation loop
+    const animate = () => {
+      animationFrameRef.current = requestAnimationFrame(animate);
+      
+      // Update controls if they have damping
+      if (controlsRef.current && controlsRef.current.enableDamping) {
+        controlsRef.current.update();
+      }
+      
+      // Update any premium visual effects
+      if (isPremiumUser && premiumEffectsRef.current) {
+        const elapsed = clock.getElapsedTime();
+        
+        // Animate lights if we have them
+        if (premiumEffectsRef.current.lights) {
+          premiumEffectsRef.current.lights.forEach(light => {
+            if (light.animation) {
+              const { target, speed, amplitude, base } = light.animation;
+              // Simple sine wave animation for light intensity
+              target.intensity = base + Math.sin(elapsed * speed) * amplitude;
             }
           });
         }
+        
+        // Use effect composer if available, otherwise use regular renderer
+        if (premiumEffectsRef.current.composer && graphicsQuality !== 'low') {
+          premiumEffectsRef.current.composer.render();
+        } else {
+          renderer.render(scene, camera);
+        }
+      } else {
+        // Standard rendering
+        renderer.render(scene, camera);
+      }
+      
+      // Count frames for FPS monitoring
+      frameCountRef.current++;
+    };
+    
+    animate();
+    
+    // Handle window resize
+    const handleResize = () => {
+      if (!mountRef.current || !camera || !renderer) return;
+      
+      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+      
+      // Update post-processing sizes
+      if (isPremiumUser && premiumEffectsRef.current && premiumEffectsRef.current.composer) {
+        premiumEffectsRef.current.composer.setSize(
+          mountRef.current.clientWidth,
+          mountRef.current.clientHeight
+        );
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  };
 
-        const x = j - 3.5;
-        const z = i - 3.5;
-        pieceObject.position.set(x, 0.6, z);
+  // Setup premium visual effects
+  const setupPremiumEffects = (scene, camera, renderer) => {
+    const {
+      EffectComposer,
+      RenderPass,
+      UnrealBloomPass,
+      OutlinePass,
+      Vector2,
+      PointLight
+    } = modulesRef.current;
+    
+    // Create effect composer
+    const composer = new EffectComposer(renderer);
+    
+    // Add basic render pass
+    const renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
+    
+    // Add subtle bloom effect
+    const bloomPass = new UnrealBloomPass(
+      new Vector2(mountRef.current.clientWidth, mountRef.current.clientHeight),
+      0.4,  // strength
+      0.1,  // radius
+      0.9   // threshold
+    );
+    composer.addPass(bloomPass);
+    
+    // Setup for outline pass (will be used when selecting pieces)
+    const outlinePass = new OutlinePass(
+      new Vector2(mountRef.current.clientWidth, mountRef.current.clientHeight),
+      scene,
+      camera
+    );
+    outlinePass.edgeStrength = 3;
+    outlinePass.edgeGlow = 1;
+    outlinePass.edgeThickness = 1;
+    outlinePass.pulsePeriod = 2;
+    outlinePass.visibleEdgeColor.set('#ffffff');
+    outlinePass.hiddenEdgeColor.set('#190a05');
+    composer.addPass(outlinePass);
+    
+    // Create animated lights
+    const animatedLights = [];
+    
+    // Subtle pulsing light
+    const pulsingLight = new PointLight(0x00b0ff, 0.4, 10);
+    pulsingLight.position.set(0, 3, 0);
+    scene.add(pulsingLight);
+    
+    // Store light with animation parameters
+    animatedLights.push({
+      light: pulsingLight,
+      animation: {
+        target: pulsingLight,
+        speed: 1.5,
+        amplitude: 0.2,
+        base: 0.4
+      }
+    });
+    
+    // Store all premium effects references
+    premiumEffectsRef.current = {
+      composer,
+      lights: animatedLights,
+      outlinePass,
+      bloomPass
+    };
+  };
 
-        scene.add(pieceObject);
+  // Load the chess board model
+  const loadChessBoard = () => {
+    setLoadingMessage('Loading 3D chess pieces...');
+    
+    // In a real implementation, this would load actual 3D models
+    // For now, we'll simulate the loading process with timeouts
+    
+    setTimeout(() => {
+      setLoadingMessage('Preparing game environment...');
+      setTimeout(() => {
+        setLoadingMessage('Setting up AI opponent...');
+        setTimeout(() => {
+          setLoadingMessage('');
+        }, 800);
+      }, 1200);
+    }, 1000);
+  };
 
-        chessPiecesRef.current[squareName] = pieceObject;
+  // Handle game end event
+  const handleGameEnd = async (result) => {
+    setGameStatus(result);
+    
+    // Only try to give rewards if the user is connected with a wallet
+    if (connected && publicKey && chessRewards.isInitialized) {
+      let rewardResult = null;
+      
+      // Process rewards based on game outcome
+      if (result === 'win') {
+        rewardResult = await chessRewards.rewardForWin(difficulty);
+        
+        // Apply premium bonus if applicable
+        if (isPremiumUser && rewardResult?.success) {
+          rewardResult.xpAmount = Math.floor(rewardResult.xpAmount * 1.25); // 25% bonus
+          rewardResult.rewardAmount = rewardResult.rewardAmount * 1.2; // 20% bonus
+        }
+      } else if (result === 'draw') {
+        rewardResult = await chessRewards.rewardForDraw(difficulty);
+        
+        // Apply premium bonus if applicable
+        if (isPremiumUser && rewardResult?.success) {
+          rewardResult.xpAmount = Math.floor(rewardResult.xpAmount * 1.1); // 10% bonus
+          rewardResult.rewardAmount = rewardResult.rewardAmount * 1.1; // 10% bonus
+        }
+      }
+      
+      // If the reward was successful, show animation
+      if (rewardResult?.success) {
+        setLastReward({
+          amount: rewardResult.rewardAmount,
+          xp: rewardResult.xpAmount
+        });
+        setShowRewardAnimation(true);
+        
+        // Hide the reward animation after a few seconds
+        setTimeout(() => {
+          setShowRewardAnimation(false);
+        }, 3000);
+      }
+    }
+    
+    // Call the external onGameEnd handler if provided
+    if (onGameEnd) {
+      onGameEnd(result);
+    }
+  };
+  
+  // Handle special move rewards
+  const handleSpecialMove = async (moveType) => {
+    if (connected && publicKey && chessRewards.isInitialized) {
+      const rewardResult = await chessRewards.rewardForSpecialMove(moveType);
+      
+      // Apply premium bonus if applicable
+      if (isPremiumUser && rewardResult?.success) {
+        rewardResult.xpAmount = Math.floor(rewardResult.xpAmount * 1.2); // 20% bonus
+        rewardResult.rewardAmount = rewardResult.rewardAmount * 1.15; // 15% bonus
+      }
+      
+      // If the reward was successful, show mini animation
+      if (rewardResult?.success) {
+        setLastReward({
+          amount: rewardResult.rewardAmount,
+          xp: rewardResult.xpAmount
+        });
+        setShowRewardAnimation(true);
+        
+        // Hide the reward animation after a short time
+        setTimeout(() => {
+          setShowRewardAnimation(false);
+        }, 2000);
       }
     }
   };
 
-  const createPiece = (THREE, type, color) => {
-    let geometry;
-    const height = 1.0;
-    const radius = 0.3;
-
-    const group = new THREE.Group();
-
-    switch (type) {
-      case 'p':
-        const pawnBase = new THREE.CylinderGeometry(radius * 0.7, radius * 0.9, height * 0.3, 16);
-        const pawnMiddle = new THREE.SphereGeometry(radius * 0.6, 16, 8);
-        const pawnBaseMesh = new THREE.Mesh(pawnBase);
-        const pawnMiddleMesh = new THREE.Mesh(pawnMiddle);
-        pawnMiddleMesh.position.y = height * 0.3;
-        group.add(pawnBaseMesh);
-        group.add(pawnMiddleMesh);
-        break;
-
-      case 'r':
-        const rookBase = new THREE.CylinderGeometry(radius * 0.8, radius * 0.9, height * 0.7, 4);
-        const rookTop = new THREE.BoxGeometry(radius * 2, height * 0.3, radius * 2);
-        rookTop.translate(0, height * 0.5, 0);
-        const rookBaseMesh = new THREE.Mesh(rookBase);
-        const rookTopMesh = new THREE.Mesh(rookTop);
-        group.add(rookBaseMesh);
-        group.add(rookTopMesh);
-        break;
-
-      case 'n':
-        const knightBase = new THREE.CylinderGeometry(radius * 0.7, radius * 0.9, height * 0.3, 16);
-        const knightHead = new THREE.BoxGeometry(radius * 0.8, height * 0.6, radius * 1.5);
-        knightHead.translate(0, height * 0.45, radius * 0.3);
-        const knightEar = new THREE.BoxGeometry(radius * 0.5, height * 0.4, radius * 0.4);
-        knightEar.translate(0, height * 0.8, radius * 0.4);
-
-        const knightBaseMesh = new THREE.Mesh(knightBase);
-        const knightHeadMesh = new THREE.Mesh(knightHead);
-        const knightEarMesh = new THREE.Mesh(knightEar);
-
-        group.add(knightBaseMesh);
-        group.add(knightHeadMesh);
-        group.add(knightEarMesh);
-        break;
-
-      case 'b':
-        const bishopBase = new THREE.CylinderGeometry(radius * 0.7, radius * 0.9, height * 0.3, 16);
-        const bishopMiddle = new THREE.ConeGeometry(radius * 0.6, height * 0.9, 16);
-        bishopMiddle.translate(0, height * 0.55, 0);
-        const bishopTop = new THREE.SphereGeometry(radius * 0.2, 16, 8);
-        bishopTop.translate(0, height * 1.0, 0);
-
-        const bishopBaseMesh = new THREE.Mesh(bishopBase);
-        const bishopMiddleMesh = new THREE.Mesh(bishopMiddle);
-        const bishopTopMesh = new THREE.Mesh(bishopTop);
-
-        group.add(bishopBaseMesh);
-        group.add(bishopMiddleMesh);
-        group.add(bishopTopMesh);
-        break;
-
-      case 'q':
-        const queenBase = new THREE.CylinderGeometry(radius * 0.8, radius * 0.9, height * 0.3, 16);
-        const queenMiddle = new THREE.CylinderGeometry(radius * 0.6, radius * 0.7, height * 0.8, 16);
-        queenMiddle.translate(0, height * 0.55, 0);
-
-        const queenCrown = new THREE.CylinderGeometry(radius * 0.7, radius * 0.6, height * 0.2, 8);
-        queenCrown.translate(0, height * 0.95, 0);
-
-        const queenBaseMesh = new THREE.Mesh(queenBase);
-        const queenMiddleMesh = new THREE.Mesh(queenMiddle);
-        const queenCrownMesh = new THREE.Mesh(queenCrown);
-
-        group.add(queenBaseMesh);
-        group.add(queenMiddleMesh);
-        group.add(queenCrownMesh);
-        break;
-
-      case 'k':
-        const kingBase = new THREE.CylinderGeometry(radius * 0.8, radius * 0.9, height * 0.3, 16);
-        const kingMiddle = new THREE.CylinderGeometry(radius * 0.6, radius * 0.7, height * 0.8, 16);
-        kingMiddle.translate(0, height * 0.55, 0);
-
-        const kingCrown = new THREE.CylinderGeometry(radius * 0.7, radius * 0.6, height * 0.2, 8);
-        kingCrown.translate(0, height * 0.95, 0);
-
-        const crossVert = new THREE.BoxGeometry(radius * 0.1, height * 0.4, radius * 0.1);
-        crossVert.translate(0, height * 1.25, 0);
-        const crossHorz = new THREE.BoxGeometry(radius * 0.3, height * 0.1, radius * 0.1);
-        crossHorz.translate(0, height * 1.15, 0);
-
-        const kingBaseMesh = new THREE.Mesh(kingBase);
-        const kingMiddleMesh = new THREE.Mesh(kingMiddle);
-        const kingCrownMesh = new THREE.Mesh(kingCrown);
-        const crossVertMesh = new THREE.Mesh(crossVert);
-        const crossHorzMesh = new THREE.Mesh(crossHorz);
-
-        group.add(kingBaseMesh);
-        group.add(kingMiddleMesh);
-        group.add(kingCrownMesh);
-        group.add(crossVertMesh);
-        group.add(crossHorzMesh);
-        break;
-
-      default:
-        const defaultGeometry = new THREE.CylinderGeometry(radius, radius, height, 16);
-        group.add(new THREE.Mesh(defaultGeometry));
-        break;
+  // Switch to isolated chess mode
+  const switchToIsolatedMode = () => {
+    cancelAnimationFrame(animationFrameRef.current);
+    if (rendererRef.current) {
+      rendererRef.current.dispose();
     }
-
-    const material = new THREE.MeshStandardMaterial({
-      color: PIECE_COLORS[color],
-      metalness: 0.1,
-      roughness: 0.8
-    });
-
-    group.children.forEach(mesh => {
-      if (mesh) {
-        mesh.material = material;
-        mesh.castShadow = true;
-        mesh.receiveShadow = false;
-      }
-    });
-
-    return group;
+    if (mountRef.current) {
+      mountRef.current.innerHTML = '';
+    }
+    setRenderMode('isolated');
   };
 
-  const updateBoardDisplay = () => {
-    if (!chessRef.current || !sceneRef.current) return;
+  // Switch to enhanced 2D mode
+  const switchTo2DEnhancedMode = () => {
+    cancelAnimationFrame(animationFrameRef.current);
+    if (rendererRef.current) {
+      rendererRef.current.dispose();
+    }
+    if (mountRef.current) {
+      mountRef.current.innerHTML = '';
+    }
+    setRenderMode('2d-enhanced');
+  };
 
-    try {
-      if (!modulesRef.current || !modulesRef.current.THREE) {
-        console.error("THREE.js module not loaded yet");
-        return;
-      }
+  // Show premium features overlay
+  const showPremiumFeatures = () => {
+    setShowPremiumOverlay(true);
+  };
 
-      const THREE = modulesRef.current.THREE;
-      const board = chessRef.current.board();
-
-      resetSquareColors();
-
-      Object.values(chessPiecesRef.current).forEach(piece => {
-        if (piece && piece.parent) {
-          piece.parent.remove(piece);
+  // Retry loading 3D chess
+  const retryLoading = () => {
+    setRetryAttempted(true);
+    setWebGLError(null);
+    setLoadError(false);
+    setRenderMode('loading');
+    retryCount.current += 1;
+    
+    // Clean up previous attempt
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    if (rendererRef.current) {
+      rendererRef.current.dispose();
+    }
+    if (mountRef.current) {
+      mountRef.current.innerHTML = '';
+    }
+    
+    // Attempt to initialize again with a delay
+    setTimeout(() => {
+      detectWebGLSupport().then(async (supported) => {
+        if (supported) {
+          try {
+            setLoadingMessage('Reloading 3D chess engine...');
+            if (retryCount.current >= maxRetries) {
+              // After several tries, use lower quality settings
+              setGraphicsQuality('low');
+            }
+            initializeChess3D();
+            setRenderMode('3d');
+          } catch (error) {
+            console.error("Error reloading 3D chess:", error);
+            setLoadError(true);
+            
+            // If we've tried too many times, switch to 2D enhanced mode
+            if (retryCount.current >= maxRetries) {
+              switchTo2DEnhancedMode();
+            }
+          }
+        } else {
+          // WebGL still not supported, use 2D enhanced mode
+          switchTo2DEnhancedMode();
         }
       });
-
-      chessPiecesRef.current = {};
-
-      for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-          const piece = board[i][j];
-          if (!piece) continue;
-
-          const { type, color } = piece;
-
-          const file = String.fromCharCode(97 + j);
-          const rank = 8 - i;
-          const squareName = file + rank;
-
-          const pieceObject = createPiece(THREE, type, color);
-
-          pieceObject.userData = {
-            squareName,
-            pieceType: type,
-            pieceColor: color
-          };
-
-          if (pieceObject instanceof THREE.Group) {
-            pieceObject.children.forEach(child => {
-              if (child) {
-                child.userData = {
-                  parent: pieceObject,
-                  ...pieceObject.userData
-                };
-              }
-            });
-          }
-
-          const x = j - 3.5;
-          const z = i - 3.5;
-          pieceObject.position.set(x, 0.6, z);
-
-          sceneRef.current.add(pieceObject);
-
-          chessPiecesRef.current[squareName] = pieceObject;
-        }
-      }
-    } catch (error) {
-      console.error("Error updating board display:", error);
-    }
+    }, 500);
   };
 
-  const makeAIMove = useCallback(() => {
-    if (!chessRef.current) return;
-
-    setThinking(true);
-
-    setTimeout(async () => {
-      if (!chessRef.current) return;
-
-      try {
-        const moves = chessRef.current.moves();
-
-        if (moves.length > 0) {
-          let move;
-
-          if (difficulty === 'easy') {
-            move = moves[Math.floor(Math.random() * moves.length)];
-          } else if (difficulty === 'medium') {
-            const capturesAndChecks = moves.filter(m => m.includes('x') || m.includes('+'));
-            move = capturesAndChecks.length > 0
-              ? capturesAndChecks[Math.floor(Math.random() * capturesAndChecks.length)]
-              : moves[Math.floor(Math.random() * moves.length)];
-          } else {
-            const checkmates = moves.filter(m => m.includes('#'));
-            const captures = moves.filter(m => m.includes('x'));
-            const checks = moves.filter(m => m.includes('+'));
-
-            if (checkmates.length > 0) {
-              move = checkmates[0];
-            } else if (captures.length > 0) {
-              const highValueCaptures = captures.filter(m => m.includes('xQ') || m.includes('xR') || m.includes('xB') || m.includes('xN'));
-              move = highValueCaptures.length > 0
-                ? highValueCaptures[Math.floor(Math.random() * highValueCaptures.length)]
-                : captures[Math.floor(Math.random() * captures.length)];
-            } else if (checks.length > 0) {
-              move = checks[Math.floor(Math.random() * checks.length)];
-            } else {
-              move = moves[Math.floor(Math.random() * moves.length)];
-            }
-          }
-
-          const moveResult = chessRef.current.move(move);
-
-          if (wsRef.current && isConnectedToShyft) {
-            try {
-              wsRef.current.send(JSON.stringify({
-                type: 'chess_ai_move',
-                move,
-                moveResult,
-                difficulty
-              }));
-            } catch (e) {
-              console.error('Error sending AI move to WebSocket:', e);
-            }
-          }
-
-          updateBoardDisplay();
-
-          checkGameStatus();
-        }
-      } catch (error) {
-        console.error("Error making AI move:", error);
-      } finally {
-        setThinking(false);
-      }
-    }, 1000);
-  }, [difficulty, isConnectedToShyft]);
-
-  const checkGameStatus = useCallback(async () => {
-    if (!chessRef.current) return;
-
-    if (chessRef.current.isGameOver()) {
-      let result = 'draw';
-
-      if (chessRef.current.isCheckmate()) {
-        const loser = chessRef.current.turn();
-        if (loser === 'w') {
-          result = 'loss';
-          setGameStatus('loss');
-        } else {
-          result = 'win';
-          setGameStatus('win');
-
-          if (chessRewards.isInitialized && !isIsolated) {
-            const rewardResult = await chessRewards.rewardForWin(difficulty);
-            if (rewardResult.success) {
-              setLastReward({
-                amount: rewardResult.rewardAmount,
-                xp: rewardResult.xpAmount,
-                reason: `Chess win on ${difficulty}`
-              });
-              setShowRewardAnimation(true);
-
-              setTimeout(() => {
-                setShowRewardAnimation(false);
-              }, 5000);
-            }
-          }
-        }
-      } else if (chessRef.current.isDraw()) {
-        setGameStatus('draw');
-
-        if (chessRewards.isInitialized && !isIsolated) {
-          const rewardResult = await chessRewards.rewardForDraw(difficulty);
-          if (rewardResult.success) {
-            setLastReward({
-              amount: rewardResult.rewardAmount,
-              xp: rewardResult.xpAmount,
-              reason: `Chess draw on ${difficulty}`
-            });
-            setShowRewardAnimation(true);
-
-            setTimeout(() => {
-              setShowRewardAnimation(false);
-            }, 5000);
-          }
-        }
-      }
-
-      if (wsRef.current && isConnectedToShyft && !isIsolated) {
-        wsRef.current.send(JSON.stringify({
-          type: 'chess_game_end',
-          result,
-          difficulty,
-          moveCount: chessRef.current.history().length
-        }));
-      }
-
-      if (onGameEnd) {
-        onGameEnd(result);
-      }
-    }
-  }, [onGameEnd, difficulty, chessRewards, isIsolated, isConnectedToShyft]);
-
-  const renderRewardAnimation = () => {
-    if (!showRewardAnimation || !lastReward) return null;
-
-    return (
-      <div className="chess-reward-animation">
-        <div className="reward-content">
-          <h3>Reward Earned!</h3>
-          <p>{lastReward.amount} EMB tokens</p>
-          {lastReward.xp && <p>{lastReward.xp} XP</p>}
-          <p className="reward-reason">{lastReward.reason}</p>
-        </div>
-      </div>
-    );
-  };
-
-  if (loadError) {
-    return (
-      <div className="flex items-center justify-center w-full h-full bg-gray-900/90 rounded-lg p-4 border border-cyan-500/30 shadow-lg shadow-cyan-500/20">
-        <div className="text-center max-w-md">
-          <div className="text-red-500 font-medium mb-2">Failed to load 3D Chess</div>
-          <p className="text-gray-400 text-sm mb-4">
-            There was a problem loading the game. This could be due to WebGL not being supported in your browser,
-            or the browser's privacy settings blocking certain features.
-          </p>
-          
-          {webGLSupported === false && (
-            <div className="bg-red-900/30 border border-red-700/40 rounded-md p-3 mb-4">
-              <p className="text-red-300 text-xs mb-2">
-                <strong>WebGL Not Available:</strong> Your browser doesn't support WebGL or it's currently disabled.
-              </p>
-              {webGLError && (
-                <p className="text-yellow-300 text-xs mb-2">
-                  <strong>Specific Issue:</strong> {webGLError}
-                </p>
-              )}
-              <ul className="text-red-200 text-xs list-disc list-inside space-y-1">
-                <li>Try updating your browser to the latest version</li>
-                <li>Check if your graphics card supports WebGL</li>
-                <li>Disable hardware acceleration and try again</li>
-                <li>If using Brave, disable shields for this site</li>
-              </ul>
+  // Render the appropriate mode
+  const renderChessGame = () => {
+    switch (renderMode) {
+      case 'loading':
+        return (
+          <div className="flex items-center justify-center w-full h-full bg-gray-800 rounded-xl">
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+              <div className="text-blue-400">{loadingMessage || 'Loading chess...'}</div>
             </div>
-          )}
-          
-          <div className="space-y-3 mt-4">
-            <button 
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:brightness-110 text-white px-4 py-2 rounded w-full font-medium shadow-md shadow-blue-500/20 transition duration-200"
-              onClick={() => {
-                retryCount.current = 0;
-                setLoadError(false);
-                setWebGLError(null);
-                setRetryAttempted(true);
-                setLoadingMessage('Reloading chess game...');
-                setTimeout(() => window.location.reload(), 500);
-              }}
-            >
-              Reload Game
-            </button>
-            <button
-              className="bg-gradient-to-r from-gray-600 to-gray-800 hover:brightness-110 text-white px-4 py-2 rounded w-full text-sm shadow-md transition duration-200"
-              onClick={() => {
-                retryCount.current++;
-                setLoadError(false);
-                setRetryAttempted(true);
-                setLoadingMessage('Loading with compatibility settings...');
-                if (onGameEnd) onGameEnd('restart');
-              }}
-            >
-              Try Compatibility Mode
-            </button>
-            {retryCount.current > 0 && (
-              <button
-                className="bg-gradient-to-r from-yellow-600 to-amber-700 hover:brightness-110 text-white px-4 py-2 rounded w-full text-sm transition duration-200"
-                onClick={() => {
-                  window.location.href = '/arcade?mode=2d';
-                }}
-              >
-                Try 2D Mode Instead
-              </button>
+          </div>
+        );
+        
+      case '3d':
+        return (
+          <div ref={mountRef} className="w-full h-full relative">
+            {/* 3D canvas will be mounted here */}
+            {showRewardAnimation && lastReward && (
+              <div className="absolute top-5 left-1/2 transform -translate-x-1/2 bg-blue-900/80 backdrop-blur-md p-3 rounded-xl text-center animate-float-up">
+                <div className="text-yellow-300 font-bold">+ {lastReward.amount} EMB</div>
+                <div className="text-blue-300">+ {lastReward.xp} XP</div>
+              </div>
+            )}
+            {isPremiumUser && (
+              <div className="absolute bottom-2 right-2 bg-purple-900/30 backdrop-blur-sm px-2 py-1 rounded text-xs text-purple-300">
+                Premium
+              </div>
+            )}
+            
+            {/* Overlay for load errors that allows retry */}
+            {loadError && (
+              <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
+                <div className="bg-gray-800 p-5 rounded-xl max-w-md text-center">
+                  <svg className="w-14 h-14 text-red-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <h3 className="text-lg font-medium text-white mb-2">3D Chess Failed to Load</h3>
+                  <p className="text-gray-300 mb-3">{webGLError || 'There was a problem loading the 3D chess game.'}</p>
+                  <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 justify-center">
+                    <button
+                      onClick={retryLoading}
+                      disabled={retryCount.current >= maxRetries}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Retry {retryCount.current > 0 ? `(${retryCount.current}/${maxRetries})` : ''}
+                    </button>
+                    <button
+                      onClick={switchTo2DEnhancedMode}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded"
+                    >
+                      Switch to 2D Mode
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
-          
-          <div className="mt-4 p-3 bg-blue-900/30 border border-blue-700/40 rounded-md">
-            <p className="text-blue-300 text-sm">
-              <strong>Troubleshooting Tips:</strong>
-            </p>
-            <ul className="text-blue-200 text-xs list-disc list-inside mt-2 space-y-1">
-              <li>Make sure your browser is updated to the latest version</li>
-              <li>Check if WebGL is enabled in your browser settings</li>
-              <li>Disable any browser extensions that might block WebGL content</li>
-              <li>If using a privacy-focused browser like Brave, temporarily disable shields</li>
-              <li>Try using Chrome or Edge which generally have better WebGL support</li>
-            </ul>
-          </div>
-
-          {retryAttempted && (
-            <div className="mt-4 p-3 bg-purple-900/30 border border-purple-700/40 rounded-md">
-              <p className="text-purple-300 text-sm">
-                <strong>Need help?</strong> If you continue having issues after trying the suggestions, please contact our support team at support@embassytrade.ai with the following error details:
-              </p>
-              <div className="bg-gray-900 text-xs text-purple-200 p-2 mt-2 rounded overflow-auto max-h-16">
-                Error: {webGLError || "WebGL not supported"}
-                <br />
-                Browser: {navigator.userAgent}
+        );
+        
+      case '2d-enhanced':
+        return (
+          <div className="w-full h-full relative">
+            {/* Enhanced 2D version with premium features when available */}
+            <div className="h-full w-full">
+              <ChessIsolated 
+                difficulty={difficulty}
+                onGameEnd={handleGameEnd}
+                isPremium={isPremiumUser}
+                onSpecialMove={handleSpecialMove}
+                theme={isPremiumUser ? 'premium' : 'standard'}
+              />
+            </div>
+            
+            {showRewardAnimation && lastReward && (
+              <div className="absolute top-5 left-1/2 transform -translate-x-1/2 bg-blue-900/80 backdrop-blur-md p-3 rounded-xl text-center animate-float-up">
+                <div className="text-yellow-300 font-bold">+ {lastReward.amount} EMB</div>
+                <div className="text-blue-300">+ {lastReward.xp} XP</div>
               </div>
+            )}
+            
+            {isPremiumUser && (
+              <div className="absolute bottom-2 right-2 bg-purple-900/30 backdrop-blur-sm px-2 py-1 rounded text-xs text-purple-300">
+                Premium
+              </div>
+            )}
+            
+            {/* Subtle indicator that this is the 2D fallback */}
+            <div className="absolute top-2 left-2 bg-gray-800/70 backdrop-blur-sm px-2 py-1 rounded text-xs text-gray-300">
+              2D Enhanced Mode
             </div>
-          )}
-
-          {retryCount.current > 0 && !webGLError && (
-            <div className="mt-4 p-3 bg-yellow-800/30 border border-yellow-700/30 rounded-md">
-              <p className="text-yellow-300 text-sm">
-                <strong>Browser compatibility note:</strong> Brave and some other privacy-focused browsers may block WebGL content. 
-                Try disabling shields for this site, use Chrome/Edge, or try the 2D mode for the best experience.
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (!mountRef.current || !chessRef.current) {
-    return (
-      <div className="flex items-center justify-center w-full h-full bg-gray-900/90 rounded-lg p-4 border border-blue-500/30">
-        <div className="flex flex-col items-center justify-center">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-          <div className="text-blue-400 mb-3">{loadingMessage}</div>
-          {loadTimeoutRef.current && (
-            <div className="text-xs text-blue-300 mt-2">
-              If loading takes too long, you can {" "}
-              <button 
-                className="underline text-cyan-400 hover:text-cyan-300"
-                onClick={() => {
-                  if (loadTimeoutRef.current) {
-                    clearTimeout(loadTimeoutRef.current);
-                  }
-                  setLoadError(true);
-                }}
-              >
-                try compatibility mode
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
+          </div>
+        );
+        
+      case 'isolated':
+        return <ChessIsolated 
+                difficulty={difficulty}
+                onGameEnd={handleGameEnd}
+                isPremium={isPremiumUser}
+                onSpecialMove={handleSpecialMove}
+               />;
+                
+      default:
+        return <div className="text-red-500">Unknown render mode: {renderMode}</div>;
+    }
+  };
 
   return (
-    <div className="relative w-full h-full">
-      <div 
-        ref={mountRef} 
-        className="w-full h-full cursor-pointer"
-      />
+    <div className="w-full h-full">
+      {renderChessGame()}
       
-      {gameStatus !== 'playing' && (
-        <div className="absolute top-4 left-4 px-4 py-2 rounded-md text-white font-medium bg-gray-800/80 backdrop-blur-sm">
-          {gameStatus === 'check' && "Check!"}
-          {gameStatus === 'checkmate' && `Checkmate! ${chessRef.current?.turn() === 'w' ? 'Black' : 'White'} wins!`}
-          {gameStatus === 'draw' && "Draw!"}
-          {gameStatus === 'stalemate' && "Stalemate!"}
-          {gameStatus === 'win' && "You won!"}
-          {gameStatus === 'loss' && "You lost!"}
+      {/* Premium features overlay */}
+      {showPremiumOverlay && (
+        <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
+          <div className="bg-gray-800 p-5 rounded-xl max-w-md">
+            <h3 className="text-xl font-medium text-white mb-3">Premium Chess Features</h3>
+            <ul className="text-gray-300 space-y-2 mb-4">
+              <li className="flex items-start">
+                <svg className="w-5 h-5 text-purple-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>Enhanced visual effects with dynamic lighting</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-5 h-5 text-purple-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>25% bonus rewards for winning games</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-5 h-5 text-purple-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>Unlock exclusive chess piece sets and animations</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-5 h-5 text-purple-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>Higher chance of receiving trading signals from games</span>
+              </li>
+            </ul>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowPremiumOverlay(false)}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
-      
-      {thinking && (
-        <div className="absolute bottom-4 right-4 px-4 py-2 rounded-md bg-blue-900/80 text-blue-100 flex items-center backdrop-blur-sm">
-          <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse mr-2"></div>
-          Computer is thinking...
-        </div>
-      )}
-      
-      <div className="absolute bottom-4 left-4 px-4 py-2 rounded-md bg-gray-800/80 text-white backdrop-blur-sm text-sm">
-        Click on a piece to select it, then click on a highlighted square to move
-      </div>
-      
-      <div className="absolute top-4 right-4 px-4 py-2 rounded-md bg-gray-800/80 text-white backdrop-blur-sm">
-        {thinking ? "Computer's turn" : "Your turn"}
-      </div>
-      
-      {!isIsolated && (
-        <div className={`absolute bottom-4 right-4 px-2 py-1 rounded-md text-xs ${
-          isConnectedToShyft ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'
-        }`}>
-          {isConnectedToShyft ? 'Connected to Shyft' : 'Offline Mode'}
-        </div>
-      )}
-
-      {renderRewardAnimation()}
     </div>
   );
 };
 
-export default React.memo(ChessGame);
+export default ChessGame;

@@ -1,202 +1,146 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useTokenService } from '../lib/tokenService';
-import { EMB_TOKEN_CONFIG, convertToUsd } from '../lib/embToken';
+import { useState, useEffect } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletConnectionButton } from '../lib/WalletProvider';
+import { JupiterProviderWrapper } from '../lib/JupiterProviderWrapper';
+import EMB_TOKEN_CONFIG from '../lib/embToken'; // Import the token config
 
-/**
- * SwapToEMB component for swapping other coins to EMB
- * Integrates with Solana wallet and pump.fun for EMB token purchases
- */
-export default function SwapToEMB({ selectedCoin, balances, onSwap }) {
-  const [amount, setAmount] = useState('');
-  const [receiveAmount, setReceiveAmount] = useState('0.00');
-  const [isSwapping, setIsSwapping] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
-  
-  // Use our token service
-  const {
-    walletConnected,
-    publicKey,
-    balance: embBalance,
-    isLoading,
-    error,
-    connectWallet,
-    swapTokens,
-    buyTokens
-  } = useTokenService();
+// Token Metadata using consistent token address from config
+const TOKEN_METADATA = {
+  'So11111111111111111111111111111111111111112': {
+    symbol: 'SOL',
+    name: 'Solana',
+    decimals: 9,
+    logoURI: '/images/tokens/sol.png'
+  },
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZvyTDt1v': {
+    symbol: 'USDC',
+    name: 'USD Coin',
+    decimals: 6,
+    logoURI: '/images/tokens/usdc.png'
+  },
+  [EMB_TOKEN_CONFIG.contract]: {
+    symbol: EMB_TOKEN_CONFIG.symbol,
+    name: EMB_TOKEN_CONFIG.name,
+    decimals: EMB_TOKEN_CONFIG.decimals,
+    logoURI: '/images/tokens/emb.png'
+  }
+};
 
-  // Don't show if EMB is already selected
-  if (selectedCoin === 'EMB') return null;
+function SwapToEMBContent() {
+  const { connected } = useWallet();
+  const [showInfo, setShowInfo] = useState(false);
 
-  // Calculate the receive amount whenever the input amount changes
-  useEffect(() => {
-    if (!amount || parseFloat(amount) <= 0) {
-      setReceiveAmount('0.00');
-      return;
-    }
-    
-    const inputAmount = parseFloat(amount);
-    // Apply exchange rate - this would normally come from an oracle or API
-    const exchangeRate = selectedCoin === 'SOL' 
-      ? 1 / EMB_TOKEN_CONFIG.exchangeRates.sol 
-      : 1; // Default 1:1 for other coins
-      
-    setReceiveAmount((inputAmount * exchangeRate).toFixed(2));
-  }, [amount, selectedCoin]);
-
-  const handleAmountChange = (e) => {
-    const value = e.target.value;
-    // Only allow numeric input with up to 6 decimal places
-    if (value === '' || /^\d+(\.\d{0,6})?$/.test(value)) {
-      setAmount(value);
-    }
+  // Function to redirect to PumpFun
+  const redirectToPumpFun = () => {
+    window.open(EMB_TOKEN_CONFIG.links.pump, '_blank');
   };
 
-  const handleSwap = async () => {
-    if (!amount || parseFloat(amount) <= 0) return;
-    
-    const swapAmount = parseFloat(amount);
-    
-    // Check if user has enough balance
-    if (balances[selectedCoin] < swapAmount) {
-      alert(`Insufficient ${selectedCoin} balance!`);
-      return;
-    }
-    
-    // Check if wallet is connected
-    if (!walletConnected) {
-      const connected = await connectWallet();
-      if (!connected) return;
-    }
-    
-    setIsSwapping(true);
-    try {
-      // Perform the swap through our token service
-      const result = await swapTokens(selectedCoin, 'EMB', swapAmount);
-      
-      if (result.success) {
-        // Call the parent component's onSwap callback
-        onSwap(selectedCoin, 'EMB', swapAmount, result.receivedAmount);
-        setAmount(''); // Reset input after successful swap
-      } else {
-        alert(`Swap failed: ${result.error}`);
-      }
-    } catch (error) {
-      console.error('Swap error:', error);
-      alert(`Failed to swap: ${error.message}`);
-    } finally {
-      setIsSwapping(false);
-    }
-  };
-
-  // Go to pump.fun to buy EMB directly
-  const handleBuyOnPump = () => {
-    buyTokens();
-  };
+  // UI for wallet not connected
+  if (!connected) {
+    return (
+      <div className="bg-gray-800 text-white rounded-lg shadow-md p-5">
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-semibold mb-2">Get EMB Token</h2>
+          <p className="text-gray-300">Connect your wallet to access EMB token</p>
+        </div>
+        <div className="flex justify-center">
+          <WalletConnectionButton />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mt-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
-      <h3 className="text-lg font-semibold mb-2 flex items-center">
-        <span>Swap to $EMB</span>
-        <span className="ml-2 px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded-full text-xs font-normal">
-          Token: {EMB_TOKEN_CONFIG.contract.slice(0, 4)}...{EMB_TOKEN_CONFIG.contract.slice(-4)}
-        </span>
-      </h3>
-      
-      <div className="flex items-center space-x-2 mb-4">
+    <div className="bg-gray-800 text-white rounded-lg shadow-md p-5">
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold mb-1">Get EMB Token</h2>
         <p className="text-sm text-gray-300">
-          Convert your ${selectedCoin} to $EMB tokens and access premium features!
+          Purchase EMB to unlock paper trading and premium features!
         </p>
-        <button 
-          onClick={() => setShowDetails(!showDetails)}
-          className="text-xs px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded-md"
-        >
-          {showDetails ? 'Hide Details' : 'Show Details'}
-        </button>
       </div>
 
-      {showDetails && (
-        <div className="mb-4 p-3 bg-gray-800/50 rounded border border-gray-700 text-xs text-gray-300 space-y-1">
-          <p>• EMB is the native utility token for Embassy AI platform</p>
-          <p>• Contract: {EMB_TOKEN_CONFIG.contract}</p>
-          <p>• Network: Solana {EMB_TOKEN_CONFIG.network}</p>
-          <p>• Use EMB for premium features and enhanced rewards</p>
-          <p>• <a href={EMB_TOKEN_CONFIG.links.explorer} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">View on Solana Explorer</a></p>
-        </div>
-      )}
-
-      <div className="flex items-center space-x-3 mb-4">
-        <div className="flex-1">
-          <label htmlFor="swap-amount" className="block text-xs text-gray-400 mb-1">
-            Amount (${selectedCoin})
-          </label>
-          <input
-            id="swap-amount"
-            type="text"
-            value={amount}
-            onChange={handleAmountChange}
-            placeholder={`Enter ${selectedCoin} amount`}
-            className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white"
+      {/* EMB Token Card */}
+      <div className="mb-5 border border-gray-700 rounded-lg p-4 bg-gradient-to-r from-gray-900 to-gray-800">
+        <div className="flex items-center mb-3">
+          <img 
+            src="/images/tokens/emb.png" 
+            alt="EMB"
+            className="w-10 h-10 rounded-full mr-3"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/images/tokens/unknown.png';
+            }}
           />
-        </div>
-
-        <div className="flex-none flex flex-col items-center justify-center">
-          <span className="text-gray-400 text-2xl">→</span>
-        </div>
-
-        <div className="flex-1">
-          <label htmlFor="receive-amount" className="block text-xs text-gray-400 mb-1">
-            Receive ($EMB)
-          </label>
-          <div className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-blue-400 font-medium">
-            {receiveAmount}
+          <div>
+            <h3 className="font-bold text-lg">{EMB_TOKEN_CONFIG.name} ({EMB_TOKEN_CONFIG.symbol})</h3>
+            <p className="text-sm text-gray-300">Early access token</p>
           </div>
         </div>
-      </div>
-
-      <div className="flex justify-between items-center text-xs text-gray-400 mb-4">
-        <span>Rate: 1 ${selectedCoin} = {selectedCoin === 'SOL' ? (1 / EMB_TOKEN_CONFIG.exchangeRates.sol).toFixed(0) : '1'} $EMB</span>
-        <span>Balance: {balances[selectedCoin]?.toFixed(2) || '0.00'} ${selectedCoin}</span>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          onClick={handleSwap}
-          disabled={!amount || parseFloat(amount) <= 0 || isSwapping || isLoading}
-          className={`py-2.5 px-4 rounded-md font-medium transition-colors ${
-            !amount || parseFloat(amount) <= 0 || isSwapping || isLoading
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
-          }`}
-        >
-          {isSwapping ? 'Swapping...' : `Swap ${selectedCoin} to EMB`}
-        </button>
         
-        <button
-          onClick={handleBuyOnPump}
-          className="py-2.5 px-4 rounded-md font-medium transition-colors bg-purple-600 hover:bg-purple-700 text-white"
+        <div className="bg-gray-700 rounded-lg p-3 mb-3 shadow-sm">
+          <p className="text-sm mb-1"><span className="font-medium">Token:</span> {EMB_TOKEN_CONFIG.symbol}</p>
+          <p className="text-sm mb-1"><span className="font-medium">Network:</span> Solana</p>
+          <p className="text-sm text-xs text-gray-300 break-all">
+            <span className="font-medium">Address:</span> {EMB_TOKEN_CONFIG.contract}
+          </p>
+        </div>
+
+        {showInfo && (
+          <div className="bg-gray-700 rounded-lg p-3 mb-3">
+            <h4 className="font-medium text-sm mb-1">What can you do with EMB?</h4>
+            <ul className="text-sm list-disc pl-5 space-y-1 text-gray-300">
+              <li>Access paper trading features</li>
+              <li>Play arcade games (1 EMB per chess game)</li>
+              <li>Unlock premium trading features</li>
+              <li>Participate in the Embassy ecosystem</li>
+            </ul>
+          </div>
+        )}
+
+        <button 
+          onClick={() => setShowInfo(!showInfo)} 
+          className="text-sm text-blue-400 hover:text-blue-300 mb-4 flex items-center"
         >
-          Buy on pump.fun
+          {showInfo ? 'Hide info' : 'Show more info'}
+          <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ml-1 transition-transform ${showInfo ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </button>
       </div>
-      
-      {error && (
-        <div className="mt-3 text-xs text-red-400">
-          Error: {error}
-        </div>
-      )}
-      
-      <div className="mt-3 text-xs text-gray-400">
-        {walletConnected ? (
-          <div className="flex items-center space-x-1">
-            <span className="w-2 h-2 bg-green-500 rounded-full"/>
-            <span>Wallet connected: {publicKey?.slice(0, 6)}...{publicKey?.slice(-4)}</span>
-          </div>
-        ) : (
-          <div>Connect wallet to swap tokens directly</div>
-        )}
+
+      {/* Get EMB Button */}
+      <button
+        onClick={redirectToPumpFun}
+        className="w-full py-3 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center"
+      >
+        <span>Get EMB on Pump.fun</span>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </button>
+
+      <div className="mt-4 p-3 bg-amber-900 border border-amber-800 rounded-lg">
+        <h4 className="font-medium text-amber-200 text-sm mb-1">Important Note:</h4>
+        <p className="text-sm text-amber-300">
+          After purchasing EMB on Pump.fun, return to this app to use it for paper trading and arcade features.
+          The token will automatically be recognized by your connected wallet.
+        </p>
+      </div>
+
+      <div className="mt-4 text-center text-xs text-gray-400">
+        EMB tokens are used for utility within the Embassy platform
       </div>
     </div>
+  );
+}
+
+// Wrapped component (keeping the wrapper for consistency with the rest of the app)
+export default function SwapToEMB(props) {
+  return (
+    <JupiterProviderWrapper>
+      <SwapToEMBContent {...props} />
+    </JupiterProviderWrapper>
   );
 }

@@ -1692,3 +1692,15 @@
 {"level":"info","message":"Server running on port 4002","timestamp":"2025-04-04T00:26:41.381Z"}
 {"level":"info","message":"WebSocket server ready for trade signal streaming","timestamp":"2025-04-04T00:26:41.389Z"}
 {"level":"info","message":"Note: Using alternate port 4002 because port 4001 was in use","timestamp":"2025-04-04T00:26:41.391Z"}
+{"level":"info","message":"Server running on port 4001","timestamp":"2025-04-04T15:22:14.138Z"}
+{"level":"info","message":"WebSocket server ready for trade signal streaming","timestamp":"2025-04-04T15:22:14.143Z"}
+{"level":"info","message":"Server running on port 4001","timestamp":"2025-04-04T19:03:20.819Z"}
+{"level":"info","message":"WebSocket server ready for trade signal streaming","timestamp":"2025-04-04T19:03:20.825Z"}
+{"level":"info","message":"Server running on port 4001","timestamp":"2025-04-04T19:08:16.751Z"}
+{"level":"info","message":"WebSocket server ready for trade signal streaming","timestamp":"2025-04-04T19:08:16.758Z"}
+{"level":"info","message":"Server running on port 4001","timestamp":"2025-04-04T19:15:31.951Z"}
+{"level":"info","message":"WebSocket server ready for trade signal streaming","timestamp":"2025-04-04T19:15:31.955Z"}
+{"level":"info","message":"Server running on port 4001","timestamp":"2025-04-04T19:19:56.819Z"}
+{"level":"info","message":"WebSocket server ready for trade signal streaming","timestamp":"2025-04-04T19:19:56.827Z"}
+{"level":"info","message":"Server running on port 4001","timestamp":"2025-04-05T00:33:42.581Z"}
+{"level":"info","message":"WebSocket server ready for trade signal streaming","timestamp":"2025-04-05T00:33:42.585Z"}
