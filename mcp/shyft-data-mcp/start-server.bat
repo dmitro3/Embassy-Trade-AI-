@@ -1,0 +1,3 @@
+@echo off
+echo Starting SHYFT Data Normalization MCP Server...
+node index.js

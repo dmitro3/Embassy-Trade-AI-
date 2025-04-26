@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "github.com/tradeforce/token-discovery-mcp": {
+      "command": "node",
+      "args": ["index.js"],
+      "cwd": "mcp/token-discovery-mcp",
+      "env": {
+        "SOLANA_RPC_URL": "https://api.devnet.solana.com",
+        "SHYFT_API_KEY": "whv00T87G8Sd8TeK",
+        "BIRDEYE_API_KEY": "67f8ce614c594ab2b3efb742f8db69db",
+        "PORT": "3100",
+        "LOG_LEVEL": "info"
+      },
+      "autoApprove": [
+        "scan_new_tokens",
+        "analyze_token",
+        "monitor_token"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "transportType": "stdio"
+    }
+  }
+}

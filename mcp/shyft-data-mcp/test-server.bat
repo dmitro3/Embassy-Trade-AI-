@@ -1,0 +1,3 @@
+@echo off
+echo Testing SHYFT Data Normalization MCP Server...
+node test-server.js
