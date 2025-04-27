@@ -1,0 +1,73 @@
+{
+  "manifest_version": 3,
+  "name": "TradeForce AI Trading Agent",
+  "version": "1.0.0",
+  "description": "AI-powered trading agent for Robinhood, Kraken, AXIOM, and Web3 wallets with 65%+ win rate",
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://*.robinhood.com https://*.kraken.com https://*.axiom.trade https://api.grok3.ai wss://*.robinhood.com wss://*.kraken.com wss://*.axiom.trade https://*.solana.com"
+  },
+  "permissions": [
+    "storage",
+    "tabs",
+    "webNavigation",
+    "scripting",
+    "notifications",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://robinhood.com/*",
+    "https://trade.kraken.com/*",
+    "https://axiom.trade/*",
+    "https://api.grok3.ai/*",
+    "wss://ws.kraken.com/*",
+    "wss://ws-auth.kraken.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://axiom.trade/*"],
+      "js": ["content/axiom-content.js"],
+      "css": ["content/content.css"]
+    },
+    {
+      "matches": ["https://robinhood.com/*"],
+      "js": ["content/robinhood-content.js"],
+      "css": ["content/content.css"]
+    },
+    {
+      "matches": ["https://trade.kraken.com/*"],
+      "js": ["content/kraken-content.js"],
+      "css": ["content/content.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+T",
+        "mac": "Command+Shift+T"
+      },
+      "description": "Open TradeForce AI Trading Agent"
+    }
+  }
+}

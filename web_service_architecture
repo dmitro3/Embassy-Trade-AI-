@@ -1,0 +1,19 @@
+digraph "Web Service Architecture" {
+	graph [fontcolor="#2D3436" fontname="Sans-Serif" fontsize=15 label="Web Service Architecture" nodesep=0.60 pad=2.0 rankdir=LR ranksep=0.75 splines=ortho]
+	node [fixedsize=true fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13 height=1.4 imagescale=true labelloc=b shape=box style=rounded width=1.4]
+	edge [color="#7B8894"]
+	"43887bc59ef74b44b2f034234ba9c760" -> b89efe760483431d9e5738930bc531cb [dir=forward fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13]
+	b89efe760483431d9e5738930bc531cb -> "1720edeebb364882bc70f01338eed3ec" [dir=forward fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13]
+	subgraph "cluster_AWS Cloud" {
+		graph [bgcolor="#E5F5FD" fontname="Sans-Serif" fontsize=12 label="AWS Cloud" labeljust=l pencolor="#AEB6BE" rankdir=LR shape=box style=rounded]
+		"43887bc59ef74b44b2f034234ba9c760" [label="Load Balancer" height=1.9 image="C:\Users\pablo\Projects\embassy-trade-motia\web\backend\venv\Lib\site-packages\resources/aws/network\elastic-load-balancing.png" shape=none]
+		subgraph "cluster_Web Tier" {
+			graph [bgcolor="#EBF3E7" fontname="Sans-Serif" fontsize=12 label="Web Tier" labeljust=l pencolor="#AEB6BE" rankdir=LR shape=box style=rounded]
+			b89efe760483431d9e5738930bc531cb [label="Web Server" height=1.9 image="C:\Users\pablo\Projects\embassy-trade-motia\web\backend\venv\Lib\site-packages\resources/aws/compute\ec2.png" shape=none]
+		}
+		subgraph "cluster_Database Tier" {
+			graph [bgcolor="#EBF3E7" fontname="Sans-Serif" fontsize=12 label="Database Tier" labeljust=l pencolor="#AEB6BE" rankdir=LR shape=box style=rounded]
+			"1720edeebb364882bc70f01338eed3ec" [label=Database height=1.9 image="C:\Users\pablo\Projects\embassy-trade-motia\web\backend\venv\Lib\site-packages\resources/aws/database\rds.png" shape=none]
+		}
+	}
+}

@@ -1,0 +1,15 @@
+/*
+ * This is a CSS fix file that will replace the problematic section in your globals.css
+ * Copy these corrected rules to replace lines ~4654-4659 in your globals.css file
+ */
+
+/* Fix for invalid CSS classes with negative values */
+.\[-20\:\-10\] {
+  margin-top: -20px;
+  margin-bottom: -10px;
+}
+
+.\[-20\:\-1\] {
+  margin-top: -20px;
+  margin-bottom: -1px;
+}

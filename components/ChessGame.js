@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { EMB_TOKEN_CONFIG } from '@/lib/embToken';
-import { useChessRewards } from '@/lib/useChessRewards';
-import { useWallet } from '@/lib/WalletProvider';
+import { EMB_TOKEN_CONFIG } from '../lib/embToken';
+import { useChessRewards } from '../lib/useChessRewards';
+import { useWallet } from '../lib/WalletProvider';
 import ChessIsolated from './ChessIsolated';
 
 const ChessGame = ({ difficulty = 'medium', onGameEnd, isIsolated = false, isPremium = false }) => {

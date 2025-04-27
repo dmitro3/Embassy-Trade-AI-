@@ -1,0 +1,32 @@
+{
+  "name": "axiom-trade-master-bot",
+  "version": "1.0.0",
+  "description": "Automated trading bot for Axiom Trade with Solana wallet integration",
+  "main": "background/background.js",
+  "scripts": {
+    "build": "echo \"No build step required\" && exit 0",
+    "lint": "eslint .",
+    "test": "echo \"No tests specified\" && exit 0",
+    "package": "zip -r axiom-trade-master-bot.zip . -x \"*.git*\" -x \"node_modules/*\"",
+    "package:win": "powershell -ExecutionPolicy Bypass -File .\\package-extension.ps1"
+  },
+  "keywords": [
+    "browser-extension",
+    "chrome-extension",
+    "trading-bot",
+    "solana",
+    "axiom-trade",
+    "cryptocurrency"
+  ],
+  "author": "TRADEFORCE",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.4"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.87.6"
+  }
+}

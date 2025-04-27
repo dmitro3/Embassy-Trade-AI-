@@ -4,19 +4,20 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import EmbassyLogo from './EmbassyLogo';
-import { useTokenService } from '@/lib/tokenService';
+import { useTokenService } from '../lib/tokenService';
 
 /**
  * Header component for the Embassy Trade AI application
  */
 const Header = () => {
   const pathname = usePathname();
-  const { walletConnected, publicKey, balance, connectWallet, disconnectWallet } = useTokenService();
+  const { walletConnected, publicKey, connectWallet, disconnectWallet } = useTokenService();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [pulseAnimation, setPulseAnimation] = useState(true);
   const [sparkleEffect, setSparkleEffect] = useState(true);
   const [rotateEffect, setRotateEffect] = useState(false); // New state for rotate effect
+  const [prevWalletState, setPrevWalletState] = useState(false);
 
   // Track scroll position to adjust header styling
   useEffect(() => {
@@ -29,6 +30,21 @@ const Header = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Close menu when wallet connection state changes
+  useEffect(() => {
+    // Only close the menu when wallet gets connected (not disconnected)
+    if (walletConnected && !prevWalletState) {
+      // Add a small delay for a smoother transition
+      const timer = setTimeout(() => {
+        setIsMenuOpen(false);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+    
+    setPrevWalletState(walletConnected);
+  }, [walletConnected, prevWalletState]);
 
   // Enhanced animations for the Kill Some Time link
   useEffect(() => {
@@ -57,10 +73,19 @@ const Header = () => {
 
   // Navigation items (without Arcade, since we'll add a special "Kill Some Time" button)
   const navItems = [
-    { label: 'Trade', path: '/trade' },
+    { label: 'TradeForce', path: '/tradeforce' },
     { label: 'Portfolio', path: '/portfolio' },
+    { label: 'Token Discovery', path: '/token-discovery' },
     { label: 'Simulation', path: '/simulation' },
+    { label: 'Social Butterfly', path: '/social-butterfly' },
+    { label: 'Live Statistics', path: '/live-statistics' },
   ];
+
+  // Handle wallet connection
+  const handleConnectWallet = async () => {
+    await connectWallet();
+    // Menu will be closed by the useEffect that tracks wallet connection state
+  };
 
   return (
     <header
@@ -165,11 +190,6 @@ const Header = () => {
           <div className="flex items-center">
             {walletConnected ? (
               <div className="hidden md:flex items-center">
-                <div className="mr-4 bg-gray-800/80 rounded-xl backdrop-blur-sm px-4 py-1.5 border border-gray-700/30">
-                  <div className="text-xs text-[#00FFA3]">EMB Balance</div>
-                  <div className="text-white font-medium">{balance ? balance.toFixed(2) : '0.00'}</div>
-                </div>
-
                 <div className="relative">
                   <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -199,7 +219,7 @@ const Header = () => {
               </div>
             ) : (
               <button
-                onClick={connectWallet}
+                onClick={handleConnectWallet}
                 className="bg-gradient-to-r from-[#00FFA3] to-[#9945FF] text-gray-900 px-5 py-2.5 rounded-lg flex items-center text-sm font-medium hover:opacity-90 transform transition hover:scale-105"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,12 +316,6 @@ const Header = () => {
                       <span className="text-white text-sm">
                         {publicKey?.toString().slice(0, 4)}...{publicKey?.toString().slice(-4)}
                       </span>
-                    </div>
-                  </li>
-                  <li className="px-4 py-2">
-                    <div className="flex items-center justify-between bg-gray-800/60 rounded-lg px-4 py-2 border border-gray-700/30">
-                      <span className="text-gray-400 text-sm">EMB Balance</span>
-                      <span className="text-[#00FFA3] font-medium">{balance ? balance.toFixed(2) : '0.00'}</span>
                     </div>
                   </li>
                   <li>

@@ -1,4 +1,5 @@
-module.exports = {
+// Convert from CommonJS to ES Module syntax
+export default {
   plugins: {
     'tailwindcss': {},
     'autoprefixer': {},

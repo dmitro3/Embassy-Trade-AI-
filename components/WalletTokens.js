@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import networks from '../lib/networks';
+import { getConnection, getStandardConnection } from '../lib/networks';
+import SolanaRpcClient from '../lib/solanaRpc';
+import tokenAccountService from '../lib/tokenAccountService';
 import axios from 'axios';
 import { Tooltip } from 'react-tooltip';
 
@@ -38,6 +40,13 @@ const TOKEN_METADATA = {
     logoURI: '/images/tokens/usdc.png',
     coingeckoId: 'usd-coin'
   },
+  '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU': {
+    symbol: 'USDC',
+    name: 'USD Coin (Devnet)',
+    decimals: 6,
+    logoURI: '/images/tokens/usdc.png',
+    coingeckoId: 'usd-coin'
+  },
   'D8U9GxmBGs98geNjWkrYf4GUjHqDvMgG5XdL41TXpump': {
     symbol: 'EMB',
     name: 'Embassy Token',
@@ -47,7 +56,24 @@ const TOKEN_METADATA = {
   }
 };
 
-export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
+/**
+ * Validates a Solana public key or mint address
+ * @param {string} address - The address to validate
+ * @returns {boolean} - True if valid, false otherwise
+ */
+const isValidSolanaAddress = (address) => {
+  if (!address || typeof address !== 'string') return false;
+  
+  try {
+    new PublicKey(address);
+    return true;
+  } catch (error) {
+    console.warn(`Invalid Solana address: ${address}`, error.message);
+    return false;
+  }
+};
+
+export default function WalletTokens({ onSelectToken, networkId = 'solana', excludeEMB = false }) {
   const { publicKey, connected } = useWallet();
   const [tokens, setTokens] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +85,7 @@ export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
   const [sortOption, setSortOption] = useState('value'); // 'name', 'balance', 'value'
   const [lastTransactions, setLastTransactions] = useState({});
   const priceRetryCount = useRef(0);
+  const connectionErrorCount = useRef(0);
   
   // Format token balance with the correct number of decimals
   const formatTokenBalance = (amount, decimals) => {
@@ -90,7 +117,8 @@ export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
       if (tokenIds.length === 0) return;
       
       const response = await axios.get(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${tokenIds.join(',')}&vs_currencies=usd&include_24h_change=true`
+        `https://api.coingecko.com/api/v3/simple/price?ids=${tokenIds.join(',')}&vs_currencies=usd&include_24h_change=true`,
+        { timeout: 5000 } // 5 second timeout
       );
       
       if (response.data) {
@@ -116,8 +144,6 @@ export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
     setIsNetworkSwitching(true);
     try {
       if (newNetworkId === 'solana') {
-        // Update network in our networks utility
-        networks.network = 'mainnet';
         setCurrentNetwork(newNetworkId);
         // Clear tokens when switching networks
         setTokens([]);
@@ -135,61 +161,91 @@ export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
     }
   };
 
-  // Fetch recent transactions for an account
+  // Fetch recent transactions for an account safely with robust error handling
   const fetchRecentTransactions = async (address) => {
-    if (!publicKey) return;
+    if (!publicKey) return null;
     
     try {
-      const connection = networks.getStandardConnection();
+      // Validate the address before proceeding
+      if (!isValidSolanaAddress(address)) {
+        return null;
+      }
       
-      // Get recent transactions (last 10)
-      const signatures = await connection.getSignaturesForAddress(
-        new PublicKey(address),
-        { limit: 5 }
-      );
+      let connection;
+      try {
+        connection = getStandardConnection();
+      } catch (connErr) {
+        console.warn('Could not get standard connection:', connErr.message);
+        return null;
+      }
       
-      if (signatures && signatures.length > 0) {
-        const latestTx = signatures[0];
-        return {
-          signature: latestTx.signature,
-          time: latestTx.blockTime ? new Date(latestTx.blockTime * 1000) : null,
-          status: latestTx.confirmationStatus
-        };
+      // Get recent transactions (last 5) with timeout
+      try {
+        const pubkey = new PublicKey(address);
+        
+        // Set up a timeout promise
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Transaction fetch timed out')), 5000)
+        );
+        
+        // Get signatures with timeout
+        const signaturesPromise = connection.getSignaturesForAddress(pubkey, { limit: 5 });
+        const signatures = await Promise.race([signaturesPromise, timeoutPromise]);
+        
+        if (signatures && signatures.length > 0) {
+          const latestTx = signatures[0];
+          return {
+            signature: latestTx.signature,
+            time: latestTx.blockTime ? new Date(latestTx.blockTime * 1000) : null,
+            status: latestTx.confirmationStatus
+          };
+        }
+      } catch (err) {
+        // Non-critical error, just log a warning
+        console.warn(`Could not fetch signatures for address ${address.substring(0, 6)}...`, err.message);
       }
       
       return null;
     } catch (err) {
-      console.error('Error fetching recent transactions:', err);
+      console.warn('Error fetching recent transactions:', err);
       return null;
     }
   };
 
-  // Fetch native SOL balance and SPL tokens
+  // Fetch native SOL balance and SPL tokens with better error handling
   const fetchTokenBalances = async () => {
-    if (!publicKey) return;
+    if (!connected) {
+      setTokens([]);
+      return;
+    }
+    
+    if (!publicKey || !isValidSolanaAddress(publicKey.toString())) {
+      setError('Invalid wallet address');
+      return;
+    }
     
     setIsLoading(true);
     setError(null);
     
     try {
-      // Use our networks utility to get a consistent connection
-      const connection = networks.getStandardConnection();
+      // Get SOL balance with robust retry using our enhanced RPC client
+      let solBalance = 0;
+      try {
+        solBalance = await SolanaRpcClient.executeWithRetry(
+          getConnection().getBalance,
+          publicKey
+        );
+      } catch (err) {
+        console.error('Failed to get SOL balance after retries:', err);
+        throw new Error('Could not retrieve SOL balance. Network may be congested.');
+      }
       
-      // Get SOL balance
-      const solBalance = await connection.getBalance(publicKey);
-      
-      // Get all SPL token accounts
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-        publicKey,
-        { programId: TOKEN_PROGRAM_ID }
-      );
-
-      // Format token data
+      // Prepare token data array
       const tokenData = [];
       
       // Add SOL to the list
       tokenData.push({
-        mint: 'So11111111111111111111111111111111111111112', // Native SOL mint address
+        mint: 'So11111111111111111111111111111111111111112',
         address: publicKey.toString(),
         amount: solBalance,
         decimals: 9,
@@ -199,92 +255,169 @@ export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
         coingeckoId: 'solana'
       });
       
-      // Add SPL tokens
-      tokenAccounts.value.forEach(tokenAccount => {
-        const accountData = tokenAccount.account.data.parsed.info;
-        const mintAddress = accountData.mint;
-        const metadata = TOKEN_METADATA[mintAddress] || { 
-          symbol: 'Unknown',
-          name: `Token (${mintAddress.slice(0, 4)}...${mintAddress.slice(-4)})`,
-          decimals: accountData.tokenAmount.decimals,
-          logoURI: '/images/tokens/unknown.png'
-        };
+      try {
+        const connection = getConnection();
+        // Use our enhanced token account service to prevent TokenAccountNotFoundError
+        const tokenAccountsResponse = await tokenAccountService.getTokenAccounts(connection, publicKey);
+        const tokenAccounts = tokenAccountsResponse.value || [];
         
-        // Only add tokens with non-zero balance
-        if (accountData.tokenAmount.uiAmount > 0) {
-          tokenData.push({
-            mint: mintAddress,
-            address: tokenAccount.pubkey.toString(),
-            amount: accountData.tokenAmount.amount,
-            decimals: accountData.tokenAmount.decimals,
-            symbol: metadata.symbol,
-            name: metadata.name,
-            logoURI: metadata.logoURI,
-            coingeckoId: metadata.coingeckoId
-          });
+        // Reset connection error counter on success
+        connectionErrorCount.current = 0;
+        
+        // Add SPL tokens
+        if (tokenAccounts && Array.isArray(tokenAccounts)) {
+          for (const tokenAccount of tokenAccounts) {
+            try {
+              // Use our enhanced unwrap function with better type checking
+              const accountData = tokenAccountService.unwrapTokenAccount(tokenAccount);
+              
+              // Skip if account data couldn't be safely unwrapped
+              if (!accountData) {
+                continue;
+              }
+              
+              const mintAddress = accountData.mint;
+              
+              // Skip EMB token if excludeEMB is true
+              if (excludeEMB && mintAddress === 'D8U9GxmBGs98geNjWkrYf4GUjHqDvMgG5XdL41TXpump') {
+                continue;
+              }
+              
+              // Get token metadata or create placeholder for unknown tokens
+              const metadata = TOKEN_METADATA[mintAddress] || { 
+                symbol: 'Unknown',
+                name: `Token (${mintAddress.slice(0, 4)}...${mintAddress.slice(-4)})`,
+                decimals: accountData.decimals || 0,
+                logoURI: '/images/tokens/unknown.png'
+              };
+              
+              // Only add tokens with non-zero balance
+              if (parseFloat(accountData.amount) > 0) {
+                tokenData.push({
+                  mint: mintAddress,
+                  address: accountData.address,
+                  amount: accountData.amount,
+                  decimals: accountData.decimals,
+                  symbol: metadata.symbol || 'Unknown',
+                  name: metadata.name || 'Unknown Token',
+                  logoURI: metadata.logoURI || '/images/tokens/unknown.png',
+                  coingeckoId: metadata.coingeckoId
+                });
+              }
+            } catch (err) {
+              console.warn('Error processing token account:', err.message);
+              // Continue to the next token account
+            }
+          }
         }
-      });
+      } catch (err) {
+        console.warn('Error getting token accounts:', err.message);
+        connectionErrorCount.current += 1;
+        
+        // Continue with just SOL if token accounts fail
+        console.log('Continuing with only SOL balance due to error fetching token accounts');
+      }
       
       setTokens(tokenData);
       
       // Fetch token prices after getting balances
       fetchTokenPrices();
-
+      
       // Fetch transaction history for main account (SOL)
-      const solTx = await fetchRecentTransactions(publicKey.toString());
-      if (solTx) {
-        setLastTransactions(prev => ({
-          ...prev,
-          [publicKey.toString()]: solTx
-        }));
+      try {
+        const solTx = await fetchRecentTransactions(publicKey.toString());
+        if (solTx) {
+          setLastTransactions(prev => ({
+            ...prev,
+            [publicKey.toString()]: solTx
+          }));
+        }
+      } catch (err) {
+        // Non-critical error, just log
+        console.warn('Error fetching transaction history:', err.message);
       }
     } catch (err) {
       console.error('Error fetching token balances:', err);
-      setError('Failed to load token balances. Please try again.');
+      connectionErrorCount.current += 1;
+      
+      if (err.message.includes('429') || err.message.includes('rate limit')) {
+        setError('Rate limit exceeded. Please try again in a few minutes.');
+      } else if (connectionErrorCount.current > 2) {
+        setError('Connection issues detected. Please check your internet connection or try a different RPC.');
+      } else {
+        setError(`Failed to load token balances: ${err.message}`);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Calculate token value in USD
+  // Calculate token value in USD with added safety checks
   const calculateTokenValue = (token) => {
-    if (!token || !token.coingeckoId || !tokenPrices[token.coingeckoId]) return null;
+    if (!token || !token.coingeckoId) return null;
     
-    const price = tokenPrices[token.coingeckoId].usd;
-    const amount = token.amount / Math.pow(10, token.decimals);
-    return price * amount;
+    const priceData = tokenPrices[token.coingeckoId];
+    if (!priceData || typeof priceData.usd !== 'number' || isNaN(priceData.usd)) {
+      return null;
+    }
+    
+    try {
+      const price = priceData.usd;
+      const decimals = parseInt(token.decimals);
+      if (isNaN(decimals)) return null;
+      
+      const amount = parseFloat(token.amount) / Math.pow(10, decimals);
+      if (isNaN(amount)) return null;
+      
+      return price * amount;
+    } catch (err) {
+      console.warn('Error calculating token value:', err.message);
+      return null;
+    }
   };
 
   // Get token 24h price change
   const getToken24hChange = (token) => {
-    if (!token || !token.coingeckoId || 
-        !tokenPrices[token.coingeckoId] || 
-        tokenPrices[token.coingeckoId].usd_24h_change === undefined) {
+    if (!token || !token.coingeckoId || !tokenPrices[token.coingeckoId]) {
       return null;
     }
     
-    return tokenPrices[token.coingeckoId].usd_24h_change;
+    try {
+      const change = tokenPrices[token.coingeckoId].usd_24h_change;
+      return typeof change === 'number' && !isNaN(change) ? change : null;
+    } catch (err) {
+      return null;
+    }
   };
 
-  // Sort tokens based on the selected option
+  // Sort tokens based on the selected option with error handling
   const sortedTokens = () => {
-    if (!tokens.length) return [];
+    if (!tokens || !Array.isArray(tokens) || tokens.length === 0) return [];
     
-    return [...tokens].sort((a, b) => {
-      switch (sortOption) {
-        case 'name':
-          return a.symbol.localeCompare(b.symbol);
-        case 'balance':
-          const balanceA = a.amount / Math.pow(10, a.decimals);
-          const balanceB = b.amount / Math.pow(10, b.decimals);
-          return balanceB - balanceA;
-        case 'value':
-        default:
-          const valueA = calculateTokenValue(a) || 0;
-          const valueB = calculateTokenValue(b) || 0;
-          return valueB - valueA;
-      }
-    });
+    try {
+      return [...tokens].sort((a, b) => {
+        switch (sortOption) {
+          case 'name':
+            return (a.symbol || '').localeCompare(b.symbol || '');
+          case 'balance':
+            try {
+              const balanceA = parseFloat(a.amount) / Math.pow(10, parseInt(a.decimals));
+              const balanceB = parseFloat(b.amount) / Math.pow(10, parseInt(b.decimals));
+              return isNaN(balanceB - balanceA) ? 0 : balanceB - balanceA;
+            } catch (err) {
+              return 0;
+            }
+          case 'value':
+          default:
+            const valueA = calculateTokenValue(a) || 0;
+            const valueB = calculateTokenValue(b) || 0;
+            return valueB - valueA;
+        }
+      });
+    } catch (err) {
+      console.warn('Error sorting tokens:', err.message);
+      return [...tokens];
+    }
   };
 
   // Update when network changes
@@ -296,28 +429,91 @@ export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
   useEffect(() => {
     if (connected && publicKey) {
       fetchTokenBalances();
+      
+      // Apply token account patches for better reliability
+      tokenAccountService.monkeyPatchTokenFunctions();
     } else {
       setTokens([]);
     }
   }, [connected, publicKey, currentNetwork]);
 
-  // Refresh balances every 30 seconds if connected
+  // Refresh balances and prices periodically if connected with exponential backoff on errors
   useEffect(() => {
     if (!connected) return;
     
-    const interval = setInterval(() => {
-      fetchTokenBalances();
-    }, 30000);
+    let balanceIntervalId;
+    let priceIntervalId;
     
-    return () => clearInterval(interval);
+    // Function to set up balance refresh with exponential backoff on errors
+    const setupBalanceRefresh = (initialDelay = 30000) => {
+      if (balanceIntervalId) clearInterval(balanceIntervalId);
+      
+      balanceIntervalId = setInterval(async () => {
+        try {
+          await fetchTokenBalances();
+          // If successful, reset to normal interval
+          if (initialDelay !== 30000) {
+            clearInterval(balanceIntervalId);
+            setupBalanceRefresh();
+          }
+        } catch (error) {
+          // If error, increase delay up to 2 minutes max
+          const newDelay = Math.min(initialDelay * 1.5, 120000);
+          if (newDelay !== initialDelay) {
+            clearInterval(balanceIntervalId);
+            setupBalanceRefresh(newDelay);
+          }
+          console.warn(`Balance refresh error, next retry in ${newDelay/1000}s`, error);
+        }
+      }, initialDelay);
+    };
+    
+    // Set up price refresh with similar pattern
+    const setupPriceRefresh = (initialDelay = 60000) => {
+      if (priceIntervalId) clearInterval(priceIntervalId);
+      
+      priceIntervalId = setInterval(async () => {
+        try {
+          await fetchTokenPrices();
+          // If successful, reset to normal interval
+          if (initialDelay !== 60000) {
+            clearInterval(priceIntervalId);
+            setupPriceRefresh();
+          }
+        } catch (error) {
+          // If error, increase delay up to 3 minutes max
+          const newDelay = Math.min(initialDelay * 1.5, 180000);
+          if (newDelay !== initialDelay) {
+            clearInterval(priceIntervalId);
+            setupPriceRefresh(newDelay);
+          }
+        }
+      }, initialDelay);
+    };
+    
+    // Initialize both refresh cycles
+    setupBalanceRefresh();
+    setupPriceRefresh();
+    
+    return () => {
+      if (balanceIntervalId) clearInterval(balanceIntervalId);
+      if (priceIntervalId) clearInterval(priceIntervalId);
+    };
   }, [connected, currentNetwork]);
 
-  // Calculate total portfolio value
+  // Calculate total portfolio value with safety checks
   const calculateTotalValue = () => {
-    return tokens.reduce((total, token) => {
-      const value = calculateTokenValue(token);
-      return total + (value || 0);
-    }, 0);
+    if (!tokens || !Array.isArray(tokens)) return 0;
+    
+    try {
+      return tokens.reduce((total, token) => {
+        const value = calculateTokenValue(token);
+        return total + (typeof value === 'number' && !isNaN(value) ? value : 0);
+      }, 0);
+    } catch (err) {
+      console.warn('Error calculating total portfolio value:', err.message);
+      return 0;
+    }
   };
 
   // Close network dropdown when clicking outside
@@ -340,13 +536,17 @@ export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
   const formatRelativeTime = (date) => {
     if (!date) return 'Unknown time';
     
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-    
-    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    try {
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
+      
+      if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+      return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    } catch (err) {
+      return 'Unknown time';
+    }
   };
 
   if (!connected) {
@@ -454,6 +654,38 @@ export default function WalletTokens({ onSelectToken, networkId = 'solana' }) {
               Some token prices may be unavailable or delayed
             </div>
           )}
+        </div>
+      )}
+
+      {/* Show a message about EMB tokens if they're excluded */}
+      {excludeEMB && (
+        <div className="my-4 p-3 bg-amber-900/20 border border-amber-800/30 rounded-lg text-amber-200 text-sm">
+          <p className="flex items-center">
+            <span className="mr-2">ℹ️</span>
+            <span>
+              Note: EMB tokens are currently only purchasable on Pumpfun and aren't available for direct trading here.
+              <a 
+                href="https://pump.fun" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-blue-400 hover:text-blue-300 underline ml-1"
+              >
+                Visit Pumpfun to get EMB
+              </a>
+            </span>
+          </p>
+        </div>
+      )}
+      
+      {/* Connection warning for persistent RPC issues */}
+      {connectionErrorCount.current > 1 && !error && (
+        <div className="my-4 p-3 bg-orange-900/20 border border-orange-800/30 rounded-lg text-orange-200 text-sm">
+          <p className="flex items-center">
+            <span className="mr-2">⚠️</span>
+            <span>
+              Warning: Some Solana RPC nodes may be experiencing issues. Your token data might be incomplete.
+            </span>
+          </p>
         </div>
       )}
       

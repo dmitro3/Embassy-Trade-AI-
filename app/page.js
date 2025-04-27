@@ -2,10 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Header from '@/components/Header';
-import EmbassyBanner from '@/components/EmbassyBanner';
-import TradeSignals from '@/components/TradeSignals';
-import { WalletProvider } from '@/lib/WalletProvider';
+import Header from '../components/Header';
+import EmbassyBanner from '../components/EmbassyBanner';
+import TradeSignals from '../components/TradeSignals';
+import EMBAIMigrationBanner from '../components/EMBAIMigrationBanner';
+import DesktopDownload from '../components/DesktopDownload';
+import { WalletProvider } from '../lib/WalletProvider';
 
 export default function Home() {
   return (
@@ -67,8 +69,17 @@ export default function Home() {
             </div>
           </div>
           
+          {/* Desktop Download Section */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#00FFA3] to-[#9945FF]">Desktop Application</h2>
+            <DesktopDownload />
+          </div>
+          
+          {/* EMBAI Migration Banner */}
+          <EMBAIMigrationBanner />
+          
           {/* CTA Section */}
-          <div className="bg-gradient-to-r from-[#9945FF]/10 to-[#00FFA3]/10 rounded-xl p-8 border border-[#9945FF]/20">
+          <div className="bg-gradient-to-r from-[#9945FF]/10 to-[#00FFA3]/10 rounded-xl p-8 border border-[#9945FF]/20 mt-12">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0">
                 <h2 className="text-2xl font-bold text-white mb-2">Ready to elevate your trading?</h2>

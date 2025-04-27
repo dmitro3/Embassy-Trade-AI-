@@ -1,38 +1,31 @@
-import React from 'react';
-import useElectron from '../lib/useElectron';
+// This file creates the missing component so your app can build properly
 
-/**
- * Banner that displays only in the desktop app to distinguish it from the web version
- * Shows "Desktop App (Demo/Beta Mode)" with version info
- */
-const DesktopAppBanner = () => {
-  const { isDesktopApp, appVersion, platform, openWebVersion } = useElectron();
+'use client';
 
-  if (!isDesktopApp) return null;
+import React, { useState } from 'react';
+import Modal from './Modal';
 
+export default function DesktopAppBanner({ isOpen, onClose }) {
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-1 px-4 text-xs flex justify-between items-center">
-      <div className="flex items-center">
-        <span className="font-bold">Desktop App (Demo/Beta Mode)</span>
-        <span className="ml-2 px-1.5 py-0.5 bg-white bg-opacity-20 rounded text-xs">
-          v{appVersion}
-        </span>
-        <span className="ml-2 opacity-70">
-          {platform === 'darwin' ? 'macOS' : platform === 'win32' ? 'Windows' : 'Linux'}
-        </span>
+    <div className="bg-blue-900/20 border border-blue-800/40 p-4 rounded-lg mb-4">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <div className="mr-3">
+            <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="font-medium text-white">Embassy Desktop App Available</h3>
+            <p className="text-sm text-gray-300">Get the best trading experience with our desktop application</p>
+          </div>
+        </div>
+        <div className="ml-4">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            Download Now
+          </button>
+        </div>
       </div>
-      
-      <button 
-        onClick={openWebVersion}
-        className="text-xs hover:underline focus:outline-none flex items-center"
-      >
-        Open Web Version
-        <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-        </svg>
-      </button>
     </div>
   );
-};
-
-export default DesktopAppBanner;
+}

@@ -1,0 +1,2 @@
+[console_scripts]
+awslabs.aws-diagram-mcp-server = awslabs.aws_diagram_mcp_server.server:main

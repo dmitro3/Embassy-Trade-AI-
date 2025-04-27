@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
-import { EMB_TOKEN_CONFIG } from '@/lib/embToken';
-import { WalletConnectionButton } from '@/lib/WalletProvider';
+import { EMB_TOKEN_CONFIG } from '../lib/embToken';
+import { WalletConnectionButton } from '../lib/WalletProvider';
 
 /**
  * Specialized modal for wallet connection using the new design
@@ -17,7 +17,7 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
   const getWalletContext = () => {
     try {
       // Import and use the wallet hook only when needed
-      const { useWallet } = require('@/lib/WalletProvider');
+      const { useWallet } = require('../lib/WalletProvider');
       return useWallet();
     } catch (error) {
       console.error("Error accessing wallet context:", error);
@@ -48,9 +48,11 @@ const WalletConnectModal = ({ isOpen, onClose, onConnect }) => {
       if (!walletAdapter) {
         throw new Error(`Wallet ${walletName} not found or not installed`);
       }
-      
-      // Select the wallet adapter
+        // Select the wallet adapter
       select(walletAdapter.adapter.name);
+      
+      // Add a small delay to ensure wallet selection is processed
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Connect to the selected wallet
       await connect();

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeForce AI Trading System Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        #output {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin-top: 20px;
+            height: 500px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .success {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .test-section {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 4px solid #3498db;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <h1>TradeForce AI Trading System Test</h1>
+    
+    <div class="container">
+        <p>This page tests the TradeForce AI Trading System components. Click the button below to run the tests.</p>
+        <button id="runTests">Run Tests</button>
+        <div id="output">Test output will appear here...</div>
+    </div>
+
+    <script type="module">
+        // Import required modules
+        import { initializeServices, getMarketData, scanTokens, executeTrade, getTradeHistory, getActiveOrders, cancelOrder, processInstruction } from './lib/axiomTradeAPI.js';
+
+        // Mock wallet connection for testing
+        const mockWallet = {
+            publicKey: { toString: () => 'DummyPublicKey123456789' },
+            signTransaction: async (tx) => tx
+        };
+
+        // Mock connection for testing
+        const mockConnection = {
+            getLatestBlockhash: async () => ({ blockhash: 'dummy-blockhash', lastValidBlockHeight: 12345 }),
+            sendRawTransaction: async () => 'dummy-signature',
+            confirmTransaction: async () => true
+        };
+
+        // Test token address
+        const TEST_TOKEN_ADDRESS = 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'; // BONK
+        const TEST_TOKEN_SYMBOL = 'BONK';
+
+        // Test strategies
+        const TEST_STRATEGIES = {
+            newToken: true,
+            highVolume: true,
+            bullishMomentum: false,
+            whaleTracking: false
+        };
+
+        // Test risk parameters
+        const TEST_RISK_PARAMS = {
+            positionSize: 0.5, // 0.5 SOL
+            stopLoss: 5, // 5%
+            takeProfit: 15 // 15%
+        };
+
+        // Output element
+        const outputElement = document.getElementById('output');
+
+        // Custom console log function that writes to the output element
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            let formattedMessage = `[${timestamp}] ${message}`;
+            
+            if (type === 'success') {
+                formattedMessage = `[${timestamp}] ✅ ${message}`;
+            } else if (type === 'error') {
+                formattedMessage = `[${timestamp}] ❌ ${message}`;
+            } else if (type === 'section') {
+                formattedMessage = `\n[${timestamp}] 📋 ${message}\n`;
+            }
+            
+            outputElement.innerHTML += formattedMessage + '\n';
+            outputElement.scrollTop = outputElement.scrollHeight;
+        }
+
+        /**
+         * Run tests for the trading system
+         */
+        async function runTests() {
+            outputElement.innerHTML = ''; // Clear previous output
+            log('=== TradeForce AI Trading System Test ===', 'section');
+            
+            try {
+                // Initialize services
+                log('1. Initializing services...', 'section');
+                const initialized = await initializeServices();
+                log(`Services initialized: ${initialized ? 'SUCCESS' : 'FAILED'}`, initialized ? 'success' : 'error');
+                
+                if (!initialized) {
+                    throw new Error('Failed to initialize services');
+                }
+                
+                // Test market data retrieval
+                log('2. Testing market data retrieval...', 'section');
+                log('2.1. By address:');
+                const marketDataByAddress = await getMarketData(TEST_TOKEN_ADDRESS);
+                log(JSON.stringify(marketDataByAddress, null, 2));
+                
+                log('2.2. By symbol:');
+                const marketDataBySymbol = await getMarketData(TEST_TOKEN_SYMBOL);
+                log(JSON.stringify(marketDataBySymbol, null, 2));
+                
+                // Test token scanning
+                log('3. Testing token scanning...', 'section');
+                const matchedTokens = await scanTokens(TEST_STRATEGIES);
+                log(`Found ${matchedTokens.length} tokens matching criteria:`, 'success');
+                matchedTokens.forEach((token, index) => {
+                    log(`${index + 1}. ${token.name || token.symbol}: $${token.price}`);
+                });
+                
+                if (matchedTokens.length === 0) {
+                    throw new Error('No tokens found matching criteria');
+                }
+                
+                // Test trade execution
+                log('4. Testing trade execution...', 'section');
+                const selectedToken = matchedTokens[0];
+                log(`Executing trade for ${selectedToken.name || selectedToken.symbol}...`);
+                
+                const tradeResult = await executeTrade({
+                    connection: mockConnection,
+                    publicKey: mockWallet.publicKey,
+                    signTransaction: mockWallet.signTransaction,
+                    token: selectedToken,
+                    amountInSol: TEST_RISK_PARAMS.positionSize,
+                    stopLossPercent: TEST_RISK_PARAMS.stopLoss,
+                    takeProfitPercent: TEST_RISK_PARAMS.takeProfit
+                });
+                
+                log('Trade execution result:', 'success');
+                log(JSON.stringify(tradeResult, null, 2));
+                
+                // Test trade history retrieval
+                log('5. Testing trade history retrieval...', 'section');
+                const tradeHistory = await getTradeHistory();
+                log(`Retrieved ${tradeHistory.trades.length} trades:`, 'success');
+                log(JSON.stringify(tradeHistory, null, 2));
+                
+                // Test active orders retrieval
+                log('6. Testing active orders retrieval...', 'section');
+                const activeOrders = await getActiveOrders();
+                log(`Retrieved ${activeOrders.orders.length} active orders:`, 'success');
+                log(JSON.stringify(activeOrders, null, 2));
+                
+                // Test order cancellation
+                if (activeOrders.orders.length > 0) {
+                    log('7. Testing order cancellation...', 'section');
+                    const orderToCancel = activeOrders.orders[0];
+                    log(`Cancelling order ${orderToCancel.id}...`);
+                    
+                    const cancellationResult = await cancelOrder(orderToCancel.id);
+                    log('Cancellation result:', 'success');
+                    log(JSON.stringify(cancellationResult, null, 2));
+                }
+                
+                // Test natural language instruction processing
+                log('8. Testing natural language instruction processing...', 'section');
+                const instruction = 'Buy BONK with 0.5 SOL and set a 5% stop loss';
+                log(`Processing instruction: "${instruction}"`);
+                
+                const instructionResult = await processInstruction(instruction);
+                log('Instruction processing result:', 'success');
+                log(JSON.stringify(instructionResult, null, 2));
+                
+                log('=== All tests completed successfully ===', 'success');
+            } catch (error) {
+                log('=== Test failed ===', 'error');
+                log(`Error: ${error.message}`, 'error');
+                log(error.stack, 'error');
+            }
+        }
+
+        // Add event listener to the run tests button
+        document.getElementById('runTests').addEventListener('click', runTests);
+    </script>
+</body>
+</html>

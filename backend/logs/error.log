@@ -1,0 +1,21 @@
+2025-04-08T23:29:47.724Z error: AI evaluation error: Request failed with status code 403
+2025-04-08T23:29:47.725Z error: API response error: {"code":"The caller does not have permission to execute the specified operation","error":"Your newly created teams doesn't have any credits yet. You can purchase credits on https://console.x.ai/team/1a181790-c866-456b-8d9f-a1a46f186d3f."}
+2025-04-08T23:29:47.736Z error: AI evaluation failed: Request failed with status code 500
+2025-04-08T23:29:47.743Z error: Continuous testing error: Request failed with status code 500
+2025-04-08T23:30:11.032Z error: Trade failed: insufficient liquidity (1069ms)
+2025-04-08T23:30:16.748Z error: Trade failed: slippage (1593ms)
+2025-04-08T23:30:30.398Z error: Trade failed: timeout (2103ms)
+2025-04-08T23:30:31.744Z error: AI evaluation error: Request failed with status code 404
+2025-04-08T23:30:31.745Z error: API response error: {"error":{"message":"The model `gpt-4` does not exist or you do not have access to it.","type":"invalid_request_error","param":null,"code":"model_not_found"}}
+2025-04-08T23:30:31.751Z error: AI evaluation failed: Request failed with status code 500
+2025-04-08T23:30:31.757Z error: AI testing failed: Request failed with status code 500
+2025-04-08T23:34:56.902Z error: AI evaluation error: Request failed with status code 403
+2025-04-08T23:34:56.903Z error: API response error: {"code":"The caller does not have permission to execute the specified operation","error":"Your newly created teams doesn't have any credits yet. You can purchase credits on https://console.x.ai/team/1a181790-c866-456b-8d9f-a1a46f186d3f."}
+2025-04-08T23:34:56.909Z error: AI evaluation failed: Request failed with status code 500
+2025-04-08T23:34:56.915Z error: Continuous testing error: Request failed with status code 500
+2025-04-08T23:35:14.735Z error: Trade failed: RPC error (4323ms)
+2025-04-08T23:35:30.579Z error: AI evaluation error: Request failed with status code 403
+2025-04-08T23:35:30.579Z error: API response error: {"code":"The caller does not have permission to execute the specified operation","error":"Your newly created teams doesn't have any credits yet. You can purchase credits on https://console.x.ai/team/1a181790-c866-456b-8d9f-a1a46f186d3f."}
+2025-04-08T23:35:30.585Z error: AI evaluation failed: Request failed with status code 500
+2025-04-08T23:35:30.590Z error: AI testing failed: Request failed with status code 500
+2025-04-09T00:31:36.745Z error: Failed to fetch token accounts

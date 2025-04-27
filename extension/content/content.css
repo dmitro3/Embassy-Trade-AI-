@@ -1,0 +1,262 @@
+/**
+ * Axiom Trade Master Bot - Content CSS
+ * 
+ * This stylesheet is injected into the Axiom Trade website to style any elements
+ * added by the content script and to highlight important trading information.
+ */
+
+/* Bot notification badge */
+.axiom-bot-badge {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(255, 107, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 9999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.axiom-bot-badge.active {
+  background-color: rgba(76, 175, 80, 0.9);
+}
+
+.axiom-bot-badge .status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  display: inline-block;
+}
+
+.axiom-bot-badge.active .status-indicator {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Highlight trending tokens */
+.axiom-bot-highlight {
+  border: 2px solid rgba(255, 107, 0, 0.7) !important;
+  box-shadow: 0 0 8px rgba(255, 107, 0, 0.5) !important;
+  position: relative;
+}
+
+.axiom-bot-highlight::after {
+  content: 'Bot Target';
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  background-color: rgba(255, 107, 0, 0.9);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 1;
+}
+
+/* Highlight high volume tokens */
+.axiom-high-volume {
+  border-left: 4px solid rgba(76, 175, 80, 0.7) !important;
+  background-color: rgba(76, 175, 80, 0.05) !important;
+}
+
+/* Highlight bullish momentum tokens */
+.axiom-bullish {
+  border-left: 4px solid rgba(33, 150, 243, 0.7) !important;
+  background-color: rgba(33, 150, 243, 0.05) !important;
+}
+
+/* Highlight new tokens */
+.axiom-new-token {
+  border-left: 4px solid rgba(156, 39, 176, 0.7) !important;
+  background-color: rgba(156, 39, 176, 0.05) !important;
+}
+
+/* Highlight whale activity */
+.axiom-whale-activity {
+  border-left: 4px solid rgba(255, 193, 7, 0.7) !important;
+  background-color: rgba(255, 193, 7, 0.05) !important;
+}
+
+/* Bot control panel */
+.axiom-bot-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(33, 33, 33, 0.9);
+  border: 1px solid rgba(255, 107, 0, 0.5);
+  border-radius: 8px;
+  padding: 12px;
+  z-index: 9999;
+  width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: white;
+  backdrop-filter: blur(5px);
+}
+
+.axiom-bot-panel h3 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255, 107, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.axiom-bot-panel .close-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  margin: 0;
+}
+
+.axiom-bot-panel .close-button:hover {
+  color: white;
+}
+
+.axiom-bot-panel .status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+}
+
+.axiom-bot-panel .status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.axiom-bot-panel .active .status-indicator {
+  background-color: rgba(76, 175, 80, 1);
+  box-shadow: 0 0 5px rgba(76, 175, 80, 1);
+  animation: pulse 1.5s infinite;
+}
+
+.axiom-bot-panel .inactive .status-indicator {
+  background-color: rgba(244, 67, 54, 1);
+  box-shadow: 0 0 5px rgba(244, 67, 54, 1);
+}
+
+.axiom-bot-panel button {
+  background-color: rgba(255, 107, 0, 1);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.axiom-bot-panel button:hover {
+  background-color: rgba(255, 107, 0, 0.8);
+}
+
+.axiom-bot-panel button.stop {
+  background-color: rgba(244, 67, 54, 1);
+}
+
+.axiom-bot-panel button.stop:hover {
+  background-color: rgba(244, 67, 54, 0.8);
+}
+
+/* Trade notification */
+.axiom-trade-notification {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background-color: rgba(33, 33, 33, 0.9);
+  border-left: 4px solid rgba(76, 175, 80, 0.7);
+  border-radius: 4px;
+  padding: 12px;
+  z-index: 9999;
+  width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: white;
+  animation: slideIn 0.3s ease-out;
+}
+
+.axiom-trade-notification.error {
+  border-left: 4px solid rgba(244, 67, 54, 0.7);
+}
+
+.axiom-trade-notification h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.axiom-trade-notification p {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Tooltip styles */
+.axiom-tooltip {
+  position: absolute;
+  background-color: rgba(33, 33, 33, 0.9);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10000;
+  pointer-events: none;
+  max-width: 200px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.axiom-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(33, 33, 33, 0.9) transparent transparent transparent;
+}

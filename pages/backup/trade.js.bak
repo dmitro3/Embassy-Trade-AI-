@@ -1,0 +1,342 @@
+import { useEffect, useState, useRef } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
+import { toast } from 'react-toastify';
+
+// Import the trading bot
+import tradingBot, { startTradingBot } from '../lib/TradingBot';
+
+// Component for displaying bot logs
+const BotLogs = ({ logs }) => {
+  const logEndRef = useRef(null);
+
+  // Auto-scroll to bottom when logs update
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [logs]);
+
+  return (
+    <div className="bg-gray-900/50 p-4 rounded-lg h-64 overflow-y-auto">
+      {logs.length === 0 ? (
+        <div className="text-gray-500 text-center py-12">
+          No logs yet. Start the bot to see activity.
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {logs.map((log, index) => (
+            <div key={index} className={`p-2 rounded-md ${
+              log.type === 'error' ? 'bg-red-900/30 text-red-300' :
+              log.type === 'warning' ? 'bg-yellow-900/30 text-yellow-300' :
+              log.type === 'success' ? 'bg-green-900/30 text-green-300' :
+              log.type === 'signal' ? 'bg-blue-900/30 text-blue-300' :
+              'bg-gray-800/50 text-gray-300'
+            }`}>
+              <div className="flex justify-between">
+                <span className="text-xs font-mono opacity-75">
+                  {new Date(log.timestamp).toLocaleTimeString()}
+                </span>
+                <span className="text-xs uppercase opacity-75">
+                  {log.type}
+                </span>
+              </div>
+              <div className="text-sm mt-1">{log.message}</div>
+            </div>
+          ))}
+          <div ref={logEndRef} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Trade = () => {
+  const { publicKey, signMessage, connected, wallet } = useWallet();
+  const [connection, setConnection] = useState(null);
+  const [botActive, setBotActive] = useState(false);
+  const [botLogs, setBotLogs] = useState([]);
+  const [botConfig, setBotConfig] = useState({
+    tradeAmount: 0.1,
+    stopLossPercent: 5,
+    takeProfitPercent: 15,
+    mevProtection: true,
+    preferredSwap: 'raydium'
+  });
+  
+  // Ref to store the cleanup function
+  const cleanupFnRef = useRef(null);
+
+  // Initialize Solana connection
+  useEffect(() => {
+    const network = process.env.NEXT_PUBLIC_NETWORK || 'devnet';
+    const endpoint = network === 'mainnet-beta' 
+      ? process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl('mainnet-beta')
+      : clusterApiUrl('devnet');
+      
+    const newConnection = new Connection(endpoint, 'confirmed');
+    setConnection(newConnection);
+    
+    // Log connection
+    setBotLogs(prev => [{
+      type: 'info',
+      message: `Connected to Solana ${network}`,
+      timestamp: Date.now()
+    }, ...prev]);
+    
+    return () => {
+      // Clean up bot if running when component unmounts
+      if (cleanupFnRef.current) {
+        cleanupFnRef.current();
+        cleanupFnRef.current = null;
+      }
+    };
+  }, []);
+
+  // Toggle bot start/stop
+  const toggleBot = async () => {
+    if (!connection || !publicKey) {
+      toast.error('Connect your wallet first');
+      return;
+    }
+
+    if (botActive) {
+      // Stop the bot
+      if (cleanupFnRef.current) {
+        await cleanupFnRef.current();
+        cleanupFnRef.current = null;
+      }
+      setBotActive(false);
+      toast.info('Trading bot stopped');
+    } else {
+      // Start the bot
+      try {
+        setBotLogs([{
+          type: 'info',
+          message: 'Initializing trading bot...',
+          timestamp: Date.now()
+        }]);
+        
+        // Start the trading bot
+        cleanupFnRef.current = await startTradingBot(
+          wallet,
+          connection,
+          (newLogs) => setBotLogs(prev => Array.isArray(newLogs) ? [...newLogs, ...prev] : [...prev, newLogs]),
+          botConfig
+        );
+        
+        setBotActive(true);
+        toast.success('Trading bot started');
+      } catch (error) {
+        console.error('Error starting bot:', error);
+        toast.error(`Failed to start bot: ${error.message}`);
+      }
+    }
+  };
+
+  // Update bot configuration
+  const updateBotConfig = (key, value) => {
+    setBotConfig(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <h1 className="text-3xl font-bold text-white mb-6">Trade & Bot Testing</h1>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left side - Bot controls */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-gray-800/70 rounded-lg p-6">
+            <h2 className="text-xl font-medium text-white mb-4">Trading Bot Control</h2>
+            
+            <div className="mb-6 bg-gray-900/30 rounded-lg p-4">
+              <p className="text-gray-300 mb-3">
+                This simplified bot connects to Raydium (primary) with Jupiter fallback, 
+                monitors for trading opportunities, and executes trades based on your parameters.
+              </p>
+              
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className={`w-3 h-3 rounded-full mr-2 ${botActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                  <span className="text-sm font-medium">Status: {botActive ? 'Active' : 'Inactive'}</span>
+                </div>
+                
+                <button
+                  onClick={toggleBot}
+                  disabled={!publicKey}
+                  className={`px-4 py-2 rounded-lg font-medium ${
+                    !publicKey 
+                      ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                      : botActive 
+                        ? 'bg-red-600 hover:bg-red-700 text-white' 
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                  }`}
+                >
+                  {!publicKey 
+                    ? 'Connect Wallet' 
+                    : botActive 
+                      ? 'Stop Bot' 
+                      : 'Start Bot'
+                  }
+                </button>
+              </div>
+            </div>
+            
+            {/* Bot Configuration */}
+            <div className="bg-gray-900/30 p-4 rounded-lg mb-4">
+              <h3 className="text-md font-medium text-white mb-3">Bot Configuration</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Trade Amount (SOL)</label>
+                  <input 
+                    type="number" 
+                    value={botConfig.tradeAmount} 
+                    onChange={(e) => updateBotConfig('tradeAmount', parseFloat(e.target.value))}
+                    className="w-full bg-gray-800 text-white px-3 py-2 rounded-md"
+                    step="0.01"
+                    min="0.01"
+                    max="10"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Stop Loss (%)</label>
+                  <input 
+                    type="number" 
+                    value={botConfig.stopLossPercent} 
+                    onChange={(e) => updateBotConfig('stopLossPercent', parseFloat(e.target.value))}
+                    className="w-full bg-gray-800 text-white px-3 py-2 rounded-md"
+                    step="0.5"
+                    min="1"
+                    max="20"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Take Profit (%)</label>
+                  <input 
+                    type="number" 
+                    value={botConfig.takeProfitPercent} 
+                    onChange={(e) => updateBotConfig('takeProfitPercent', parseFloat(e.target.value))}
+                    className="w-full bg-gray-800 text-white px-3 py-2 rounded-md"
+                    step="0.5"
+                    min="1"
+                    max="100"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Preferred Swap</label>
+                  <select 
+                    value={botConfig.preferredSwap} 
+                    onChange={(e) => updateBotConfig('preferredSwap', e.target.value)}
+                    className="w-full bg-gray-800 text-white px-3 py-2 rounded-md"
+                  >
+                    <option value="raydium">Raydium (with Jupiter fallback)</option>
+                    <option value="jupiter">Jupiter</option>
+                  </select>
+                </div>
+                
+                <div className="col-span-2">
+                  <label className="inline-flex items-center">
+                    <input 
+                      type="checkbox" 
+                      checked={botConfig.mevProtection} 
+                      onChange={(e) => updateBotConfig('mevProtection', e.target.checked)}
+                      className="form-checkbox h-4 w-4 text-blue-600"
+                    />
+                    <span className="ml-2 text-gray-300">MEV Protection</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            {/* Bot Logs */}
+            <div>
+              <h3 className="text-md font-medium text-white mb-3">Bot Logs</h3>
+              <BotLogs logs={botLogs} />
+            </div>
+          </div>
+        </div>
+        
+        {/* Right side - Testing Insights & Help */}
+        <div>
+          <div className="bg-gray-800/70 rounded-lg p-6 mb-6">
+            <h3 className="text-xl font-medium text-white mb-4">Testing Guide</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-md font-medium text-blue-400">1. Setup</h4>
+                <p className="text-gray-300 text-sm">Make sure your Phantom wallet is connected to Devnet and has test SOL.</p>
+              </div>
+              
+              <div>
+                <h4 className="text-md font-medium text-blue-400">2. Start Bot</h4>
+                <p className="text-gray-300 text-sm">Click "Start Bot" to begin monitoring. For testing, the bot will generate logs but won't make real transactions.</p>
+              </div>
+              
+              <div>
+                <h4 className="text-md font-medium text-blue-400">3. GPT-4 Analysis</h4>
+                <p className="text-gray-300 text-sm">The bot can generate trading signals that can be analyzed by GPT-4 for performance improvement.</p>
+              </div>
+              
+              <div className="bg-gray-900/40 p-3 rounded-lg text-sm">
+                <p className="text-green-400 font-medium mb-1">Note:</p>
+                <p className="text-gray-300">This is a testing interface. Real trades require you to sign each transaction through your Phantom wallet.</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Bot Performance Card */}
+          <div className="bg-gray-800/70 rounded-lg p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-white">Bot Performance</h3>
+              <div className="bg-blue-600/30 text-blue-300 px-2 py-1 rounded text-xs font-medium">
+                DEVNET TESTING
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between border-b border-gray-700 pb-2">
+                <span className="text-gray-400">Win Rate</span>
+                <span className="text-white">0.00%</span>
+              </div>
+              
+              <div className="flex justify-between border-b border-gray-700 pb-2">
+                <span className="text-gray-400">Trades</span>
+                <span className="text-white">0</span>
+              </div>
+              
+              <div className="flex justify-between border-b border-gray-700 pb-2">
+                <span className="text-gray-400">Avg. Profit</span>
+                <span className="text-white">0.00%</span>
+              </div>
+              
+              <div className="flex justify-between">
+                <span className="text-gray-400">Best Trade</span>
+                <span className="text-white">0.00%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Hidden dev tools section */}
+      <div className="mt-8 bg-gray-900/30 p-4 rounded-lg">
+        <h3 className="text-md font-medium text-white mb-2">Local Testing Steps</h3>
+        <div className="bg-black/30 p-3 rounded-lg">
+          <ol className="text-gray-300 list-decimal list-inside space-y-1 text-sm font-mono">
+            <li>Start MongoDB: <code className="text-green-400">mongod</code></li>
+            <li>Start backend: <code className="text-green-400">cd backend && npx nodemon server.js</code></li>
+            <li>Start frontend: <code className="text-green-400">cd web && npm run dev</code></li>
+            <li>Test Trade tab: <code className="text-green-400">http://localhost:3008/trade</code></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Trade;

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeForce AI Trading Agent</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container main-view">
+    <header>
+      <div class="logo">
+        <img src="../assets/icons/icon48.png" alt="TradeForce AI Trading Agent">
+        <h1>TRADEFORCE AI</h1>
+      </div>
+    </header>
+
+    <!-- Loading Animation (shown during initialization) -->
+    <div id="loading-container" class="loading-container">
+      <div class="loading-ring"></div>
+      <p class="loading-text">Loading...</p>
+    </div>
+
+    <!-- Main Content (hidden during loading) -->
+    <div id="main-content" class="main-content hidden">
+      <!-- Vertical Sidebar Navigation -->
+      <div class="sidebar">
+        <button id="dark-mode-toggle" class="sidebar-button cyan" title="Toggle Dark Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button id="chat-button" class="sidebar-button purple" title="Chat with AI">
+          <i class="fas fa-comment"></i>
+        </button>
+        <button id="trade-button" class="sidebar-button blue active" title="Trade Execution">
+          <i class="fas fa-arrow-up"></i>
+        </button>
+        <button id="dashboard-button" class="sidebar-button teal" title="Dashboard">
+          <i class="fas fa-desktop"></i>
+        </button>
+        <button id="download-button" class="sidebar-button green" title="Download Data">
+          <i class="fas fa-download"></i>
+        </button>
+        <button id="back-button" class="sidebar-button gray" title="Back">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Trade Tab (default view) -->
+        <div id="trade-tab" class="tab-content active">
+          <h2>Trading Dashboard</h2>
+          
+          <!-- Platform Connections -->
+          <div class="connection-section">
+            <h3>Platform Connections</h3>
+            <div class="connection-grid">
+              <div class="connection-item">
+                <div id="robinhood-status" class="status not-connected">
+                  <span class="status-indicator"></span>
+                  <span class="status-text">Robinhood</span>
+                </div>
+                <button id="connect-robinhood" class="primary-button">Connect</button>
+              </div>
+              <div class="connection-item">
+                <div id="kraken-status" class="status not-connected">
+                  <span class="status-indicator"></span>
+                  <span class="status-text">Kraken</span>
+                </div>
+                <button id="connect-kraken" class="primary-button">Connect</button>
+              </div>
+              <div class="connection-item">
+                <div id="axiom-status" class="status not-connected">
+                  <span class="status-indicator"></span>
+                  <span class="status-text">AXIOM</span>
+                </div>
+                <button id="connect-axiom" class="primary-button">Connect</button>
+              </div>
+              <div class="connection-item">
+                <div id="phantom-status" class="status not-connected">
+                  <span class="status-indicator"></span>
+                  <span class="status-text">Phantom</span>
+                </div>
+                <button id="connect-phantom" class="primary-button">Connect</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- AI Trading Controls -->
+          <div class="trading-controls">
+            <h3>AI Trading Controls</h3>
+            <div class="control-row">
+              <div class="control-group">
+                <label for="trading-strategy">Strategy:</label>
+                <select id="trading-strategy" class="control-input">
+                  <option value="combined">Combined (Recommended)</option>
+                  <option value="arbitrage">Arbitrage</option>
+                  <option value="momentum">Momentum</option>
+                  <option value="statistical">Statistical</option>
+                </select>
+              </div>
+              <div class="control-group">
+                <label for="risk-level">Risk Level:</label>
+                <select id="risk-level" class="control-input">
+                  <option value="low">Conservative</option>
+                  <option value="medium" selected>Balanced</option>
+                  <option value="high">Aggressive</option>
+                </select>
+              </div>
+            </div>
+            <div class="control-row">
+              <div class="control-group">
+                <label for="max-trades">Max Concurrent Trades:</label>
+                <input type="number" id="max-trades" class="control-input" min="1" max="10" value="5">
+              </div>
+              <div class="control-group">
+                <label for="win-rate-target">Win Rate Target:</label>
+                <input type="number" id="win-rate-target" class="control-input" min="50" max="90" value="65">%
+              </div>
+            </div>
+            <div class="control-row">
+              <div class="control-group full-width">
+                <label for="trade-amount">Trade Amount:</label>
+                <input type="range" id="trade-amount" min="0.1" max="10" step="0.1" value="1">
+                <div class="range-labels">
+                  <span class="range-min">0.1</span>
+                  <span class="range-value" id="amount-value">1.0</span>
+                  <span class="range-max">10.0</span>
+                </div>
+              </div>
+            </div>
+            <div class="control-row">
+              <button id="start-trading" class="action-button start">START AI TRADING</button>
+              <button id="stop-trading" class="action-button stop hidden">STOP TRADING</button>
+            </div>
+          </div>
+          
+          <!-- Performance Summary -->
+          <div class="performance-summary">
+            <h3>Performance Summary</h3>
+            <div class="performance-grid">
+              <div class="performance-item">
+                <span class="label">Win Rate:</span>
+                <span id="win-rate" class="value highlight">65%</span>
+              </div>
+              <div class="performance-item">
+                <span class="label">Total Trades:</span>
+                <span id="total-trades" class="value">0</span>
+              </div>
+              <div class="performance-item">
+                <span class="label">Total Profit:</span>
+                <span id="total-profit" class="value">$0.00</span>
+              </div>
+              <div class="performance-item">
+                <span class="label">Active Trades:</span>
+                <span id="active-trades" class="value">0/5</span>
+              </div>
+            </div>
+            <button id="view-full-stats" class="secondary-button">View Detailed Statistics</button>
+          </div>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content">
+          <h2>Trading Dashboard</h2>
+          <div class="dashboard-content">
+            <div class="chart-container">
+              <h3>Win Rate Over Time</h3>
+              <div class="chart-placeholder">
+                <div class="chart-message">Connect to platforms to view win rate data</div>
+              </div>
+            </div>
+            <div class="chart-container">
+              <h3>Cumulative PnL</h3>
+              <div class="chart-placeholder">
+                <div class="chart-message">Connect to platforms to view PnL data</div>
+              </div>
+            </div>
+            <div class="recent-trades">
+              <h3>Recent Trades</h3>
+              <div class="trades-table-container">
+                <table class="trades-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Symbol</th>
+                      <th>Side</th>
+                      <th>Amount</th>
+                      <th>PnL</th>
+                      <th>Platform</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-trades-body">
+                    <tr class="empty-row">
+                      <td colspan="6">No trades yet</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Chat Tab -->
+        <div id="chat-tab" class="tab-content">
+          <h2>Chat with AI Trading Assistant</h2>
+          <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+              <div class="message system">
+                <div class="message-content">
+                  Hello! I'm your AI trading assistant. How can I help you today?
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-container">
+              <input type="text" id="chat-input" class="chat-input" placeholder="Ask about trading, market analysis, or platform connections...">
+              <button id="send-message" class="send-button">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Download Tab -->
+        <div id="download-tab" class="tab-content">
+          <h2>Download Data & Reports</h2>
+          <div class="download-options">
+            <div class="download-option">
+              <h3>Trade History</h3>
+              <p>Download your complete trading history across all connected platforms.</p>
+              <button id="download-history" class="secondary-button">
+                <i class="fas fa-download"></i> Download CSV
+              </button>
+            </div>
+            <div class="download-option">
+              <h3>Performance Report</h3>
+              <p>Download a detailed performance report with metrics and analytics.</p>
+              <button id="download-report" class="secondary-button">
+                <i class="fas fa-download"></i> Download PDF
+              </button>
+            </div>
+            <div class="download-option">
+              <h3>Extension Package</h3>
+              <p>Download the latest version of the TradeForce AI Trading Agent extension.</p>
+              <div class="browser-options">
+                <button id="download-chrome" class="browser-button">
+                  <i class="fab fa-chrome"></i> Chrome
+                </button>
+                <button id="download-firefox" class="browser-button">
+                  <i class="fab fa-firefox"></i> Firefox
+                </button>
+                <button id="download-edge" class="browser-button">
+                  <i class="fab fa-edge"></i> Edge
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Debug Info -->
+    <div class="debug-info">
+      <span id="debug-indicator" class="debug-indicator">0 Issues</span>
+    </div>
+  </div>
+
+  <!-- Settings Panel (hidden by default) -->
+  <div id="settings-panel" class="container settings hidden">
+    <header>
+      <div class="logo">
+        <img src="../assets/icons/icon48.png" alt="TradeForce AI Trading Agent">
+        <h1>SETTINGS</h1>
+      </div>
+    </header>
+
+    <div class="settings-content">
+      <section class="settings-section">
+        <h2>Trading Parameters</h2>
+        <div class="setting-item">
+          <label for="settings-max-trades">Max Concurrent Trades:</label>
+          <input type="number" id="settings-max-trades" min="1" max="10" value="5">
+        </div>
+        <div class="setting-item">
+          <label for="settings-win-rate">Target Win Rate (%):</label>
+          <input type="number" id="settings-win-rate" min="50" max="90" value="65">
+        </div>
+        <div class="setting-item">
+          <label for="settings-position-size">Position Size:</label>
+          <input type="number" id="settings-position-size" min="0.1" max="10" step="0.1" value="1">
+        </div>
+
+        <div class="setting-item risk-level">
+          <label>Risk Level:</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="settings-risk-level" id="settings-risk-low" value="low">
+              <span class="radio-label">Conservative</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="settings-risk-level" id="settings-risk-medium" value="medium" checked>
+              <span class="radio-label">Balanced</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="settings-risk-level" id="settings-risk-high" value="high">
+              <span class="radio-label">Aggressive</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>Strategy Parameters</h2>
+        <div class="setting-item">
+          <label for="settings-strategy">Default Strategy:</label>
+          <select id="settings-strategy">
+            <option value="combined">Combined</option>
+            <option value="arbitrage">Arbitrage</option>
+            <option value="momentum">Momentum</option>
+            <option value="statistical">Statistical</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label for="settings-take-profit">Take Profit (%):</label>
+          <input type="number" id="settings-take-profit" min="10" max="200" step="5" value="50">
+        </div>
+        <div class="setting-item">
+          <label for="settings-stop-loss">Stop Loss (%):</label>
+          <input type="number" id="settings-stop-loss" min="5" max="50" step="1" value="15">
+        </div>
+
+        <div class="setting-item">
+          <label class="checkbox-option">
+            <input type="checkbox" id="settings-auto-adjust" checked>
+            <span class="checkmark"></span>
+            Auto-adjust parameters with AI
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>API Connections</h2>
+        <div class="setting-item">
+          <label for="settings-robinhood-api">Robinhood API Key:</label>
+          <input type="password" id="settings-robinhood-api" placeholder="Enter API key">
+        </div>
+        <div class="setting-item">
+          <label for="settings-kraken-api">Kraken API Key:</label>
+          <input type="password" id="settings-kraken-api" placeholder="Enter API key">
+        </div>
+        <div class="setting-item">
+          <label for="settings-axiom-api">AXIOM API Key:</label>
+          <input type="password" id="settings-axiom-api" placeholder="Enter API key">
+        </div>
+        <div class="setting-item">
+          <label for="settings-grok-api">Grok 3 API Key:</label>
+          <input type="password" id="settings-grok-api" placeholder="Enter API key">
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <button id="save-settings" class="primary-button">Save</button>
+      <button id="cancel-settings" class="secondary-button">Cancel</button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

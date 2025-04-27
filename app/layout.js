@@ -1,6 +1,6 @@
 // Server part (no use client directive)
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "./styles.css"; // Using our new CSS file instead of globals.css
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

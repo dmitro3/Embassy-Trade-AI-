@@ -1,6 +1,6 @@
 import React from 'react';
 import TradePromptModal from './TradePromptModal';
-import useTradeWebSocket from '@/lib/useTradeWebSocket';
+import useTradeWebSocket from '../lib/useTradeWebSocket';
 
 /**
  * Component that handles trade prompts from WebSocket and renders the modal when needed

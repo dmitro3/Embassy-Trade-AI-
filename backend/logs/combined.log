@@ -1,0 +1,769 @@
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-06T19:22:34.241Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-06T19:22:34.408Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-06T19:22:58.447Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-06T19:22:58.479Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-06T19:24:06.389Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-06T19:24:06.416Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-06T22:47:52.722Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-06T22:47:52.755Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-06T22:54:54.059Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-06T22:54:54.091Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-06T22:54:56.064Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-07T01:06:58.726Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-07T01:06:58.754Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-07T01:13:38.023Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-07T01:13:38.047Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-07T01:31:32.905Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-07T01:31:32.929Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-07T01:31:32.985Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-07T01:32:36.132Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-07T01:32:36.160Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-07T01:32:36.510Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-07T12:01:45.319Z"}
+{"level":"info","message":"Server running on port 5000","service":"embassy-trade-bot","timestamp":"2025-04-07T12:01:45.346Z"}
+{"level":"info","message":"Browser logger initialized for Embassy Trade Bot","service":"embassy-trade-bot","timestamp":"2025-04-07T12:07:07.547Z"}
+{"level":"info","message":"Connected to MongoDB","service":"embassy-trade-bot","timestamp":"2025-04-07T13:09:20.506Z"}
+{"level":"info","message":"Browser logger initialized for Embassy Trade Bot","service":"embassy-trade-bot","timestamp":"2025-04-07T13:15:12.744Z"}
+{"level":"info","message":"Browser logger initialized for Embassy Trade Bot","service":"embassy-trade-bot","timestamp":"2025-04-07T13:15:14.581Z"}
+{"level":"info","message":"Browser logger initialized for Embassy Trade Bot","service":"embassy-trade-bot","timestamp":"2025-04-07T13:15:22.136Z"}
+2025-04-08T12:54:02.017Z info: Server started on port 5000
+2025-04-08T12:54:02.032Z info: MongoDB connected successfully
+2025-04-08T12:58:46.686Z info: Network verification complete
+2025-04-08T12:58:46.700Z info: Trading bot started
+2025-04-08T12:58:48.757Z info: Token test complete for So11111111111111111111111111111111111111112
+2025-04-08T13:00:56.303Z info: Trading bot stopped
+2025-04-08T13:17:22.694Z info: Server started on port 5000
+2025-04-08T13:17:22.722Z info: MongoDB connected successfully
+2025-04-08T13:19:04.205Z info: Browser Logger initialized for Embassy Trade Bot Browser Logger initialized for Embassy Trade Bot
+2025-04-08T13:19:05.447Z info: Token account for mint EMBAcKxvuMddwBmWRUftKdSAt6Su9tpXnAQFKMQiXMAA not found for wallet Gzf96o4iZdPtytRdoqVwo1fbzgQ4AkhwtET3LhG3p8dS. This is normal for new tokens. Token account for mint EMBAcKxvuMddwBmWRUftKdSAt6Su9tpXnAQFKMQiXMAA not found for wallet Gzf96o4iZdPtytRdoqVwo1fbzgQ4AkhwtET3LhG3p8dS. This is normal for new tokens.
+2025-04-08T13:19:05.686Z info: Token account for mint 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU not found for wallet Gzf96o4iZdPtytRdoqVwo1fbzgQ4AkhwtET3LhG3p8dS. This is normal for new tokens. Token account for mint 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU not found for wallet Gzf96o4iZdPtytRdoqVwo1fbzgQ4AkhwtET3LhG3p8dS. This is normal for new tokens.
+2025-04-08T13:26:54.124Z info: Network verification complete
+2025-04-08T13:26:54.136Z info: Trading bot started
+2025-04-08T13:26:56.216Z info: Token test complete for So11111111111111111111111111111111111111112
+2025-04-08T13:28:35.187Z info: Trading bot stopped
+2025-04-08T19:10:25.626Z info: Server started on port 5000
+2025-04-08T19:10:25.629Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-08T19:10:25.655Z info: MongoDB connected successfully
+2025-04-08T19:26:26.371Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:26:27.592Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:27:24.704Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:28:30.572Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:28:31.961Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:29:24.173Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:29:25.638Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:29:29.407Z info: Loaded EMB balance: 0
+2025-04-08T19:29:29.576Z info: Loaded EMB balance: 0
+2025-04-08T19:29:29.704Z info: Loaded USDC balance: 0
+2025-04-08T19:29:29.768Z info: Loaded USDC balance: 0
+2025-04-08T19:35:09.049Z info: Loaded EMB balance: 0
+2025-04-08T19:35:09.214Z info: Loaded USDC balance: 0
+2025-04-08T19:36:49.786Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:36:52.038Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:36:53.206Z info: Loaded EMB balance: 0
+2025-04-08T19:36:53.726Z info: Loaded USDC balance: 0
+2025-04-08T19:37:12.362Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:37:13.424Z info: Loaded EMB balance: 0
+2025-04-08T19:37:13.541Z info: Loaded USDC balance: 0
+2025-04-08T19:39:23.239Z info: Loaded EMB balance: 0
+2025-04-08T19:39:23.376Z info: Loaded USDC balance: 0
+2025-04-08T19:40:08.315Z info: Trading bot stopped
+2025-04-08T19:40:08.391Z info: Trading bot stopped
+2025-04-08T19:40:08.463Z info: Trading bot stopped
+2025-04-08T19:40:08.625Z info: Loaded EMB balance: 0
+2025-04-08T19:40:08.824Z info: Loaded EMB balance: 0
+2025-04-08T19:40:09.470Z info: Loaded USDC balance: 0
+2025-04-08T19:40:09.607Z info: Loaded EMB balance: 0
+2025-04-08T19:40:09.766Z info: Loaded USDC balance: 0
+2025-04-08T19:40:09.898Z info: Loaded USDC balance: 0
+2025-04-08T19:40:55.983Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:40:58.227Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:41:00.565Z info: Loaded EMB balance: 0
+2025-04-08T19:41:00.932Z info: Loaded USDC balance: 0
+2025-04-08T19:43:46.883Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:43:50.282Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T19:43:54.341Z info: Loaded EMB balance: 0
+2025-04-08T19:43:54.718Z info: Loaded USDC balance: 0
+2025-04-08T22:56:50.792Z info: Server started on port 5000
+2025-04-08T22:56:50.795Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-08T22:56:50.827Z info: MongoDB connected successfully
+2025-04-08T22:58:01.419Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T22:58:04.035Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:00:15.428Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:00:17.001Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:04:05.399Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:04:07.372Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:04:13.395Z info: Loaded EMB balance: 0
+2025-04-08T23:04:14.431Z info: Loaded EMB balance: 0
+2025-04-08T23:04:15.146Z info: Loaded USDC balance: 0
+2025-04-08T23:04:15.848Z info: Loaded USDC balance: 0
+2025-04-08T23:08:10.020Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:12:35.834Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:20:58.944Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:21:35.173Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-08T23:21:37.514Z info: Loaded EMB balance: 0
+2025-04-08T23:21:37.800Z info: Loaded USDC balance: 0
+2025-04-08T23:27:34.258Z info: Loaded EMB balance: 0
+2025-04-08T23:27:34.468Z info: Loaded USDC balance: 0
+2025-04-08T23:29:47.199Z info: Starting continuous stress testing: 5 cycles, 10 trades per cycle, real trades
+2025-04-08T23:29:47.218Z info: Cycle 1/5 with Grok
+2025-04-08T23:29:47.274Z warn: Tests already running
+2025-04-08T23:29:47.348Z info: Evaluating test results with Grok
+2025-04-08T23:29:47.390Z info: Starting AI evaluation with Grok
+2025-04-08T23:29:47.390Z info: Using Grok API for evaluation
+2025-04-08T23:29:47.724Z error: AI evaluation error: Request failed with status code 403
+2025-04-08T23:29:47.725Z error: API response error: {"code":"The caller does not have permission to execute the specified operation","error":"Your newly created teams doesn't have any credits yet. You can purchase credits on https://console.x.ai/team/1a181790-c866-456b-8d9f-a1a46f186d3f."}
+2025-04-08T23:29:47.736Z error: AI evaluation failed: Request failed with status code 500
+2025-04-08T23:29:47.743Z error: Continuous testing error: Request failed with status code 500
+2025-04-08T23:29:56.951Z info: Starting AI tests: 10 trades, bullish market, normal network, using gpt-4
+2025-04-08T23:29:56.958Z info: Starting simulated stability tests: 10 trades, normal network, bullish market
+2025-04-08T23:29:57.002Z info: Executing trade 1/10
+2025-04-08T23:29:57.050Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:00.614Z info: Trade successful (3565ms)
+2025-04-08T23:30:01.121Z info: Executing trade 2/10
+2025-04-08T23:30:01.126Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:05.638Z info: Trade successful (4508ms)
+2025-04-08T23:30:06.147Z info: Executing trade 3/10
+2025-04-08T23:30:06.155Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:09.447Z info: Trade successful (3292ms)
+2025-04-08T23:30:09.956Z info: Executing trade 4/10
+2025-04-08T23:30:09.962Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:11.032Z error: Trade failed: insufficient liquidity (1069ms)
+2025-04-08T23:30:11.548Z info: Executing trade 5/10
+2025-04-08T23:30:11.553Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:14.631Z info: Trade successful (3077ms)
+2025-04-08T23:30:15.146Z info: Executing trade 6/10
+2025-04-08T23:30:15.151Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:16.748Z error: Trade failed: slippage (1593ms)
+2025-04-08T23:30:17.256Z info: Executing trade 7/10
+2025-04-08T23:30:17.264Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:22.212Z info: Trade successful (4946ms)
+2025-04-08T23:30:22.721Z info: Executing trade 8/10
+2025-04-08T23:30:22.726Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:25.679Z info: Trade successful (2952ms)
+2025-04-08T23:30:26.189Z info: Executing trade 9/10
+2025-04-08T23:30:26.195Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:27.782Z info: Trade successful (1585ms)
+2025-04-08T23:30:28.288Z info: Executing trade 10/10
+2025-04-08T23:30:28.293Z info: Simulating trade under bullish market conditions
+2025-04-08T23:30:30.398Z error: Trade failed: timeout (2103ms)
+2025-04-08T23:30:30.914Z info: Testing complete. Success rate: 70.00%, Avg latency: 2869.00ms
+2025-04-08T23:30:30.920Z info: Evaluating test results with gpt-4
+2025-04-08T23:30:30.988Z info: Starting AI evaluation with gpt-4
+2025-04-08T23:30:30.989Z info: Using OpenAI API with model gpt-4
+2025-04-08T23:30:31.744Z error: AI evaluation error: Request failed with status code 404
+2025-04-08T23:30:31.745Z error: API response error: {"error":{"message":"The model `gpt-4` does not exist or you do not have access to it.","type":"invalid_request_error","param":null,"code":"model_not_found"}}
+2025-04-08T23:30:31.751Z error: AI evaluation failed: Request failed with status code 500
+2025-04-08T23:30:31.757Z error: AI testing failed: Request failed with status code 500
+2025-04-08T23:34:56.534Z info: Starting continuous stress testing: 4 cycles, 10 trades per cycle, simulated
+2025-04-08T23:34:56.540Z info: Cycle 1/4 with Grok
+2025-04-08T23:34:56.601Z warn: Tests already running
+2025-04-08T23:34:56.657Z info: Evaluating test results with Grok
+2025-04-08T23:34:56.714Z info: Starting AI evaluation with Grok
+2025-04-08T23:34:56.714Z info: Using Grok API for evaluation
+2025-04-08T23:34:56.902Z error: AI evaluation error: Request failed with status code 403
+2025-04-08T23:34:56.903Z error: API response error: {"code":"The caller does not have permission to execute the specified operation","error":"Your newly created teams doesn't have any credits yet. You can purchase credits on https://console.x.ai/team/1a181790-c866-456b-8d9f-a1a46f186d3f."}
+2025-04-08T23:34:56.909Z error: AI evaluation failed: Request failed with status code 500
+2025-04-08T23:34:56.915Z error: Continuous testing error: Request failed with status code 500
+2025-04-08T23:34:58.573Z info: Starting AI tests: 10 trades, bullish market, normal network, using Grok
+2025-04-08T23:34:58.580Z info: Starting simulated stability tests: 10 trades, normal network, bullish market
+2025-04-08T23:34:58.640Z info: Executing trade 1/10
+2025-04-08T23:34:58.696Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:00.698Z info: Trade successful (1999ms)
+2025-04-08T23:35:01.206Z info: Executing trade 2/10
+2025-04-08T23:35:01.212Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:02.322Z info: Trade successful (1107ms)
+2025-04-08T23:35:02.842Z info: Executing trade 3/10
+2025-04-08T23:35:02.850Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:07.813Z info: Trade successful (4961ms)
+2025-04-08T23:35:08.326Z info: Executing trade 4/10
+2025-04-08T23:35:08.331Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:09.894Z info: Trade successful (1561ms)
+2025-04-08T23:35:10.405Z info: Executing trade 5/10
+2025-04-08T23:35:10.411Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:14.735Z error: Trade failed: RPC error (4323ms)
+2025-04-08T23:35:15.241Z info: Executing trade 6/10
+2025-04-08T23:35:15.247Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:16.929Z info: Trade successful (1681ms)
+2025-04-08T23:35:17.443Z info: Executing trade 7/10
+2025-04-08T23:35:17.449Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:21.846Z info: Trade successful (4393ms)
+2025-04-08T23:35:22.356Z info: Executing trade 8/10
+2025-04-08T23:35:22.362Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:25.929Z info: Trade successful (3566ms)
+2025-04-08T23:35:26.435Z info: Executing trade 9/10
+2025-04-08T23:35:26.441Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:27.728Z info: Trade successful (1286ms)
+2025-04-08T23:35:28.243Z info: Executing trade 10/10
+2025-04-08T23:35:28.251Z info: Simulating trade under bullish market conditions
+2025-04-08T23:35:29.909Z info: Trade successful (1659ms)
+2025-04-08T23:35:30.418Z info: Testing complete. Success rate: 90.00%, Avg latency: 2653.60ms
+2025-04-08T23:35:30.423Z info: Evaluating test results with Grok
+2025-04-08T23:35:30.492Z info: Starting AI evaluation with Grok
+2025-04-08T23:35:30.493Z info: Using Grok API for evaluation
+2025-04-08T23:35:30.579Z error: AI evaluation error: Request failed with status code 403
+2025-04-08T23:35:30.579Z error: API response error: {"code":"The caller does not have permission to execute the specified operation","error":"Your newly created teams doesn't have any credits yet. You can purchase credits on https://console.x.ai/team/1a181790-c866-456b-8d9f-a1a46f186d3f."}
+2025-04-08T23:35:30.585Z error: AI evaluation failed: Request failed with status code 500
+2025-04-08T23:35:30.590Z error: AI testing failed: Request failed with status code 500
+2025-04-09T00:31:36.481Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-09T00:31:36.745Z error: Failed to fetch token accounts
+2025-04-09T00:31:41.062Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-09T00:31:42.768Z info: Loaded EMB balance: 0
+2025-04-09T00:31:43.847Z info: Loaded USDC balance: 0
+2025-04-09T00:41:37.981Z info: Server started on port 5000
+2025-04-09T00:41:37.986Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-09T00:41:38.007Z info: MongoDB connected successfully
+2025-04-09T00:45:34.432Z info: Server started on port 5000
+2025-04-09T00:45:34.434Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-09T00:45:34.453Z info: MongoDB connected successfully
+2025-04-09T00:49:19.366Z info: Server started on port 5000
+2025-04-09T00:49:19.371Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-09T00:49:19.390Z info: MongoDB connected successfully
+2025-04-09T00:49:47.745Z info: Server started on port 5000
+2025-04-09T00:49:47.752Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-09T00:49:47.800Z info: MongoDB connected successfully
+2025-04-09T01:09:21.656Z info: Server started on port 5000
+2025-04-09T01:09:21.659Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-09T01:09:21.678Z info: MongoDB connected successfully
+2025-04-09T02:21:55.552Z info: Server started on port 5000
+2025-04-09T02:21:55.557Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-09T02:21:55.581Z info: MongoDB connected successfully
+2025-04-09T03:16:42.537Z info: Server started on port 5000
+2025-04-09T03:16:42.542Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-09T03:16:42.566Z info: MongoDB connected successfully
+2025-04-09T03:30:21.359Z info: Server started on port 5000
+2025-04-09T03:30:21.362Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-09T03:30:21.378Z info: MongoDB connected successfully
+2025-04-10T01:43:58.901Z info: Server started on port 5000
+2025-04-10T01:43:58.908Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T01:43:58.932Z info: MongoDB connected successfully
+2025-04-10T01:50:54.402Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T01:52:19.861Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T01:52:22.208Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T03:18:05.670Z info: Server started on port 5000
+2025-04-10T03:18:05.673Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T03:18:05.689Z info: MongoDB connected successfully
+2025-04-10T03:55:20.476Z info: Server started on port 5000
+2025-04-10T03:55:20.478Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T03:55:20.494Z info: MongoDB connected successfully
+2025-04-10T04:02:06.594Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T04:02:10.069Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T04:04:06.835Z info: Server started on port 5000
+2025-04-10T04:04:06.843Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T04:04:06.872Z info: MongoDB connected successfully
+2025-04-10T04:05:47.966Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T04:06:01.884Z info: Auto trading enabled
+2025-04-10T04:23:20.481Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T04:23:32.083Z info: Auto trading enabled
+2025-04-10T05:00:24.298Z info: Server started on port 5000
+2025-04-10T05:00:24.301Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T05:00:24.320Z info: MongoDB connected successfully
+2025-04-10T05:01:29.340Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T05:01:30.124Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T05:02:43.872Z info: Server started on port 5000
+2025-04-10T05:02:43.879Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T05:02:43.906Z info: MongoDB connected successfully
+2025-04-10T05:07:17.943Z info: Server started on port 5000
+2025-04-10T05:07:17.948Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T05:07:17.984Z info: MongoDB connected successfully
+2025-04-10T05:10:09.521Z info: Server started on port 5000
+2025-04-10T05:10:09.529Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T05:10:09.575Z info: MongoDB connected successfully
+2025-04-10T05:12:32.224Z info: Server started on port 5000
+2025-04-10T05:12:32.232Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T05:12:32.280Z info: MongoDB connected successfully
+2025-04-10T05:17:17.915Z info: Server started on port 5000
+2025-04-10T05:17:17.921Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T05:17:17.946Z info: MongoDB connected successfully
+2025-04-10T13:11:19.849Z warn: Missing environment variable: NEXT_PUBLIC_FIREBASE_API_KEY
+2025-04-10T13:11:19.856Z warn: Missing environment variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+2025-04-10T13:11:19.857Z warn: Missing environment variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+2025-04-10T13:11:19.858Z warn: Missing environment variable: NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-10T13:11:19.859Z warn: 4 environment variables are missing. Some features may not work properly.
+2025-04-10T13:11:19.860Z warn: Missing variables: NEXT_PUBLIC_FIREBASE_API_KEY, NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN, NEXT_PUBLIC_FIREBASE_PROJECT_ID, NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-10T13:11:19.863Z info: Using fallback value for SHYFT_API_KEY
+2025-04-10T13:11:19.941Z info: Server started on port 5000
+2025-04-10T13:11:19.942Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-10T13:11:19.983Z info: MongoDB connected successfully
+2025-04-10T13:13:03.766Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-10T13:48:12.576Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T01:16:27.541Z info: Auto trading enabled
+2025-04-11T01:17:27.629Z info: MCP handling trade prompt: Execute a trade of 0.08421304469863994 SOL on Embassy AI.
+2025-04-11T01:17:27.788Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08421304469863994,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:17:27.615Z","txId":"sim_m9c3kngf"}
+2025-04-11T01:17:27.859Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08421304469863994,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:17:27.615Z","txId":"sim_m9c3kngf"}
+2025-04-11T01:18:27.607Z info: MCP handling trade prompt: Execute a trade of 0.08167245020059008 SOL on Embassy AI.
+2025-04-11T01:18:27.759Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08167245020059008,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:18:27.598Z","txId":"sim_m9c3lxqm"}
+2025-04-11T01:18:27.834Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08167245020059008,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:18:27.598Z","txId":"sim_m9c3lxqm"}
+2025-04-11T01:19:28.427Z info: MCP handling trade prompt: Execute a trade of 0.12201799440413846 SOL on Embassy AI.
+2025-04-11T01:19:29.413Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12201799440413846,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:19:28.423Z","txId":"sim_m9c3n8o7"}
+2025-04-11T01:19:30.420Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12201799440413846,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:19:28.423Z","txId":"sim_m9c3n8o7"}
+2025-04-11T01:20:28.423Z info: MCP handling trade prompt: Execute a trade of 0.12084665693694364 SOL on Embassy AI.
+2025-04-11T01:20:29.420Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12084665693694364,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:20:28.414Z","txId":"sim_m9c3oiym"}
+2025-04-11T01:20:30.423Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12084665693694364,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:20:28.414Z","txId":"sim_m9c3oiym"}
+2025-04-11T01:22:09.452Z info: MCP handling trade prompt: Execute a trade of 0.05216122314324302 SOL on Embassy AI.
+2025-04-11T01:22:10.418Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.05216122314324302,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:22:09.447Z","txId":"sim_m9c3qox3"}
+2025-04-11T01:22:11.423Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.05216122314324302,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:22:09.447Z","txId":"sim_m9c3qox3"}
+2025-04-11T01:23:09.441Z info: MCP handling trade prompt: Execute a trade of 0.08635011102969223 SOL on Embassy AI.
+2025-04-11T01:23:10.415Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08635011102969223,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:23:09.437Z","txId":"sim_m9c3rz7h"}
+2025-04-11T01:23:11.409Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08635011102969223,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:23:09.437Z","txId":"sim_m9c3rz7h"}
+2025-04-11T01:24:09.436Z info: MCP handling trade prompt: Execute a trade of 0.14633900176401404 SOL on Embassy AI.
+2025-04-11T01:24:10.409Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14633900176401404,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:24:09.431Z","txId":"sim_m9c3t9hz"}
+2025-04-11T01:24:11.414Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14633900176401404,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:24:09.431Z","txId":"sim_m9c3t9hz"}
+2025-04-11T01:25:09.442Z info: MCP handling trade prompt: Execute a trade of 0.1455642379441501 SOL on Embassy AI.
+2025-04-11T01:25:10.418Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1455642379441501,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:25:09.436Z","txId":"sim_m9c3ujss"}
+2025-04-11T01:25:11.416Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1455642379441501,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:25:09.436Z","txId":"sim_m9c3ujss"}
+2025-04-11T01:26:09.439Z info: MCP handling trade prompt: Execute a trade of 0.11599260153353069 SOL on Embassy AI.
+2025-04-11T01:26:10.409Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11599260153353069,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:26:09.434Z","txId":"sim_m9c3vu3e"}
+2025-04-11T01:26:11.418Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11599260153353069,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:26:09.434Z","txId":"sim_m9c3vu3e"}
+2025-04-11T01:27:09.447Z info: MCP handling trade prompt: Execute a trade of 0.11161506008989701 SOL on Embassy AI.
+2025-04-11T01:27:10.412Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11161506008989701,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:27:09.440Z","txId":"sim_m9c3x4e8"}
+2025-04-11T01:27:11.418Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11161506008989701,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:27:09.440Z","txId":"sim_m9c3x4e8"}
+2025-04-11T01:28:09.432Z info: MCP handling trade prompt: Execute a trade of 0.05974130570607239 SOL on Embassy AI.
+2025-04-11T01:28:10.420Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.05974130570607239,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:28:09.429Z","txId":"sim_m9c3yeol"}
+2025-04-11T01:28:11.411Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.05974130570607239,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:28:09.429Z","txId":"sim_m9c3yeol"}
+2025-04-11T01:29:09.445Z info: MCP handling trade prompt: Execute a trade of 0.055465670246338965 SOL on Embassy AI.
+2025-04-11T01:29:10.413Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.055465670246338965,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:29:09.441Z","txId":"sim_m9c3zozl"}
+2025-04-11T01:29:11.417Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.055465670246338965,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:29:09.441Z","txId":"sim_m9c3zozl"}
+2025-04-11T01:30:09.445Z info: MCP handling trade prompt: Execute a trade of 0.10145288627383431 SOL on Embassy AI.
+2025-04-11T01:30:10.415Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10145288627383431,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:30:09.443Z","txId":"sim_m9c40zab"}
+2025-04-11T01:30:11.425Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10145288627383431,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:30:09.443Z","txId":"sim_m9c40zab"}
+2025-04-11T01:31:09.445Z info: MCP handling trade prompt: Execute a trade of 0.13375076505580186 SOL on Embassy AI.
+2025-04-11T01:31:10.408Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13375076505580186,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:31:09.441Z","txId":"sim_m9c429kx"}
+2025-04-11T01:31:11.416Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13375076505580186,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:31:09.441Z","txId":"sim_m9c429kx"}
+2025-04-11T01:32:09.444Z info: MCP handling trade prompt: Execute a trade of 0.1473192887609467 SOL on Embassy AI.
+2025-04-11T01:32:10.421Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1473192887609467,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:32:09.439Z","txId":"sim_m9c43jvj"}
+2025-04-11T01:32:11.412Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1473192887609467,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:32:09.439Z","txId":"sim_m9c43jvj"}
+2025-04-11T01:33:09.434Z info: MCP handling trade prompt: Execute a trade of 0.06914719674522393 SOL on Embassy AI.
+2025-04-11T01:33:10.421Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.06914719674522393,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:33:09.430Z","txId":"sim_m9c44u5y"}
+2025-04-11T01:33:11.409Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.06914719674522393,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:33:09.430Z","txId":"sim_m9c44u5y"}
+2025-04-11T01:34:09.443Z info: MCP handling trade prompt: Execute a trade of 0.1105457918937778 SOL on Embassy AI.
+2025-04-11T01:34:10.410Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1105457918937778,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:34:09.438Z","txId":"sim_m9c464gu"}
+2025-04-11T01:34:11.421Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1105457918937778,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:34:09.438Z","txId":"sim_m9c464gu"}
+2025-04-11T01:35:09.449Z info: MCP handling trade prompt: Execute a trade of 0.14733545407028845 SOL on Embassy AI.
+2025-04-11T01:35:10.416Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14733545407028845,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:35:09.445Z","txId":"sim_m9c47erp"}
+2025-04-11T01:35:11.422Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14733545407028845,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:35:09.445Z","txId":"sim_m9c47erp"}
+2025-04-11T01:36:09.435Z info: MCP handling trade prompt: Execute a trade of 0.13553560184274116 SOL on Embassy AI.
+2025-04-11T01:36:10.421Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13553560184274116,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:36:09.433Z","txId":"sim_m9c48p21"}
+2025-04-11T01:36:11.412Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13553560184274116,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:36:09.433Z","txId":"sim_m9c48p21"}
+2025-04-11T01:37:09.427Z info: MCP handling trade prompt: Execute a trade of 0.11730851864020042 SOL on Embassy AI.
+2025-04-11T01:37:10.406Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11730851864020042,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:37:09.430Z","txId":"sim_m9c49zcm"}
+2025-04-11T01:37:11.397Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11730851864020042,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:37:09.430Z","txId":"sim_m9c49zcm"}
+2025-04-11T01:38:09.398Z info: MCP handling trade prompt: Execute a trade of 0.07722416075492174 SOL on Embassy AI.
+2025-04-11T01:38:10.386Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.07722416075492174,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:38:09.397Z","txId":"sim_m9c4b9md"}
+2025-04-11T01:38:11.390Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.07722416075492174,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:38:09.397Z","txId":"sim_m9c4b9md"}
+2025-04-11T01:39:09.387Z info: MCP handling trade prompt: Execute a trade of 0.052608654274048955 SOL on Embassy AI.
+2025-04-11T01:39:10.375Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.052608654274048955,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:39:09.389Z","txId":"sim_m9c4cjwt"}
+2025-04-11T01:39:11.371Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.052608654274048955,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:39:09.389Z","txId":"sim_m9c4cjwt"}
+2025-04-11T01:40:09.380Z info: MCP handling trade prompt: Execute a trade of 0.07542272820634455 SOL on Embassy AI.
+2025-04-11T01:40:11.352Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.07542272820634455,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:40:09.390Z","txId":"sim_m9c4du7i"}
+2025-04-11T01:40:12.360Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.07542272820634455,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:40:09.390Z","txId":"sim_m9c4du7i"}
+2025-04-11T01:41:09.375Z info: MCP handling trade prompt: Execute a trade of 0.14934559164390665 SOL on Embassy AI.
+2025-04-11T01:41:10.353Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14934559164390665,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:41:09.379Z","txId":"sim_m9c4f4hv"}
+2025-04-11T01:41:11.334Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14934559164390665,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:41:09.379Z","txId":"sim_m9c4f4hv"}
+2025-04-11T01:42:09.350Z info: MCP handling trade prompt: Execute a trade of 0.11087679790883813 SOL on Embassy AI.
+2025-04-11T01:42:10.329Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11087679790883813,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:42:09.355Z","txId":"sim_m9c4gerv"}
+2025-04-11T01:42:11.326Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11087679790883813,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:42:09.355Z","txId":"sim_m9c4gerv"}
+2025-04-11T01:43:09.347Z info: MCP handling trade prompt: Execute a trade of 0.08064162296299461 SOL on Embassy AI.
+2025-04-11T01:43:10.310Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08064162296299461,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:43:09.352Z","txId":"sim_m9c4hp2g"}
+2025-04-11T01:43:11.315Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08064162296299461,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:43:09.352Z","txId":"sim_m9c4hp2g"}
+2025-04-11T01:44:09.310Z info: MCP handling trade prompt: Execute a trade of 0.06775127394295043 SOL on Embassy AI.
+2025-04-11T01:44:10.296Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.06775127394295043,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:44:09.314Z","txId":"sim_m9c4izc2"}
+2025-04-11T01:44:11.291Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.06775127394295043,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:44:09.314Z","txId":"sim_m9c4izc2"}
+2025-04-11T01:45:09.293Z info: MCP handling trade prompt: Execute a trade of 0.09006711974074078 SOL on Embassy AI.
+2025-04-11T01:45:10.314Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09006711974074078,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:45:09.296Z","txId":"sim_m9c4k9m8"}
+2025-04-11T01:45:11.280Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09006711974074078,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:45:09.296Z","txId":"sim_m9c4k9m8"}
+2025-04-11T01:46:09.299Z info: MCP handling trade prompt: Execute a trade of 0.11441937402385952 SOL on Embassy AI.
+2025-04-11T01:46:10.269Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11441937402385952,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:46:09.303Z","txId":"sim_m9c4ljx3"}
+2025-04-11T01:46:11.268Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11441937402385952,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:46:09.303Z","txId":"sim_m9c4ljx3"}
+2025-04-11T01:47:09.294Z info: MCP handling trade prompt: Execute a trade of 0.06002355456943336 SOL on Embassy AI.
+2025-04-11T01:47:10.247Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.06002355456943336,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:47:09.300Z","txId":"sim_m9c4mu7o"}
+2025-04-11T01:47:11.281Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.06002355456943336,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:47:09.300Z","txId":"sim_m9c4mu7o"}
+2025-04-11T01:48:09.287Z info: MCP handling trade prompt: Execute a trade of 0.0679999953375695 SOL on Embassy AI.
+2025-04-11T01:48:10.234Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.0679999953375695,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:48:09.282Z","txId":"sim_m9c4o4hu"}
+2025-04-11T01:48:11.229Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.0679999953375695,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:48:09.282Z","txId":"sim_m9c4o4hu"}
+2025-04-11T01:49:09.245Z info: MCP handling trade prompt: Execute a trade of 0.08136912916584654 SOL on Embassy AI.
+2025-04-11T01:49:10.216Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08136912916584654,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:49:09.248Z","txId":"sim_m9c4perk"}
+2025-04-11T01:49:11.224Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08136912916584654,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:49:09.248Z","txId":"sim_m9c4perk"}
+2025-04-11T01:50:09.284Z info: MCP handling trade prompt: Execute a trade of 0.13386023084366522 SOL on Embassy AI.
+2025-04-11T01:50:10.202Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13386023084366522,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:50:09.292Z","txId":"sim_m9c4qp3g"}
+2025-04-11T01:50:11.204Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13386023084366522,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:50:09.292Z","txId":"sim_m9c4qp3g"}
+2025-04-11T01:51:09.233Z info: MCP handling trade prompt: Execute a trade of 0.12711260014317577 SOL on Embassy AI.
+2025-04-11T01:51:10.183Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12711260014317577,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:51:09.228Z","txId":"sim_m9c4rzcc"}
+2025-04-11T01:51:11.185Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12711260014317577,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:51:09.228Z","txId":"sim_m9c4rzcc"}
+2025-04-11T01:52:09.208Z info: MCP handling trade prompt: Execute a trade of 0.06653784841208685 SOL on Embassy AI.
+2025-04-11T01:52:10.175Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.06653784841208685,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:52:09.208Z","txId":"sim_m9c4t9mg"}
+2025-04-11T01:52:11.166Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.06653784841208685,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:52:09.208Z","txId":"sim_m9c4t9mg"}
+2025-04-11T01:53:09.197Z info: MCP handling trade prompt: Execute a trade of 0.053812792800048116 SOL on Embassy AI.
+2025-04-11T01:53:10.152Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.053812792800048116,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:53:09.190Z","txId":"sim_m9c4ujwm"}
+2025-04-11T01:53:11.161Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.053812792800048116,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:53:09.190Z","txId":"sim_m9c4ujwm"}
+2025-04-11T01:54:09.174Z info: MCP handling trade prompt: Execute a trade of 0.08636745167428717 SOL on Embassy AI.
+2025-04-11T01:54:10.152Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08636745167428717,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:54:09.167Z","txId":"sim_m9c4vu6n"}
+2025-04-11T01:54:11.152Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08636745167428717,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:54:09.167Z","txId":"sim_m9c4vu6n"}
+2025-04-11T01:55:09.163Z info: MCP handling trade prompt: Execute a trade of 0.14233368949613737 SOL on Embassy AI.
+2025-04-11T01:55:10.138Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14233368949613737,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:55:09.159Z","txId":"sim_m9c4x4h3"}
+2025-04-11T01:55:11.128Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14233368949613737,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:55:09.159Z","txId":"sim_m9c4x4h3"}
+2025-04-11T01:56:09.176Z info: MCP handling trade prompt: Execute a trade of 0.13971601780367499 SOL on Embassy AI.
+2025-04-11T01:56:10.121Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13971601780367499,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:56:09.151Z","txId":"sim_m9c4yerj"}
+2025-04-11T01:56:11.131Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13971601780367499,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:56:09.151Z","txId":"sim_m9c4yerj"}
+2025-04-11T01:57:09.124Z info: MCP handling trade prompt: Execute a trade of 0.1396006170219441 SOL on Embassy AI.
+2025-04-11T01:57:10.112Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1396006170219441,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:57:09.127Z","txId":"sim_m9c4zp1j"}
+2025-04-11T01:57:11.118Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1396006170219441,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:57:09.127Z","txId":"sim_m9c4zp1j"}
+2025-04-11T01:58:09.128Z info: MCP handling trade prompt: Execute a trade of 0.09057324896809911 SOL on Embassy AI.
+2025-04-11T01:58:10.096Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09057324896809911,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:58:09.118Z","txId":"sim_m9c50zby"}
+2025-04-11T01:58:11.126Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09057324896809911,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:58:09.118Z","txId":"sim_m9c50zby"}
+2025-04-11T01:59:09.144Z info: MCP handling trade prompt: Execute a trade of 0.11791546640300148 SOL on Embassy AI.
+2025-04-11T01:59:10.097Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11791546640300148,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:59:09.132Z","txId":"sim_m9c529n0"}
+2025-04-11T01:59:11.097Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11791546640300148,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T01:59:09.132Z","txId":"sim_m9c529n0"}
+2025-04-11T02:00:09.119Z info: MCP handling trade prompt: Execute a trade of 0.12138730768187106 SOL on Embassy AI.
+2025-04-11T02:00:10.086Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12138730768187106,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:00:09.110Z","txId":"sim_m9c53jx2"}
+2025-04-11T02:00:11.081Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12138730768187106,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:00:09.110Z","txId":"sim_m9c53jx2"}
+2025-04-11T02:01:09.107Z info: MCP handling trade prompt: Execute a trade of 0.05310554235069507 SOL on Embassy AI.
+2025-04-11T02:01:10.077Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.05310554235069507,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:01:09.092Z","txId":"sim_m9c54u78"}
+2025-04-11T02:01:11.071Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.05310554235069507,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:01:09.092Z","txId":"sim_m9c54u78"}
+2025-04-11T02:02:09.127Z info: MCP handling trade prompt: Execute a trade of 0.08221708799364114 SOL on Embassy AI.
+2025-04-11T02:02:10.057Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08221708799364114,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:02:09.110Z","txId":"sim_m9c564ie"}
+2025-04-11T02:02:11.059Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08221708799364114,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:02:09.110Z","txId":"sim_m9c564ie"}
+2025-04-11T02:03:09.096Z info: MCP handling trade prompt: Execute a trade of 0.0685588485948842 SOL on Embassy AI.
+2025-04-11T02:03:10.051Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.0685588485948842,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:03:09.081Z","txId":"sim_m9c57es9"}
+2025-04-11T02:03:11.044Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.0685588485948842,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:03:09.081Z","txId":"sim_m9c57es9"}
+2025-04-11T02:04:09.085Z info: MCP handling trade prompt: Execute a trade of 0.1253632634425863 SOL on Embassy AI.
+2025-04-11T02:04:10.034Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1253632634425863,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:04:09.090Z","txId":"sim_m9c58p36"}
+2025-04-11T02:04:11.031Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1253632634425863,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:04:09.090Z","txId":"sim_m9c58p36"}
+2025-04-11T02:05:09.070Z info: MCP handling trade prompt: Execute a trade of 0.0693689393697065 SOL on Embassy AI.
+2025-04-11T02:05:10.029Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.0693689393697065,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:05:09.071Z","txId":"sim_m9c59zdb"}
+2025-04-11T02:05:11.029Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.0693689393697065,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:05:09.071Z","txId":"sim_m9c59zdb"}
+2025-04-11T02:06:09.083Z info: MCP handling trade prompt: Execute a trade of 0.1303599737503244 SOL on Embassy AI.
+2025-04-11T02:06:10.142Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1303599737503244,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:06:09.088Z","txId":"sim_m9c5b9og"}
+2025-04-11T02:06:11.025Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1303599737503244,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:06:09.088Z","txId":"sim_m9c5b9og"}
+2025-04-11T02:07:09.084Z info: MCP handling trade prompt: Execute a trade of 0.056441211124164364 SOL on Embassy AI.
+2025-04-11T02:07:11.009Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.056441211124164364,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:07:09.093Z","txId":"sim_m9c5cjz9"}
+2025-04-11T02:07:12.010Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.056441211124164364,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:07:09.093Z","txId":"sim_m9c5cjz9"}
+2025-04-11T02:08:09.348Z info: MCP handling trade prompt: Execute a trade of 0.10042090338407744 SOL on Embassy AI.
+2025-04-11T02:08:09.999Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10042090338407744,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:08:09.335Z","txId":"sim_m9c5dugn"}
+2025-04-11T02:08:11.005Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10042090338407744,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:08:09.335Z","txId":"sim_m9c5dugn"}
+2025-04-11T02:09:09.063Z info: MCP handling trade prompt: Execute a trade of 0.11377822188234721 SOL on Embassy AI.
+2025-04-11T02:09:10.126Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11377822188234721,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:09:09.061Z","txId":"sim_m9c5f4jp"}
+2025-04-11T02:09:10.980Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11377822188234721,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:09:09.061Z","txId":"sim_m9c5f4jp"}
+2025-04-11T02:10:09.018Z info: MCP handling trade prompt: Execute a trade of 0.08548617703493536 SOL on Embassy AI.
+2025-04-11T02:10:09.970Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08548617703493536,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:10:09.016Z","txId":"sim_m9c5get4"}
+2025-04-11T02:10:10.978Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08548617703493536,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:10:09.016Z","txId":"sim_m9c5get4"}
+2025-04-11T02:11:09.116Z info: MCP handling trade prompt: Execute a trade of 0.13938162309358032 SOL on Embassy AI.
+2025-04-11T02:11:09.957Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13938162309358032,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:11:09.108Z","txId":"sim_m9c5hp6c"}
+2025-04-11T02:11:11.013Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13938162309358032,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:11:09.108Z","txId":"sim_m9c5hp6c"}
+2025-04-11T02:12:08.991Z info: MCP handling trade prompt: Execute a trade of 0.10854562817756883 SOL on Embassy AI.
+2025-04-11T02:12:09.957Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10854562817756883,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:12:09.004Z","txId":"sim_m9c5ize4"}
+2025-04-11T02:12:10.954Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10854562817756883,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:12:09.004Z","txId":"sim_m9c5ize4"}
+2025-04-11T02:13:08.996Z info: MCP handling trade prompt: Execute a trade of 0.06791783087516123 SOL on Embassy AI.
+2025-04-11T02:13:09.947Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.06791783087516123,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:13:08.986Z","txId":"sim_m9c5k9oa"}
+2025-04-11T02:13:10.941Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.06791783087516123,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:13:08.986Z","txId":"sim_m9c5k9oa"}
+2025-04-11T02:14:09.193Z info: MCP handling trade prompt: Execute a trade of 0.1235776467943603 SOL on Embassy AI.
+2025-04-11T02:14:09.930Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1235776467943603,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:14:09.228Z","txId":"sim_m9c5lk5o"}
+2025-04-11T02:14:10.941Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1235776467943603,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:14:09.228Z","txId":"sim_m9c5lk5o"}
+2025-04-11T02:15:08.948Z info: MCP handling trade prompt: Execute a trade of 0.1495854481855727 SOL on Embassy AI.
+2025-04-11T02:15:09.933Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1495854481855727,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:15:08.955Z","txId":"sim_m9c5mu8r"}
+2025-04-11T02:15:10.930Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1495854481855727,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:15:08.955Z","txId":"sim_m9c5mu8r"}
+2025-04-11T02:16:08.962Z info: MCP handling trade prompt: Execute a trade of 0.06590616760927402 SOL on Embassy AI.
+2025-04-11T02:16:09.919Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.06590616760927402,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:16:08.968Z","txId":"sim_m9c5o4jt"}
+2025-04-11T02:16:10.930Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.06590616760927402,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:16:08.968Z","txId":"sim_m9c5o4jt"}
+2025-04-11T02:17:08.964Z info: MCP handling trade prompt: Execute a trade of 0.11025306625014047 SOL on Embassy AI.
+2025-04-11T02:17:09.914Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11025306625014047,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:17:08.965Z","txId":"sim_m9c5peud"}
+2025-04-11T02:17:10.911Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11025306625014047,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:17:08.965Z","txId":"sim_m9c5peud"}
+2025-04-11T02:18:09.008Z info: MCP handling trade prompt: Execute a trade of 0.13827862218005693 SOL on Embassy AI.
+2025-04-11T02:18:09.913Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13827862218005693,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:18:08.943Z","txId":"sim_m9c5qp4f"}
+2025-04-11T02:18:10.912Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13827862218005693,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:18:08.943Z","txId":"sim_m9c5qp4f"}
+2025-04-11T02:19:08.943Z info: MCP handling trade prompt: Execute a trade of 0.09961389314312695 SOL on Embassy AI.
+2025-04-11T02:19:09.903Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09961389314312695,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:19:08.946Z","txId":"sim_m9c5rzf6"}
+2025-04-11T02:19:10.896Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09961389314312695,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:19:08.946Z","txId":"sim_m9c5rzf6"}
+2025-04-11T02:20:08.960Z info: MCP handling trade prompt: Execute a trade of 0.07622613113089827 SOL on Embassy AI.
+2025-04-11T02:20:09.890Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.07622613113089827,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:20:08.941Z","txId":"sim_m9c5t9pq"}
+2025-04-11T02:20:10.913Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.07622613113089827,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:20:08.941Z","txId":"sim_m9c5t9pq"}
+2025-04-11T02:21:09.025Z info: MCP handling trade prompt: Execute a trade of 0.07484993302778363 SOL on Embassy AI.
+2025-04-11T02:21:09.882Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.07484993302778363,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:21:09.024Z","txId":"sim_m9c5uk2o"}
+2025-04-11T02:21:10.889Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.07484993302778363,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:21:09.024Z","txId":"sim_m9c5uk2o"}
+2025-04-11T02:22:08.949Z info: MCP handling trade prompt: Execute a trade of 0.08381956809089205 SOL on Embassy AI.
+2025-04-11T02:22:09.870Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08381956809089205,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:22:08.924Z","txId":"sim_m9c5vuak"}
+2025-04-11T02:22:10.881Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08381956809089205,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:22:08.924Z","txId":"sim_m9c5vuak"}
+2025-04-11T02:23:08.933Z info: MCP handling trade prompt: Execute a trade of 0.13567381428076875 SOL on Embassy AI.
+2025-04-11T02:23:09.864Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13567381428076875,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:23:08.928Z","txId":"sim_m9c5x4lc"}
+2025-04-11T02:23:10.869Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13567381428076875,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:23:08.928Z","txId":"sim_m9c5x4lc"}
+2025-04-11T02:24:08.909Z info: MCP handling trade prompt: Execute a trade of 0.052244034500501135 SOL on Embassy AI.
+2025-04-11T02:24:09.867Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.052244034500501135,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:24:08.904Z","txId":"sim_m9c5yevc"}
+2025-04-11T02:24:10.857Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.052244034500501135,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:24:08.904Z","txId":"sim_m9c5yevc"}
+2025-04-11T02:25:08.877Z info: MCP handling trade prompt: Execute a trade of 0.05368783306056986 SOL on Embassy AI.
+2025-04-11T02:25:09.859Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.05368783306056986,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:25:08.872Z","txId":"sim_m9c5zp54"}
+2025-04-11T02:25:10.850Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.05368783306056986,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:25:08.872Z","txId":"sim_m9c5zp54"}
+2025-04-11T02:26:08.895Z info: MCP handling trade prompt: Execute a trade of 0.13765876615154315 SOL on Embassy AI.
+2025-04-11T02:26:10.024Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13765876615154315,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:26:08.883Z","txId":"sim_m9c60zg3"}
+2025-04-11T02:26:10.856Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13765876615154315,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:26:08.883Z","txId":"sim_m9c60zg3"}
+2025-04-11T02:27:08.945Z info: MCP handling trade prompt: Execute a trade of 0.08504761471122815 SOL on Embassy AI.
+2025-04-11T02:27:09.844Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08504761471122815,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:27:08.859Z","txId":"sim_m9c629q3"}
+2025-04-11T02:27:10.896Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08504761471122815,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:27:08.859Z","txId":"sim_m9c629q3"}
+2025-04-11T02:28:08.888Z info: MCP handling trade prompt: Execute a trade of 0.05467501612782569 SOL on Embassy AI.
+2025-04-11T02:28:09.825Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.05467501612782569,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:28:08.877Z","txId":"sim_m9c63k19"}
+2025-04-11T02:28:10.837Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.05467501612782569,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:28:08.877Z","txId":"sim_m9c63k19"}
+2025-04-11T02:29:08.870Z info: MCP handling trade prompt: Execute a trade of 0.1460220573927994 SOL on Embassy AI.
+2025-04-11T02:29:10.825Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1460220573927994,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:29:08.858Z","txId":"sim_m9c64ube"}
+2025-04-11T02:29:11.835Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1460220573927994,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:29:08.858Z","txId":"sim_m9c64ube"}
+2025-04-11T02:30:08.854Z info: MCP handling trade prompt: Execute a trade of 0.11426817300289091 SOL on Embassy AI.
+2025-04-11T02:30:09.825Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11426817300289091,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:30:08.848Z","txId":"sim_m9c664ls"}
+2025-04-11T02:30:10.817Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11426817300289091,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:30:08.848Z","txId":"sim_m9c664ls"}
+2025-04-11T02:31:08.861Z info: MCP handling trade prompt: Execute a trade of 0.0573191361985699 SOL on Embassy AI.
+2025-04-11T02:31:09.913Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.0573191361985699,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:31:08.853Z","txId":"sim_m9c67ewl"}
+2025-04-11T02:31:10.812Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.0573191361985699,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:31:08.853Z","txId":"sim_m9c67ewl"}
+2025-04-11T02:32:08.837Z info: MCP handling trade prompt: Execute a trade of 0.14585968197951757 SOL on Embassy AI.
+2025-04-11T02:32:09.814Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14585968197951757,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:32:08.833Z","txId":"sim_m9c68p6p"}
+2025-04-11T02:32:10.808Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14585968197951757,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:32:08.833Z","txId":"sim_m9c68p6p"}
+2025-04-11T02:33:08.835Z info: MCP handling trade prompt: Execute a trade of 0.1276951862394704 SOL on Embassy AI.
+2025-04-11T02:33:09.796Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1276951862394704,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:33:08.827Z","txId":"sim_m9c69zh7"}
+2025-04-11T02:33:10.823Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1276951862394704,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:33:08.827Z","txId":"sim_m9c69zh7"}
+2025-04-11T02:34:08.845Z info: MCP handling trade prompt: Execute a trade of 0.07280053867089875 SOL on Embassy AI.
+2025-04-11T02:34:09.798Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.07280053867089875,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:34:08.837Z","txId":"sim_m9c6b9s5"}
+2025-04-11T02:34:10.796Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.07280053867089875,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:34:08.837Z","txId":"sim_m9c6b9s5"}
+2025-04-11T02:35:08.822Z info: MCP handling trade prompt: Execute a trade of 0.14028119731673733 SOL on Embassy AI.
+2025-04-11T02:35:09.810Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14028119731673733,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:35:08.823Z","txId":"sim_m9c6ck2f"}
+2025-04-11T02:35:10.806Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14028119731673733,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:35:08.823Z","txId":"sim_m9c6ck2f"}
+2025-04-11T02:36:08.831Z info: MCP handling trade prompt: Execute a trade of 0.09359561069059205 SOL on Embassy AI.
+2025-04-11T02:36:09.808Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09359561069059205,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:36:08.826Z","txId":"sim_m9c6dud6"}
+2025-04-11T02:36:10.814Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09359561069059205,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:36:08.826Z","txId":"sim_m9c6dud6"}
+2025-04-11T02:37:08.880Z info: MCP handling trade prompt: Execute a trade of 0.12078590832781384 SOL on Embassy AI.
+2025-04-11T02:37:09.785Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12078590832781384,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:37:08.871Z","txId":"sim_m9c6f4p3"}
+2025-04-11T02:37:10.785Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12078590832781384,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:37:08.871Z","txId":"sim_m9c6f4p3"}
+2025-04-11T02:38:08.811Z info: MCP handling trade prompt: Execute a trade of 0.14432379256037786 SOL on Embassy AI.
+2025-04-11T02:38:09.772Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14432379256037786,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:38:08.807Z","txId":"sim_m9c6gexz"}
+2025-04-11T02:38:10.769Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14432379256037786,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:38:08.807Z","txId":"sim_m9c6gexz"}
+2025-04-11T02:39:08.804Z info: MCP handling trade prompt: Execute a trade of 0.13271632246331733 SOL on Embassy AI.
+2025-04-11T02:39:09.762Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13271632246331733,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:39:08.801Z","txId":"sim_m9c6hp8h"}
+2025-04-11T02:39:10.766Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13271632246331733,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:39:08.801Z","txId":"sim_m9c6hp8h"}
+2025-04-11T02:40:08.804Z info: MCP handling trade prompt: Execute a trade of 0.08226615069629968 SOL on Embassy AI.
+2025-04-11T02:40:09.768Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08226615069629968,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:40:08.801Z","txId":"sim_m9c6izj5"}
+2025-04-11T02:40:10.761Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08226615069629968,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:40:08.801Z","txId":"sim_m9c6izj5"}
+2025-04-11T02:41:08.781Z info: MCP handling trade prompt: Execute a trade of 0.07415042091180779 SOL on Embassy AI.
+2025-04-11T02:41:09.759Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.07415042091180779,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:41:08.778Z","txId":"sim_m9c6k9t6"}
+2025-04-11T02:41:10.760Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.07415042091180779,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:41:08.778Z","txId":"sim_m9c6k9t6"}
+2025-04-11T02:42:08.784Z info: MCP handling trade prompt: Execute a trade of 0.11144275796867582 SOL on Embassy AI.
+2025-04-11T02:42:09.754Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11144275796867582,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:42:08.777Z","txId":"sim_m9c6lk3t"}
+2025-04-11T02:42:10.750Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11144275796867582,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:42:08.777Z","txId":"sim_m9c6lk3t"}
+2025-04-11T02:43:08.781Z info: MCP handling trade prompt: Execute a trade of 0.11085306525218301 SOL on Embassy AI.
+2025-04-11T02:43:09.740Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11085306525218301,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:43:08.774Z","txId":"sim_m9c6muee"}
+2025-04-11T02:43:10.752Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11085306525218301,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:43:08.774Z","txId":"sim_m9c6muee"}
+2025-04-11T02:44:08.783Z info: MCP handling trade prompt: Execute a trade of 0.11533288098303483 SOL on Embassy AI.
+2025-04-11T02:44:09.745Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11533288098303483,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:44:08.780Z","txId":"sim_m9c6o4p8"}
+2025-04-11T02:44:10.734Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11533288098303483,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:44:08.780Z","txId":"sim_m9c6o4p8"}
+2025-04-11T02:45:08.766Z info: MCP handling trade prompt: Execute a trade of 0.09399690259088227 SOL on Embassy AI.
+2025-04-11T02:45:09.737Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09399690259088227,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:45:08.762Z","txId":"sim_m9c6peze"}
+2025-04-11T02:45:10.734Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09399690259088227,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:45:08.762Z","txId":"sim_m9c6peze"}
+2025-04-11T02:46:08.765Z info: MCP handling trade prompt: Execute a trade of 0.10626764344733408 SOL on Embassy AI.
+2025-04-11T02:46:09.742Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10626764344733408,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:46:08.762Z","txId":"sim_m9c6qpa2"}
+2025-04-11T02:46:10.722Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10626764344733408,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:46:08.762Z","txId":"sim_m9c6qpa2"}
+2025-04-11T02:47:08.762Z info: MCP handling trade prompt: Execute a trade of 0.07455644319364708 SOL on Embassy AI.
+2025-04-11T02:47:09.723Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.07455644319364708,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:47:08.761Z","txId":"sim_m9c6rzkp"}
+2025-04-11T02:47:10.722Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.07455644319364708,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:47:08.761Z","txId":"sim_m9c6rzkp"}
+2025-04-11T02:48:08.747Z info: MCP handling trade prompt: Execute a trade of 0.14735583345524955 SOL on Embassy AI.
+2025-04-11T02:48:09.718Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14735583345524955,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:48:08.751Z","txId":"sim_m9c6t9v3"}
+2025-04-11T02:48:10.725Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14735583345524955,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:48:08.751Z","txId":"sim_m9c6t9v3"}
+2025-04-11T02:49:09.027Z info: MCP handling trade prompt: Execute a trade of 0.0798551234731693 SOL on Embassy AI.
+2025-04-11T02:49:10.030Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.0798551234731693,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:49:09.095Z","txId":"sim_m9c6ukfb"}
+2025-04-11T02:49:10.865Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.0798551234731693,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:49:09.095Z","txId":"sim_m9c6ukfb"}
+2025-04-11T02:50:08.734Z info: MCP handling trade prompt: Execute a trade of 0.13810103499499637 SOL on Embassy AI.
+2025-04-11T02:50:09.724Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13810103499499637,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:50:08.734Z","txId":"sim_m9c6vufy"}
+2025-04-11T02:50:10.717Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13810103499499637,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:50:08.734Z","txId":"sim_m9c6vufy"}
+2025-04-11T02:51:08.779Z info: MCP handling trade prompt: Execute a trade of 0.13036620491699336 SOL on Embassy AI.
+2025-04-11T02:51:09.708Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13036620491699336,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:51:08.756Z","txId":"sim_m9c6x4r8"}
+2025-04-11T02:51:10.703Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13036620491699336,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:51:08.756Z","txId":"sim_m9c6x4r8"}
+2025-04-11T02:52:09.024Z info: MCP handling trade prompt: Execute a trade of 0.14166559614260898 SOL on Embassy AI.
+2025-04-11T02:52:10.704Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14166559614260898,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:52:08.834Z","txId":"sim_m9c6yf42"}
+2025-04-11T02:52:11.751Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14166559614260898,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:52:08.834Z","txId":"sim_m9c6yf42"}
+2025-04-11T02:53:08.732Z info: MCP handling trade prompt: Execute a trade of 0.10600832517971259 SOL on Embassy AI.
+2025-04-11T02:53:09.708Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10600832517971259,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:53:08.725Z","txId":"sim_m9c6zpbq"}
+2025-04-11T02:53:10.700Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10600832517971259,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:53:08.725Z","txId":"sim_m9c6zpbq"}
+2025-04-11T02:54:08.741Z info: MCP handling trade prompt: Execute a trade of 0.09409932349390021 SOL on Embassy AI.
+2025-04-11T02:54:09.700Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09409932349390021,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:54:08.733Z","txId":"sim_m9c70zml"}
+2025-04-11T02:54:10.695Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09409932349390021,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:54:08.733Z","txId":"sim_m9c70zml"}
+2025-04-11T02:55:08.723Z info: MCP handling trade prompt: Execute a trade of 0.09971914527986198 SOL on Embassy AI.
+2025-04-11T02:55:09.688Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09971914527986198,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:55:08.716Z","txId":"sim_m9c729ws"}
+2025-04-11T02:55:10.698Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09971914527986198,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:55:08.716Z","txId":"sim_m9c729ws"}
+2025-04-11T02:56:08.730Z info: MCP handling trade prompt: Execute a trade of 0.062298803447959954 SOL on Embassy AI.
+2025-04-11T02:56:09.682Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.062298803447959954,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:56:08.723Z","txId":"sim_m9c73k7n"}
+2025-04-11T02:56:10.698Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.062298803447959954,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:56:08.723Z","txId":"sim_m9c73k7n"}
+2025-04-11T02:57:08.842Z info: MCP handling trade prompt: Execute a trade of 0.14660698103317826 SOL on Embassy AI.
+2025-04-11T02:57:10.682Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14660698103317826,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:57:08.728Z","txId":"sim_m9c74uig"}
+2025-04-11T02:57:11.693Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14660698103317826,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:57:08.728Z","txId":"sim_m9c74uig"}
+2025-04-11T02:58:08.713Z info: MCP handling trade prompt: Execute a trade of 0.08883600633982708 SOL on Embassy AI.
+2025-04-11T02:58:09.685Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08883600633982708,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:58:08.709Z","txId":"sim_m9c764sl"}
+2025-04-11T02:58:10.689Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08883600633982708,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:58:08.709Z","txId":"sim_m9c764sl"}
+2025-04-11T02:59:08.736Z info: MCP handling trade prompt: Execute a trade of 0.08167229824562058 SOL on Embassy AI.
+2025-04-11T02:59:09.676Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.08167229824562058,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:59:08.730Z","txId":"sim_m9c77f3u"}
+2025-04-11T02:59:10.682Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.08167229824562058,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T02:59:08.730Z","txId":"sim_m9c77f3u"}
+2025-04-11T03:00:08.689Z info: MCP handling trade prompt: Execute a trade of 0.054871492340702446 SOL on Embassy AI.
+2025-04-11T03:00:09.696Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.054871492340702446,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:00:08.689Z","txId":"sim_m9c78pdd"}
+2025-04-11T03:00:10.671Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.054871492340702446,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:00:08.689Z","txId":"sim_m9c78pdd"}
+2025-04-11T03:01:08.709Z info: MCP handling trade prompt: Execute a trade of 0.13810185282888207 SOL on Embassy AI.
+2025-04-11T03:01:09.665Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.13810185282888207,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:01:08.705Z","txId":"sim_m9c79zoh"}
+2025-04-11T03:01:10.664Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.13810185282888207,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:01:08.705Z","txId":"sim_m9c79zoh"}
+2025-04-11T03:02:08.679Z info: MCP handling trade prompt: Execute a trade of 0.10579728301996458 SOL on Embassy AI.
+2025-04-11T03:02:09.673Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10579728301996458,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:02:08.679Z","txId":"sim_m9c7b9yf"}
+2025-04-11T03:02:10.667Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10579728301996458,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:02:08.679Z","txId":"sim_m9c7b9yf"}
+2025-04-11T03:03:08.675Z info: MCP handling trade prompt: Execute a trade of 0.09536642617867047 SOL on Embassy AI.
+2025-04-11T03:03:09.662Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09536642617867047,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:03:08.674Z","txId":"sim_m9c7ck8y"}
+2025-04-11T03:03:10.669Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09536642617867047,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:03:08.674Z","txId":"sim_m9c7ck8y"}
+2025-04-11T03:04:08.689Z info: MCP handling trade prompt: Execute a trade of 0.14229672906311885 SOL on Embassy AI.
+2025-04-11T03:04:09.666Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.14229672906311885,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:04:08.688Z","txId":"sim_m9c7duk0"}
+2025-04-11T03:04:10.661Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.14229672906311885,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:04:08.688Z","txId":"sim_m9c7duk0"}
+2025-04-11T03:05:08.709Z info: MCP handling trade prompt: Execute a trade of 0.1350670887863586 SOL on Embassy AI.
+2025-04-11T03:05:09.668Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1350670887863586,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:05:08.700Z","txId":"sim_m9c7f4v0"}
+2025-04-11T03:05:10.663Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1350670887863586,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:05:08.700Z","txId":"sim_m9c7f4v0"}
+2025-04-11T03:06:08.701Z info: MCP handling trade prompt: Execute a trade of 0.12926434321038138 SOL on Embassy AI.
+2025-04-11T03:06:09.651Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12926434321038138,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:06:08.684Z","txId":"sim_m9c7gf58"}
+2025-04-11T03:06:10.649Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12926434321038138,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:06:08.684Z","txId":"sim_m9c7gf58"}
+2025-04-11T03:07:08.703Z info: MCP handling trade prompt: Execute a trade of 0.05289881506736265 SOL on Embassy AI.
+2025-04-11T03:07:09.650Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.05289881506736265,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:07:08.689Z","txId":"sim_m9c7hpg1"}
+2025-04-11T03:07:10.653Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.05289881506736265,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:07:08.689Z","txId":"sim_m9c7hpg1"}
+2025-04-11T03:08:08.687Z info: MCP handling trade prompt: Execute a trade of 0.1467563642631511 SOL on Embassy AI.
+2025-04-11T03:08:09.652Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1467563642631511,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:08:08.683Z","txId":"sim_m9c7izqj"}
+2025-04-11T03:08:10.653Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1467563642631511,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:08:08.683Z","txId":"sim_m9c7izqj"}
+2025-04-11T03:09:08.666Z info: MCP handling trade prompt: Execute a trade of 0.06474422689655455 SOL on Embassy AI.
+2025-04-11T03:09:09.649Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.06474422689655455,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:09:08.662Z","txId":"sim_m9c7ka0m"}
+2025-04-11T03:09:10.646Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.06474422689655455,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:09:08.662Z","txId":"sim_m9c7ka0m"}
+2025-04-11T03:10:08.662Z info: MCP handling trade prompt: Execute a trade of 0.051955346152076455 SOL on Embassy AI.
+2025-04-11T03:10:09.646Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.051955346152076455,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:10:08.658Z","txId":"sim_m9c7lkb6"}
+2025-04-11T03:10:10.642Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.051955346152076455,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:10:08.658Z","txId":"sim_m9c7lkb6"}
+2025-04-11T03:11:08.656Z info: MCP handling trade prompt: Execute a trade of 0.12299593362892525 SOL on Embassy AI.
+2025-04-11T03:11:09.641Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12299593362892525,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:11:08.652Z","txId":"sim_m9c7mulo"}
+2025-04-11T03:11:10.644Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12299593362892525,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:11:08.652Z","txId":"sim_m9c7mulo"}
+2025-04-11T03:12:08.706Z info: MCP handling trade prompt: Execute a trade of 0.11312023901614988 SOL on Embassy AI.
+2025-04-11T03:12:09.649Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.11312023901614988,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:12:08.860Z","txId":"sim_m9c7o525"}
+2025-04-11T03:12:10.637Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.11312023901614988,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:12:08.860Z","txId":"sim_m9c7o525"}
+2025-04-11T03:13:08.652Z info: MCP handling trade prompt: Execute a trade of 0.12086209659461492 SOL on Embassy AI.
+2025-04-11T03:13:09.645Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12086209659461492,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:13:08.656Z","txId":"sim_m9c7pf74"}
+2025-04-11T03:13:10.635Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12086209659461492,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:13:08.656Z","txId":"sim_m9c7pf74"}
+2025-04-11T03:14:08.653Z info: MCP handling trade prompt: Execute a trade of 0.10888538035877969 SOL on Embassy AI.
+2025-04-11T03:14:09.631Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10888538035877969,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:14:08.650Z","txId":"sim_m9c7qphm"}
+2025-04-11T03:14:10.639Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10888538035877969,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:14:08.650Z","txId":"sim_m9c7qphm"}
+2025-04-11T03:15:08.893Z info: MCP handling trade prompt: Execute a trade of 0.06878955589259436 SOL on Embassy AI.
+2025-04-11T03:15:09.629Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.06878955589259436,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:15:08.775Z","txId":"sim_m9c7rzvr"}
+2025-04-11T03:15:10.634Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.06878955589259436,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:15:08.775Z","txId":"sim_m9c7rzvr"}
+2025-04-11T03:16:08.990Z info: MCP handling trade prompt: Execute a trade of 0.07783932094117003 SOL on Embassy AI.
+2025-04-11T03:16:10.716Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.07783932094117003,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:16:08.931Z","txId":"sim_m9c7taar"}
+2025-04-11T03:16:11.653Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.07783932094117003,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:16:08.931Z","txId":"sim_m9c7taar"}
+2025-04-11T03:17:09.601Z info: MCP handling trade prompt: Execute a trade of 0.10773748703521124 SOL on Embassy AI.
+2025-04-11T03:17:11.643Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10773748703521124,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:17:09.468Z","txId":"sim_m9c7ul0c"}
+2025-04-11T03:17:12.816Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10773748703521124,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:17:09.468Z","txId":"sim_m9c7ul0c"}
+2025-04-11T03:18:08.721Z info: MCP handling trade prompt: Execute a trade of 0.12214764121955382 SOL on Embassy AI.
+2025-04-11T03:18:10.897Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12214764121955382,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:18:08.795Z","txId":"sim_m9c7vusb"}
+2025-04-11T03:18:11.696Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12214764121955382,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:18:08.795Z","txId":"sim_m9c7vusb"}
+2025-04-11T03:19:08.657Z info: MCP handling trade prompt: Execute a trade of 0.10713435649745746 SOL on Embassy AI.
+2025-04-11T03:19:09.619Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10713435649745746,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:19:08.658Z","txId":"sim_m9c7x4z6"}
+2025-04-11T03:19:10.615Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10713435649745746,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:19:08.658Z","txId":"sim_m9c7x4z6"}
+2025-04-11T03:20:08.642Z info: MCP handling trade prompt: Execute a trade of 0.1061763439027688 SOL on Embassy AI.
+2025-04-11T03:20:09.611Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.1061763439027688,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:20:08.642Z","txId":"sim_m9c7yf9e"}
+2025-04-11T03:20:10.623Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.1061763439027688,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:20:08.642Z","txId":"sim_m9c7yf9e"}
+2025-04-11T03:21:08.756Z info: MCP handling trade prompt: Execute a trade of 0.12027872843828222 SOL on Embassy AI.
+2025-04-11T03:21:10.634Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.12027872843828222,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:21:08.711Z","txId":"sim_m9c7zplz"}
+2025-04-11T03:21:11.957Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.12027872843828222,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:21:08.711Z","txId":"sim_m9c7zplz"}
+2025-04-11T03:22:08.642Z info: MCP handling trade prompt: Execute a trade of 0.05977835237647971 SOL on Embassy AI.
+2025-04-11T03:22:09.613Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.05977835237647971,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:22:08.641Z","txId":"sim_m9c80zup"}
+2025-04-11T03:22:10.605Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.05977835237647971,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:22:08.641Z","txId":"sim_m9c80zup"}
+2025-04-11T03:23:08.713Z info: MCP handling trade prompt: Execute a trade of 0.10516124239647068 SOL on Embassy AI.
+2025-04-11T03:23:09.612Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10516124239647068,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:23:08.713Z","txId":"sim_m9c82a7d"}
+2025-04-11T03:23:10.605Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10516124239647068,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:23:08.713Z","txId":"sim_m9c82a7d"}
+2025-04-11T03:24:08.625Z info: MCP handling trade prompt: Execute a trade of 0.05432431280400316 SOL on Embassy AI.
+2025-04-11T03:24:09.603Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.05432431280400316,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:24:08.622Z","txId":"sim_m9c83kfi"}
+2025-04-11T03:24:10.611Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.05432431280400316,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:24:08.622Z","txId":"sim_m9c83kfi"}
+2025-04-11T03:24:40.097Z warn: Missing environment variable: NEXT_PUBLIC_FIREBASE_API_KEY
+2025-04-11T03:24:40.106Z warn: Missing environment variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+2025-04-11T03:24:40.115Z warn: Missing environment variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+2025-04-11T03:24:40.117Z warn: Missing environment variable: NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-11T03:24:40.118Z warn: 4 environment variables are missing. Some features may not work properly.
+2025-04-11T03:24:40.119Z warn: Missing variables: NEXT_PUBLIC_FIREBASE_API_KEY, NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN, NEXT_PUBLIC_FIREBASE_PROJECT_ID, NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-11T03:24:40.120Z info: Using fallback value for SHYFT_API_KEY
+2025-04-11T03:24:40.266Z info: Server started on port 5000
+2025-04-11T03:24:40.267Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-11T03:24:40.317Z info: MongoDB connected successfully
+2025-04-11T03:25:08.672Z info: MCP handling trade prompt: Execute a trade of 0.10593941522120275 SOL on Embassy AI.
+2025-04-11T03:25:09.608Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.10593941522120275,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:25:08.626Z","txId":"sim_m9c84uqa"}
+2025-04-11T03:25:10.605Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.10593941522120275,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:25:08.626Z","txId":"sim_m9c84uqa"}
+2025-04-11T03:26:11.774Z info: MCP handling trade prompt: Execute a trade of 0.0535734495889548 SOL on Embassy AI.
+2025-04-11T03:26:13.614Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.0535734495889548,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:26:09.488Z","txId":"sim_m9c865ow"}
+2025-04-11T03:26:34.902Z info: MCP handling trade prompt: Execute a trade of 0.09692686636044438 SOL on Embassy AI.
+2025-04-11T03:26:35.024Z info: MCP automated trade: {"success":true,"action":"trade_executed","tradeAmount":0.09692686636044438,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:26:34.897Z","txId":"sim_m9c86pap"}
+2025-04-11T03:26:35.099Z info: Automated trade executed: {"success":true,"action":"trade_executed","tradeAmount":0.09692686636044438,"market":"SOL-USDC","price":105.87,"timestamp":"2025-04-11T03:26:34.897Z","txId":"sim_m9c86pap"}
+2025-04-11T03:38:15.176Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:38:26.334Z info: Auto trading enabled
+2025-04-11T03:39:05.435Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:39:15.345Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:39:49.997Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:39:53.487Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:47:24.915Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:47:29.895Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:54:03.607Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:54:07.159Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:54:25.120Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T03:54:28.841Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T04:04:22.088Z warn: Missing environment variable: NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-11T04:04:22.097Z warn: 1 environment variables are missing. Some features may not work properly.
+2025-04-11T04:04:22.099Z warn: Missing variables: NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-11T04:04:22.100Z info: Using fallback value for SHYFT_API_KEY
+2025-04-11T04:04:22.204Z info: Server started on port 5000
+2025-04-11T04:04:22.206Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-11T04:04:22.257Z info: MongoDB connected successfully
+2025-04-11T04:05:37.089Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T04:29:42.818Z warn: Missing environment variable: NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-11T04:29:42.824Z warn: 1 environment variables are missing. Some features may not work properly.
+2025-04-11T04:29:42.825Z warn: Missing variables: NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-11T04:29:42.825Z info: Using fallback value for SHYFT_API_KEY
+2025-04-11T04:29:42.868Z info: Server started on port 5000
+2025-04-11T04:29:42.869Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-11T04:29:42.888Z info: MongoDB connected successfully
+2025-04-11T04:31:45.614Z info: Browser logger initialized for Embassy Trade Bot
+2025-04-11T13:27:00.014Z warn: Missing environment variable: NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-11T13:27:00.024Z warn: 1 environment variables are missing. Some features may not work properly.
+2025-04-11T13:27:00.031Z warn: Missing variables: NEXT_PUBLIC_SHYFT_API_KEY
+2025-04-11T13:27:00.033Z info: Using fallback value for SHYFT_API_KEY
+2025-04-11T13:27:00.132Z info: Server started on port 5000
+2025-04-11T13:27:00.133Z info: API Testing endpoints ready (ChatGPT and Grok)
+2025-04-11T13:27:00.229Z info: MongoDB connected successfully
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 08:20:09"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 08:51:00"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 09:00:29"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 09:09:26"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 09:24:24"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 09:34:37"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 20:51:12"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 20:54:13"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 20:57:41"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 21:05:27"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 21:12:49"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 21:18:39"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 21:22:20"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 21:40:41"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 21:52:12"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 21:59:41"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 22:10:55"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 22:37:06"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 23:06:22"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 23:18:30"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-12 23:37:56"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 00:10:54"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 00:45:04"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 00:49:52"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 00:55:10"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 00:59:14"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 01:04:11"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 21:24:38"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 22:25:18"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 22:31:14"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 22:45:46"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 22:49:30"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-13 22:53:19"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 22:32:28"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 22:35:35"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 22:40:51"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 22:49:58"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:09:16"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:09:58"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:16:20"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:30:30"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:40:05"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:40:43"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:41:38"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:43:05"}
+{"level":"info","message":"MongoDB transport added to logger","service":"embassy-trade-ai","timestamp":"2025-04-21 23:46:08"}
