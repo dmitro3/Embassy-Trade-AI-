@@ -1,7 +1,7 @@
 'use server';
 
 import { NextResponse } from 'next/server';
-import logger from '../../../lib/logger.js';
+// Using console for logging instead of logger module
 
 // In-memory storage for bot logs (in production, use Redis or another database)
 let botLogs = [];

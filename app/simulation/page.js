@@ -1,15 +1,27 @@
 'use client';
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
-import CoinSelector from '@/components/CoinSelector';
-import useTradeSignalSimulator from '@/lib/simulateTradeSignals';
-import SwapToEMB from '@/components/SwapToEMB';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { toast, Toaster } from 'react-hot-toast';
+
+// Import our custom Web3 wallet and trading components
+import SolanaWalletModalProvider from '../../components/SolanaWalletModalProvider';
+import WalletBalanceDisplay from '../../components/WalletBalanceDisplay';
+import MLConsensusTrading from '../../components/MLConsensusTrading';
+import PaperTradingExecutor from '../../components/PaperTradingExecutor';
+
+// Fix import paths to ensure proper resolution
+import CoinSelector from '../../components/CoinSelector';
+import useTradeSignalSimulator from '../../lib/simulateTradeSignals';
+import SwapToEMB from '../../components/SwapToEMB';
 
 // Dynamically import components with browser APIs
 const TradingSimulator = dynamic(
-  () => import('@/components/TradingSimulator'),
+  () => import('../../components/TradingSimulator'),
   { ssr: false, loading: () => <p className="text-gray-400">Loading trading simulator...</p> }
 );
 
@@ -32,7 +44,17 @@ const MOCK_ONLINE_USERS = [
 // Photon private key for paper trading
 const PHOTON_PRIVATE_KEY = '38HQ8wNk38Q4VCfrSfESGgggoefgPF9kaeZbYvLC6nKqGTLnQN136CLRiqi6e68yppFB5ypjwzjNCTdjyoieiQQe';
 
-export default function SimulationPage() {
+// Main page component wrapped with wallet provider
+export default function SimulationPageContainer() {
+  return (
+    <SolanaWalletModalProvider network={WalletAdapterNetwork.Devnet} autoConnect={true}>
+      <SimulationPage />
+    </SolanaWalletModalProvider>
+  );
+}
+
+// Actual simulation page content
+function SimulationPage() {
   // Added ref to track the currently processed signal
   const processedSignalRef = useRef(null);
   const cooldownTimerRef = useRef(null);

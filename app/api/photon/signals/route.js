@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-const photonClient = require('../../../../server/utils/photon');
+import photonClient from '../../../../server/utils/photon.js';
 
 /**
  * API endpoint to fetch AI-powered trading signals from AIXBT and @mobyagent

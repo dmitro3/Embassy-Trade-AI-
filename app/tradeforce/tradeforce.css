@@ -1,0 +1,282 @@
+/* TradeForce Dashboard Styles */
+
+/* Main gradients and animations */
+.tf-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+.tf-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tf-header::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+  top: -100px;
+  right: -50px;
+  border-radius: 100%;
+  filter: blur(20px);
+  z-index: 0;
+  animation: pulse 4s infinite ease-in-out;
+}
+
+.tf-header::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+  bottom: -50px;
+  left: 20%;
+  border-radius: 100%;
+  filter: blur(20px);
+  z-index: 0;
+  animation: pulse 5s infinite ease-in-out 0.5s;
+}
+
+.tf-card {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.tf-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.tf-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.tf-button:hover {
+  transform: translateY(-1px);
+}
+
+.tf-button:active {
+  transform: translateY(1px);
+}
+
+.tf-button .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+.tf-gradient-text {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 600;
+}
+
+.tf-status-active {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  display: inline-block;
+  margin-right: 8px;
+  animation: pulse 2s infinite;
+}
+
+.tf-status-warning {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #eab308;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.tf-status-error {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.tf-status-inactive {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #6b7280;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.tf-badge-active {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
+  animation: botActivity 2s infinite;
+}
+
+.tf-badge-paused {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+}
+
+.tf-badge-inactive {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.tf-chart-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.tf-chart-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: chartLoading 1.5s infinite;
+}
+
+/* Token card hover effect */
+.tf-token-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.tf-token-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.tf-token-card.selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes botActivity {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes chartLoading {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .tf-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Chart Colors */
+.tf-chart-bullish {
+  --chart-color: #22c55e;
+  --chart-grid: rgba(34, 197, 94, 0.1);
+}
+
+.tf-chart-bearish {
+  --chart-color: #ef4444;
+  --chart-grid: rgba(239, 68, 68, 0.1);
+}
+
+.tf-chart-neutral {
+  --chart-color: #3b82f6;
+  --chart-grid: rgba(59, 130, 246, 0.1);
+}
+
+/* Token price indicators */
+.tf-price-up {
+  color: #22c55e;
+}
+
+.tf-price-down {
+  color: #ef4444;
+}
+
+.tf-price-neutral {
+  color: #9ca3af;
+}

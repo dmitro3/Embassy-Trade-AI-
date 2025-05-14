@@ -1,53 +1,17 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { clusterApiUrl, Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from '@solana/spl-token';
-import { scanTokens, executeTrade, startTradingBot as startAxiomTradingBot, closeTrade } from '../../lib/axiomTradeAPI';
 import SolanaWalletProvider from '../../components/SolanaWalletProvider';
-import TradeForceEnhanced from '../../components/TradeForceEnhanced';
+import TradeForceDashboard from '../../components/TradeForceDashboard';
 // Import MCP server health checker
 import { useMCPServerHealth, MCPServerStatus } from '../../lib/mcpServerHealth';
 
-// Import styles first
-import 'react-toastify/dist/ReactToastify.css';
-// Then import the library (not dynamically)
-import { ToastContainer, toast as reactToast } from 'react-toastify';
+// Import toast library for notifications
+import { Toaster } from 'react-hot-toast';
 
-// Create a toast wrapper that will be available globally
-const toast = {
-  success: message => {
-    console.log('SUCCESS:', message);
-    if (typeof window !== 'undefined') {
-      reactToast.success(message);
-    }
-  },
-  error: message => {
-    console.error('ERROR:', message);
-    if (typeof window !== 'undefined') {
-      reactToast.error(message);
-    }
-  },
-  info: message => {
-    console.log('INFO:', message);
-    if (typeof window !== 'undefined') {
-      reactToast.info(message);
-    }
-  },
-  warning: message => {
-    console.warn('WARNING:', message);
-    if (typeof window !== 'undefined') {
-      reactToast.warning(message);
-    }
-  }
-};
-
-// Make toast available globally for error handling
-if (typeof window !== 'undefined') {
-  window.toast = toast;
-}
+// Import TradeForce-specific styles
+import './tradeforce.css';
 
 // Using our new SolanaWalletProvider component which is already imported above
 
@@ -673,18 +637,41 @@ function TradingInterface() {
 
 // Wrap the components with our robust SolanaWalletProvider
 export default function TradeforcePage() {
+  // Check MCP server health
+  const { isHealthy, isLoading: isCheckingHealth } = useMCPServerHealth();
+  
   return (
     <SolanaWalletProvider network="devnet">
-      <div className="bg-gray-900 min-h-screen">
-        <ToastContainer 
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          theme="dark"
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
+        <TradeForceDashboard />
+        <Toaster 
+          position="bottom-right"
+          toastOptions={{
+            // Styling for toast notifications
+            style: {
+              background: '#1e293b',
+              color: '#fff',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            },
+            success: {
+              iconTheme: {
+                primary: '#22c55e',
+                secondary: '#1e293b'
+              }
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#1e293b'
+              }
+            }
+          }}
         />
-        <TradeForceEnhanced />
+        
+        {/* MCP Server Status Indicator */}
+        <div className="fixed bottom-4 right-4">
+          <MCPServerStatus isHealthy={isHealthy} isLoading={isCheckingHealth} />
+        </div>
       </div>
     </SolanaWalletProvider>
   );

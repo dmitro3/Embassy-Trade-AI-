@@ -1,7 +1,7 @@
 // filepath: c:\Users\pablo\Projects\embassy-trade-motia\web\app\api\tradeforce\scan\route.js
 import { NextResponse } from 'next/server';
 import tradeforceAI from '../../../../lib/tradeforceAI.js';
-import logger from '../../../../lib/logger.js';
+// Using console for logging instead of logger module
 
 /**
  * POST endpoint to trigger a market scan
@@ -34,9 +34,8 @@ export async function POST(request) {
       timestamp: new Date().toISOString(),
       results: scanResults,
       count: scanResults.length
-    });
-  } catch (error) {
-    logger.error(`Market scan API error: ${error.message}`);
+    });  } catch (error) {
+    console.error(`Market scan API error: ${error.message}`);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }
@@ -60,9 +59,8 @@ export async function GET() {
       results: tradeforceAI.scanResults,
       count: tradeforceAI.scanResults.length,
       marketState: tradeforceAI.marketState
-    });
-  } catch (error) {
-    logger.error(`Get market scan API error: ${error.message}`);
+    });  } catch (error) {
+    console.error(`Get market scan API error: ${error.message}`);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }

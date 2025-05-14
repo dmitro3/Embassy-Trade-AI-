@@ -2,17 +2,17 @@ import { NextResponse } from 'next/server';
 import logger from '../../../../lib/logger';
 
 /**
- * Token API Endpoint
+ * Mock Token API Endpoint
  * 
- * Provides token data for the TradeForce dashboard
+ * Provides mock token data as a fallback when the main API is not available
  * 
- * @route GET /api/tradeforce/tokens
+ * @route GET /api/mock/tokens
  */
 export async function GET() {
   try {
-    // In a real implementation, this would fetch data from a database or external API
-    // For now, we'll return mock data
+    logger.info('Serving mock token data');
     
+    // Mock token data with realistic values
     const tokens = [
       {
         symbol: 'SOL',
@@ -56,13 +56,23 @@ export async function GET() {
       }
     ];
     
+    // Add a slight randomness to prices to simulate market movement
+    const randomizedTokens = tokens.map(token => {
+      const randomFactor = 1 + (Math.random() * 0.02 - 0.01); // -1% to +1%
+      return {
+        ...token,
+        price: token.price * randomFactor
+      };
+    });
+    
     return NextResponse.json({
       success: true,
-      tokens,
-      timestamp: new Date().toISOString()
+      tokens: randomizedTokens,
+      timestamp: new Date().toISOString(),
+      source: 'mock'
     });
   } catch (error) {
-    logger.error(`Error in tokens API: ${error.message}`);
+    logger.error(`Error in mock tokens API: ${error.message}`);
     
     return NextResponse.json(
       { success: false, error: error.message },
@@ -72,11 +82,9 @@ export async function GET() {
 }
 
 /**
- * Token API Endpoint - POST method
+ * Mock Token API Endpoint - POST method
  * 
- * Allows for filtering and sorting tokens
- * 
- * @route POST /api/tradeforce/tokens
+ * @route POST /api/mock/tokens
  * @body { filter?: object, sort?: object }
  */
 export async function POST(request) {
@@ -85,9 +93,9 @@ export async function POST(request) {
     const body = await request.json();
     const { filter = {}, sort = {} } = body;
     
-    // In a real implementation, this would fetch and filter data from a database or external API
-    // For now, we'll return mock data
+    logger.info('Serving mock token data (POST)');
     
+    // Mock token data
     const tokens = [
       {
         symbol: 'SOL',
@@ -158,15 +166,25 @@ export async function POST(request) {
       });
     }
     
+    // Add a slight randomness to prices to simulate market movement
+    const randomizedTokens = filteredTokens.map(token => {
+      const randomFactor = 1 + (Math.random() * 0.02 - 0.01); // -1% to +1%
+      return {
+        ...token,
+        price: token.price * randomFactor
+      };
+    });
+    
     return NextResponse.json({
       success: true,
-      tokens: filteredTokens,
+      tokens: randomizedTokens,
       timestamp: new Date().toISOString(),
+      source: 'mock',
       filter,
       sort
     });
   } catch (error) {
-    logger.error(`Error in tokens API (POST): ${error.message}`);
+    logger.error(`Error in mock tokens API (POST): ${error.message}`);
     
     return NextResponse.json(
       { success: false, error: error.message },

@@ -1,203 +1,106 @@
-// filepath: c:\Users\pablo\Projects\embassy-trade-motia\web\app\api\tradeforce\roundTable\route.js
 import { NextResponse } from 'next/server';
-import tradeforceAI from '../../../../lib/tradeforceAI.js';
-import logger from '../../../../lib/logger.js';
-import marketDataAggregator from '../../../../lib/marketDataAggregator.js';
+import roundTableAI from '../../../../lib/roundTableAI';
+import logger from '../../../../lib/logger';
 
 /**
- * POST endpoint for RoundTable analysis
- * Analyzes an asset using the TradeForce AI RoundTable consensus mechanism
+ * RoundTable AI API Endpoint
+ * 
+ * Provides AI trading signals and consensus for a given asset
+ * 
+ * @route GET /api/tradeforce/roundTable?asset=SOL
  */
-export async function POST(request) {
+export async function GET(request) {
   try {
-    const body = await request.json();
-    const { asset, timeframe = '1h', riskLevel = 'medium' } = body;
+    // Get asset from query params
+    const { searchParams } = new URL(request.url);
+    const asset = searchParams.get('asset');
     
+    // Validate asset parameter
     if (!asset) {
       return NextResponse.json(
-        { error: 'Asset address is required' },
+        { success: false, error: 'Asset parameter is required' },
         { status: 400 }
       );
     }
     
-    // Ensure TradeForce AI is initialized
-    try {
-      if (!tradeforceAI.isInitialized()) {
-        await tradeforceAI.init();
-      }
-    } catch (initError) {
-      logger.error(`TradeForce AI initialization failed: ${initError.message}`);
-      // Continue with a fallback mechanism
+    // Initialize AI if not already initialized
+    if (!roundTableAI.isInitialized()) {
+      await roundTableAI.initialize();
     }
     
-    try {
-      // Get market data with timeout and fallback
-      const marketDataPromise = marketDataAggregator.getHistoricalOHLCV(asset, {
-        interval: timeframe,
-        limit: 100,
-        forceRefresh: true,
-        timeout: 15000 // 15 second timeout
-      }).catch(err => {
-        logger.warn(`Market data fetch failed: ${err.message}`);
-        // Return minimal fallback data if the real data fetch fails
-        return [{
-          time: Date.now() - 86400000, // 24 hours ago
-          open: 1.0,
-          high: 1.1, 
-          low: 0.9,
-          close: 1.0,
-          volume: 1000,
-          fallback: true
-        }];
-      });
-      
-      // Get current price with timeout and fallback
-      const priceDataPromise = marketDataAggregator.getCurrentPrice(asset)
-        .catch(err => {
-          logger.warn(`Price data fetch failed: ${err.message}`);
-          return 1.0; // Fallback price
-        });
-      
-      // Get token info with timeout and fallback
-      const tokenInfoPromise = marketDataAggregator.getTokenInfo(asset)
-        .catch(err => {
-          logger.warn(`Token info fetch failed: ${err.message}`);
-          return {
-            address: asset,
-            symbol: asset.substring(0, 4).toUpperCase(),
-            name: `Unknown (${asset.substring(0, 6)}...)`,
-            decimals: 9,
-            fallback: true
-          };
-        });
-      
-      // Wait for all promises to resolve (with fallbacks if they fail)
-      const [marketData, priceData, tokenInfo] = await Promise.all([
-        marketDataPromise,
-        priceDataPromise,
-        tokenInfoPromise
-      ]);
-      
-      // Check if we have sufficient data for analysis
-      if (!marketData || marketData.length === 0) {
-        throw new Error('Insufficient market data for analysis');
-      }
-      
-      // Analyze with RoundTable, with timeout protection
-      try {
-        const analysisPromise = tradeforceAI.analyzeAssetWithRoundTable(
-          asset, 
-          marketData,
-          { 
-            currentPrice: priceData,
-            tokenInfo,
-            riskLevel
-          }
-        );
-        
-        // Add timeout to prevent hanging
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Analysis timed out after 30 seconds')), 30000);
-        });
-        
-        // Race the analysis against the timeout
-        const result = await Promise.race([analysisPromise, timeoutPromise]);
-        
-        return NextResponse.json(result);
-      } catch (analysisError) {
-        logger.error(`Analysis error: ${analysisError.message}`);
-        
-        // Return a minimal fallback analysis
-        return NextResponse.json({
-          asset,
-          symbol: tokenInfo.symbol || asset.substring(0, 4).toUpperCase(),
-          action: 'hold',
-          hasConsensus: false,
-          consensusConfidence: 0.5,
-          currentPrice: priceData,
-          agentSignals: [
-            {
-              agent: 'Trend Analyst',
-              specialty: 'Moving Averages',
-              action: 'hold',
-              confidence: 0.5,
-              strategy: 'MA Crossovers',
-              notes: ['Analysis timed out or failed']
-            }
-          ],
-          agreeingAgents: 0,
-          fallback: true,
-          error: analysisError.message
-        }, 
-        { status: 200 }); // Return 200 even with fallback data to prevent UI errors
-      }
-    } catch (error) {
-      logger.error(`RoundTable API processing error: ${error.message}`);
-      
-      // Return a minimal fallback analysis with error information
-      return NextResponse.json({
-        asset,
-        action: 'hold',
-        hasConsensus: false,
-        consensusConfidence: 0,
-        fallback: true,
-        error: error.message
-      }, 
-      { status: 200 }); // Return 200 even with fallback data
-    }
+    // Run RoundTable AI to get consensus
+    const result = await roundTableAI.runRoundTable(asset);
+    
+    // Return the result
+    return NextResponse.json({
+      success: true,
+      asset,
+      consensus: {
+        signal: result.consensusSignal,
+        confidence: result.consensusConfidence,
+        hasConsensus: result.hasConsensus
+      },
+      agents: result.agents,
+      timestamp: result.timestamp
+    });
   } catch (error) {
-    logger.error(`RoundTable API error: ${error.message}`);
+    logger.error(`Error in RoundTable API: ${error.message}`);
     
-    // Return minimal response even on critical errors
-    return NextResponse.json({ 
-      error: error.message,
-      fallback: true,
-      action: 'hold'
-    }, 
-    { status: 200 });  // Return 200 to prevent cascading UI failures
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   }
 }
 
 /**
- * GET endpoint for RoundTable analysis
- * Gets token details and recent analyses
+ * RoundTable AI API Endpoint - POST method
+ * 
+ * Allows for more complex queries with request body
+ * 
+ * @route POST /api/tradeforce/roundTable
+ * @body { asset: string, options?: object }
  */
-export async function GET(request) {
+export async function POST(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const asset = searchParams.get('asset');
+    // Parse request body
+    const body = await request.json();
+    const { asset, options = {} } = body;
     
+    // Validate asset parameter
     if (!asset) {
       return NextResponse.json(
-        { error: 'Asset address is required' },
+        { success: false, error: 'Asset parameter is required' },
         { status: 400 }
       );
     }
     
-    // Ensure TradeForce AI is initialized
-    if (!tradeforceAI.isInitialized()) {
-      await tradeforceAI.init();
+    // Initialize AI if not already initialized
+    if (!roundTableAI.isInitialized()) {
+      await roundTableAI.initialize();
     }
     
-    // Get token info
-    const tokenInfo = await marketDataAggregator.getTokenInfo(asset);
+    // Run RoundTable AI to get consensus
+    const result = await roundTableAI.runRoundTable(asset);
     
-    // Get price data
-    const priceData = await marketDataAggregator.getCurrentPrice(asset);
-    
-    // Find recent analyses for this asset
-    const recentAnalyses = tradeforceAI.recentAnalyses.filter(a => a.asset === asset);
-    
+    // Return the result
     return NextResponse.json({
+      success: true,
       asset,
-      tokenInfo,
-      price: priceData,
-      recentAnalyses: recentAnalyses.slice(0, 5)
+      consensus: {
+        signal: result.consensusSignal,
+        confidence: result.consensusConfidence,
+        hasConsensus: result.hasConsensus
+      },
+      agents: result.agents,
+      timestamp: result.timestamp,
+      options
     });
   } catch (error) {
-    logger.error(`RoundTable API GET error: ${error.message}`);
+    logger.error(`Error in RoundTable API (POST): ${error.message}`);
+    
     return NextResponse.json(
-      { error: error.message },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }

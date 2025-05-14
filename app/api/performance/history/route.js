@@ -1,42 +1,44 @@
-// app/api/performance/history/route.js
+/**
+ * API Route: /api/performance/history
+ * 
+ * This API endpoint provides historical performance data for trading strategies,
+ * including metrics like win rate, drawdown, risk-adjusted returns, and profit/loss trends.
+ */
+
 import { NextResponse } from 'next/server';
 import logger from '../../../../lib/logger';
 import tradeExecutionService from '../../../../lib/tradeExecutionService';
 
 /**
- * GET /api/performance/history
+ * GET handler for /api/performance/history
  * 
- * Returns historical performance data for trading strategies
- * 
- * Query parameters:
- * - timeframe: '1D', '1W', '1M', 'ALL' (default: '1W')
- * - strategy: Strategy ID (default: all strategies)
+ * @param {Request} request - The request object
+ * @returns {Promise<NextResponse>} - The response object
  */
 export async function GET(request) {
   try {
-    // Get query parameters
+    // Get URL parameters
     const { searchParams } = new URL(request.url);
-    const timeframe = searchParams.get('timeframe') || '1W';
-    const strategy = searchParams.get('strategy');
+    const timeframe = searchParams.get('timeframe') || '1m';
     
     // Get trade history from the trade execution service
-    const trades = await tradeExecutionService.getTradeHistory(timeframe, strategy);
+    const trades = await tradeExecutionService.getTradeHistory(timeframe);
     
-    // Process trades to generate performance data
-    const history = processTradeHistory(trades);
-    
-    // Calculate performance metrics
-    const metrics = calculatePerformanceMetrics(trades);
+    // Process trade history to generate performance data
+    const { history, metrics } = processTradeHistory(trades);
     
     // Return the performance data
     return NextResponse.json({
+      success: true,
       history,
-      metrics,
-      timeframe
-    }, { status: 200 });
+      metrics
+    });
   } catch (error) {
-    logger.error('Error fetching performance history:', error);
-    return NextResponse.json({ error: 'Failed to fetch performance history' }, { status: 500 });
+    logger.error(`Error in performance history API: ${error.message}`);
+    return NextResponse.json({
+      success: false,
+      error: error.message
+    }, { status: 500 });
   }
 }
 
@@ -44,186 +46,221 @@ export async function GET(request) {
  * Process trade history to generate performance data
  * 
  * @param {Array} trades - Array of trade objects
- * @returns {Array} - Processed performance data
+ * @returns {Object} - Object containing history and metrics
  */
 function processTradeHistory(trades) {
-  if (!trades || trades.length === 0) {
-    return generateMockData();
+  // Initialize metrics
+  const metrics = {
+    winRate: 0,
+    sharpeRatio: 0,
+    sortinoRatio: 0,
+    maxDrawdown: 0,
+    totalTrades: trades.length,
+    profitableTrades: 0,
+    averageProfit: 0,
+    averageLoss: 0,
+    profitFactor: 0,
+    expectancy: 0
+  };
+  
+  // If no trades, return empty data
+  if (trades.length === 0) {
+    return { history: [], metrics };
   }
   
-  // Sort trades by timestamp
-  const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  // Group trades by day
+  const tradesByDay = groupTradesByDay(trades);
   
-  // Initialize variables for tracking performance
-  let cumulativePnl = 0;
-  let winCount = 0;
-  let lossCount = 0;
-  let maxPortfolioValue = 100000; // Starting portfolio value
-  let currentPortfolioValue = 100000;
-  let maxDrawdown = 0;
+  // Calculate daily performance metrics
+  const history = calculateDailyPerformance(tradesByDay);
   
-  // Process each trade
-  return sortedTrades.map((trade, index) => {
-    // Calculate profit/loss
-    const pnl = trade.profitAmount || 0;
-    cumulativePnl += pnl;
+  // Calculate overall metrics
+  calculateOverallMetrics(trades, history, metrics);
+  
+  return { history, metrics };
+}
+
+/**
+ * Group trades by day
+ * 
+ * @param {Array} trades - Array of trade objects
+ * @returns {Object} - Object with dates as keys and arrays of trades as values
+ */
+function groupTradesByDay(trades) {
+  const tradesByDay = {};
+  
+  trades.forEach(trade => {
+    const date = new Date(trade.timestamp);
+    const dateString = date.toISOString().split('T')[0];
     
-    // Update win/loss count
-    if (pnl > 0) {
-      winCount++;
-    } else if (pnl < 0) {
-      lossCount++;
+    if (!tradesByDay[dateString]) {
+      tradesByDay[dateString] = [];
     }
     
-    // Calculate win rate
-    const totalTrades = index + 1;
-    const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
+    tradesByDay[dateString].push(trade);
+  });
+  
+  return tradesByDay;
+}
+
+/**
+ * Calculate daily performance metrics
+ * 
+ * @param {Object} tradesByDay - Object with dates as keys and arrays of trades as values
+ * @returns {Array} - Array of daily performance objects
+ */
+function calculateDailyPerformance(tradesByDay) {
+  const history = [];
+  let cumulativePnl = 0;
+  let highWaterMark = 0;
+  let winRateWindow = [];
+  const winRateWindowSize = 10; // Moving average window size
+  
+  // Sort dates
+  const dates = Object.keys(tradesByDay).sort();
+  
+  dates.forEach(date => {
+    const dailyTrades = tradesByDay[date];
+    const timestamp = new Date(date).getTime();
     
-    // Update portfolio value
-    currentPortfolioValue += pnl;
+    // Calculate daily PnL
+    let dailyPnl = 0;
+    let wins = 0;
+    let losses = 0;
     
-    // Update max portfolio value
-    if (currentPortfolioValue > maxPortfolioValue) {
-      maxPortfolioValue = currentPortfolioValue;
+    dailyTrades.forEach(trade => {
+      const pnl = trade.profitLoss || 0;
+      dailyPnl += pnl;
+      
+      if (pnl > 0) {
+        wins++;
+      } else if (pnl < 0) {
+        losses++;
+      }
+    });
+    
+    // Update cumulative PnL
+    cumulativePnl += dailyPnl;
+    
+    // Update high water mark
+    if (cumulativePnl > highWaterMark) {
+      highWaterMark = cumulativePnl;
     }
     
     // Calculate drawdown
-    const drawdown = maxPortfolioValue > 0 
-      ? ((maxPortfolioValue - currentPortfolioValue) / maxPortfolioValue) * 100 
-      : 0;
-    
-    // Update max drawdown
-    if (drawdown > maxDrawdown) {
-      maxDrawdown = drawdown;
-    }
-    
-    // Return performance data point
-    return {
-      timestamp: trade.timestamp,
-      pnl: cumulativePnl,
-      winRate: winRate,
-      drawdown: drawdown,
-      tradeId: trade.id,
-      symbol: trade.symbol
-    };
-  });
-}
-
-/**
- * Calculate performance metrics from trade history
- * 
- * @param {Array} trades - Array of trade objects
- * @returns {Object} - Performance metrics
- */
-function calculatePerformanceMetrics(trades) {
-  if (!trades || trades.length === 0) {
-    return {
-      winRate: 65.2,
-      sharpeRatio: 1.8,
-      sortinoRatio: 2.3,
-      maxDrawdown: 12.5,
-      totalTrades: 42,
-      profitableTrades: 27,
-      averageProfit: 0.85,
-      averageLoss: 0.32
-    };
-  }
-  
-  // Calculate win rate
-  const winningTrades = trades.filter(trade => (trade.profitAmount || 0) > 0);
-  const losingTrades = trades.filter(trade => (trade.profitAmount || 0) < 0);
-  const totalTrades = trades.length;
-  const winRate = totalTrades > 0 ? (winningTrades.length / totalTrades) * 100 : 0;
-  
-  // Calculate average profit and loss
-  const totalProfit = winningTrades.reduce((sum, trade) => sum + (trade.profitAmount || 0), 0);
-  const totalLoss = losingTrades.reduce((sum, trade) => sum + (trade.profitAmount || 0), 0);
-  const averageProfit = winningTrades.length > 0 ? totalProfit / winningTrades.length : 0;
-  const averageLoss = losingTrades.length > 0 ? Math.abs(totalLoss / losingTrades.length) : 0;
-  
-  // Calculate returns for risk metrics
-  const returns = trades.map(trade => (trade.profitAmount || 0) / (trade.value || 1));
-  
-  // Calculate Sharpe ratio
-  const meanReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-  const stdDev = Math.sqrt(
-    returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / returns.length
-  );
-  const sharpeRatio = stdDev !== 0 ? meanReturn / stdDev : 0;
-  
-  // Calculate Sortino ratio (only considers negative returns)
-  const negativeReturns = returns.filter(r => r < 0);
-  const downstdDev = Math.sqrt(
-    negativeReturns.reduce((sum, r) => sum + Math.pow(r, 2), 0) / 
-    (negativeReturns.length || 1)
-  );
-  const sortinoRatio = downstdDev !== 0 ? meanReturn / downstdDev : 0;
-  
-  // Calculate max drawdown
-  let peak = 0;
-  let maxDrawdown = 0;
-  let portfolioValue = 100000; // Starting portfolio value
-  
-  for (const trade of trades) {
-    portfolioValue += trade.profitAmount || 0;
-    peak = Math.max(peak, portfolioValue);
-    const drawdown = (peak - portfolioValue) / peak * 100;
-    maxDrawdown = Math.max(maxDrawdown, drawdown);
-  }
-  
-  return {
-    winRate,
-    sharpeRatio,
-    sortinoRatio,
-    maxDrawdown,
-    totalTrades,
-    profitableTrades: winningTrades.length,
-    averageProfit,
-    averageLoss
-  };
-}
-
-/**
- * Generate mock data for development and testing
- * 
- * @returns {Array} - Mock performance data
- */
-function generateMockData() {
-  const mockData = [];
-  const now = new Date();
-  let cumulativePnl = 0;
-  let winCount = 0;
-  
-  // Generate data points for the last 30 days
-  for (let i = 30; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    
-    // Generate random PnL between -2 and 5
-    const pnl = Math.random() * 7 - 2;
-    cumulativePnl += pnl;
-    
-    // Update win count
-    if (pnl > 0) {
-      winCount++;
-    }
+    const drawdown = highWaterMark > 0 ? ((highWaterMark - cumulativePnl) / highWaterMark) * 100 : 0;
     
     // Calculate win rate
-    const totalTrades = 30 - i + 1;
-    const winRate = (winCount / totalTrades) * 100;
+    const dailyWinRate = dailyTrades.length > 0 ? (wins / dailyTrades.length) * 100 : 0;
     
-    // Calculate drawdown (random between 0 and 15%)
-    const drawdown = Math.random() * 15;
+    // Update win rate window
+    winRateWindow.push(dailyWinRate);
+    if (winRateWindow.length > winRateWindowSize) {
+      winRateWindow.shift();
+    }
     
-    mockData.push({
-      timestamp: date.toISOString(),
-      pnl: cumulativePnl,
-      winRate,
+    // Calculate win rate moving average
+    const winRateMA = winRateWindow.reduce((sum, rate) => sum + rate, 0) / winRateWindow.length;
+    
+    // Add daily performance to history
+    history.push({
+      timestamp,
+      date,
+      pnl: dailyPnl,
+      cumulativePnl,
       drawdown,
-      tradeId: `mock-${i}`,
-      symbol: ['SOL', 'BONK', 'JTO', 'PYTH', 'RNDR'][Math.floor(Math.random() * 5)]
+      trades: dailyTrades.length,
+      wins,
+      losses,
+      winRate: dailyWinRate,
+      winRateMA
     });
-  }
+  });
   
-  return mockData;
+  return history;
+}
+
+/**
+ * Calculate overall performance metrics
+ * 
+ * @param {Array} trades - Array of trade objects
+ * @param {Array} history - Array of daily performance objects
+ * @param {Object} metrics - Object to store metrics
+ */
+function calculateOverallMetrics(trades, history, metrics) {
+  // Calculate win rate
+  const wins = trades.filter(trade => (trade.profitLoss || 0) > 0).length;
+  metrics.profitableTrades = wins;
+  metrics.winRate = trades.length > 0 ? (wins / trades.length) * 100 : 0;
+  
+  // Calculate profit and loss metrics
+  let totalProfit = 0;
+  let totalLoss = 0;
+  let profitCount = 0;
+  let lossCount = 0;
+  
+  trades.forEach(trade => {
+    const pnl = trade.profitLoss || 0;
+    
+    if (pnl > 0) {
+      totalProfit += pnl;
+      profitCount++;
+    } else if (pnl < 0) {
+      totalLoss += Math.abs(pnl);
+      lossCount++;
+    }
+  });
+  
+  metrics.averageProfit = profitCount > 0 ? totalProfit / profitCount : 0;
+  metrics.averageLoss = lossCount > 0 ? totalLoss / lossCount : 0;
+  metrics.profitFactor = totalLoss > 0 ? totalProfit / totalLoss : totalProfit > 0 ? Infinity : 0;
+  
+  // Calculate expectancy
+  metrics.expectancy = trades.length > 0 ? 
+    (metrics.winRate / 100 * metrics.averageProfit) - ((100 - metrics.winRate) / 100 * metrics.averageLoss) : 0;
+  
+  // Calculate max drawdown
+  metrics.maxDrawdown = history.reduce((max, day) => Math.max(max, day.drawdown), 0);
+  
+  // Calculate risk-adjusted returns
+  calculateRiskAdjustedReturns(trades, metrics);
+}
+
+/**
+ * Calculate risk-adjusted returns
+ * 
+ * @param {Array} trades - Array of trade objects
+ * @param {Object} metrics - Object to store metrics
+ */
+function calculateRiskAdjustedReturns(trades, metrics) {
+  // Extract daily returns
+  const returns = trades.map(trade => {
+    const pnl = trade.profitLoss || 0;
+    const value = trade.value || 1; // Avoid division by zero
+    return pnl / value * 100; // Return as percentage
+  });
+  
+  // Calculate mean return
+  const meanReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
+  
+  // Calculate standard deviation
+  const squaredDiffs = returns.map(r => Math.pow(r - meanReturn, 2));
+  const variance = squaredDiffs.reduce((sum, d) => sum + d, 0) / returns.length;
+  const stdDev = Math.sqrt(variance);
+  
+  // Calculate downside deviation (for Sortino ratio)
+  const downsideReturns = returns.filter(r => r < 0);
+  const downsideSquaredDiffs = downsideReturns.map(r => Math.pow(r, 2));
+  const downsideVariance = downsideSquaredDiffs.length > 0 ? 
+    downsideSquaredDiffs.reduce((sum, d) => sum + d, 0) / downsideSquaredDiffs.length : 0;
+  const downsideDeviation = Math.sqrt(downsideVariance);
+  
+  // Calculate risk-free rate (assume 0% for simplicity)
+  const riskFreeRate = 0;
+  
+  // Calculate Sharpe ratio
+  metrics.sharpeRatio = stdDev > 0 ? (meanReturn - riskFreeRate) / stdDev : 0;
+  
+  // Calculate Sortino ratio
+  metrics.sortinoRatio = downsideDeviation > 0 ? (meanReturn - riskFreeRate) / downsideDeviation : 0;
 }

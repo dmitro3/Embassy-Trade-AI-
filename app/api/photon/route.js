@@ -1,6 +1,6 @@
 // app/api/photon/route.js
 import { NextResponse } from 'next/server';
-const photonClient = require('@/server/utils/photon');
+import photonClient from '../../../server/utils/photon.js';
 
 // Handle API requests to Photon
 export async function POST(request) {
