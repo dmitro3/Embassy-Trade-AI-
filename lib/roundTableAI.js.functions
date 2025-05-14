@@ -1,0 +1,95 @@
+  /**
+   * Calculate RSI trend
+   * 
+   * @param {Object} marketData - Market data
+   * @returns {string} - RSI trend ('rising', 'falling', or 'neutral')
+   */
+  calculateRSITrend(marketData) {
+    // Get the last few RSI values
+    const rsiValues = marketData.indicators.rsiHistory || [];
+    
+    if (rsiValues.length < 3) {
+      return 'neutral';
+    }
+    
+    const current = rsiValues[rsiValues.length - 1];
+    const previous = rsiValues[rsiValues.length - 2];
+    const earlier = rsiValues[rsiValues.length - 3];
+    
+    if (current > previous && previous > earlier) {
+      return 'rising';
+    } else if (current < previous && previous < earlier) {
+      return 'falling';
+    } else {
+      return 'neutral';
+    }
+  }
+  
+  /**
+   * Detect MACD crossover
+   * 
+   * @param {Object} marketData - Market data
+   * @returns {string} - MACD crossover ('bullish', 'bearish', or 'none')
+   */
+  detectMACDCrossover(marketData) {
+    const macd = marketData.indicators.macd;
+    const macdHistory = marketData.indicators.macdHistory || [];
+    
+    if (macdHistory.length < 2) {
+      return 'none';
+    }
+    
+    const current = macdHistory[macdHistory.length - 1];
+    const previous = macdHistory[macdHistory.length - 2];
+    
+    if (current.histogram > 0 && previous.histogram <= 0) {
+      return 'bullish';
+    } else if (current.histogram < 0 && previous.histogram >= 0) {
+      return 'bearish';
+    } else {
+      return 'none';
+    }
+  }
+  
+  /**
+   * Calculate position within Bollinger Bands
+   * 
+   * @param {number} price - Current price
+   * @param {Object} bollinger - Bollinger Bands
+   * @returns {number} - Position (-1 to 1, where -1 is at lower band, 0 is at middle band, 1 is at upper band)
+   */
+  calculateBollingerPosition(price, bollinger) {
+    const range = bollinger.upper - bollinger.lower;
+    
+    if (range === 0) {
+      return 0;
+    }
+    
+    return 2 * ((price - bollinger.lower) / range - 0.5);
+  }
+  
+  /**
+   * Calculate volatility trend
+   * 
+   * @param {Object} marketData - Market data
+   * @returns {string} - Volatility trend ('increasing', 'decreasing', or 'stable')
+   */
+  calculateVolatilityTrend(marketData) {
+    const atrHistory = marketData.indicators.atrHistory || [];
+    
+    if (atrHistory.length < 3) {
+      return 'stable';
+    }
+    
+    const current = atrHistory[atrHistory.length - 1];
+    const previous = atrHistory[atrHistory.length - 2];
+    const earlier = atrHistory[atrHistory.length - 3];
+    
+    if (current > previous && previous > earlier) {
+      return 'increasing';
+    } else if (current < previous && previous < earlier) {
+      return 'decreasing';
+    } else {
+      return 'stable';
+    }
+  }
