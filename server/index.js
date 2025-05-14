@@ -1,11 +1,16 @@
-const express = require('express');
-const { spawn } = require('child_process');
-const cors = require('cors');
-const WebSocket = require('ws');
-const http = require('http');
-const winston = require('winston');
-const path = require('path');
-const portfinder = require('portfinder');
+import express from 'express';
+import { spawn } from 'child_process';
+import cors from 'cors';
+import { WebSocketServer } from 'ws';
+import http from 'http';
+import winston from 'winston';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import portfinder from 'portfinder';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configure winston logging
 const logger = winston.createLogger({
@@ -22,7 +27,7 @@ const logger = winston.createLogger({
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocketServer({ server });
 
 app.use(cors());
 app.use(express.json());

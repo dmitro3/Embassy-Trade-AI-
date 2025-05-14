@@ -1,80 +1,81 @@
 @echo off
-echo Starting TradeForce AI Trading System with all MCP servers...
+echo Starting TradeForce AI Trading System Complete Environment...
 echo.
 
 REM Set environment variables
-set NODE_ENV=development
-set PORT=3000
+set NEXT_PUBLIC_SHYFT_API_KEY=whv00T87G8Sd8TeK
+set NEXT_PUBLIC_BIRDEYE_API_KEY=67f8ce614c594ab2b3efb742f8db69db
+set NEXT_PUBLIC_PHOTON_PRIVATE_KEY=38HQ8wNk38Q4VCfrSfESGgggoefgPF9kaeZbYvLC6nKqGTLnQN136CLRiqi6e68yppFB5ypjwzjNCTdjyoieiQQe
 
-REM Check if Node.js is installed
-where node >nul 2>nul
-if %ERRORLEVEL% neq 0 (
-  echo Error: Node.js is not installed or not in PATH.
-  echo Please install Node.js from https://nodejs.org/
-  exit /b 1
+REM Start MCP servers in separate windows
+echo Starting Token Discovery MCP Server...
+start "Token Discovery MCP" cmd /c "cd mcp\token-discovery-mcp && npm start"
+
+echo Starting Pump.fun MCP Server...
+if exist "mcp\pumpfun-mcp" (
+  start "Pump.fun MCP" cmd /c "cd mcp\pumpfun-mcp && npm start"
+) else (
+  echo Pump.fun MCP Server not found. Skipping...
 )
 
-REM Create logs directory if it doesn't exist
-if not exist logs mkdir logs
-
-REM Start Token Discovery MCP Server
-echo Starting Token Discovery MCP Server...
-start "Token Discovery MCP" cmd /c "cd mcp\token-discovery-mcp && node index.js > ..\..\logs\token-discovery-mcp.log 2>&1"
-timeout /t 3 > nul
-
-REM Start DEXScreener MCP Server
 echo Starting DEXScreener MCP Server...
-start "DEXScreener MCP" cmd /c "cd mcp\dexscreener-mcp && node index.js > ..\..\logs\dexscreener-mcp.log 2>&1"
-timeout /t 3 > nul
+if exist "mcp\dexscreener-mcp" (
+  start "DEXScreener MCP" cmd /c "cd mcp\dexscreener-mcp && npm start"
+) else (
+  echo DEXScreener MCP Server not found. Skipping...
+)
 
-REM Start Pump.fun MCP Server
-echo Starting Pump.fun MCP Server...
-start "Pump.fun MCP" cmd /c "cd mcp\pumpfun-mcp && node index.js > ..\..\logs\pumpfun-mcp.log 2>&1"
-timeout /t 3 > nul
+echo Starting Jupiter Aggregation MCP Server...
+if exist "mcp\jupiter-mcp" (
+  start "Jupiter MCP" cmd /c "cd mcp\jupiter-mcp && npm start"
+) else (
+  echo Jupiter MCP Server not found. Skipping...
+)
 
-REM Start SHYFT Data MCP Server
-echo Starting SHYFT Data MCP Server...
-start "SHYFT Data MCP" cmd /c "cd mcp\shyft-data-mcp && node index.js > ..\..\logs\shyft-data-mcp.log 2>&1"
-timeout /t 3 > nul
+echo Starting Raydium Swaps MCP Server...
+if exist "mcp\raydium-mcp" (
+  start "Raydium MCP" cmd /c "cd mcp\raydium-mcp && npm start"
+) else (
+  echo Raydium MCP Server not found. Skipping...
+)
 
-REM Start backend server
-echo Starting backend server...
-start "Backend Server" cmd /c "cd backend && node server.js > ..\logs\backend.log 2>&1"
-timeout /t 5 > nul
+echo Starting Photon Execution MCP Server...
+if exist "mcp\photon-mcp" (
+  start "Photon MCP" cmd /c "cd mcp\photon-mcp && npm start"
+) else (
+  echo Photon MCP Server not found. Skipping...
+)
+
+echo Starting Birdeye Analytics MCP Server...
+if exist "mcp\birdeye-mcp" (
+  start "Birdeye MCP" cmd /c "cd mcp\birdeye-mcp && npm start"
+) else (
+  echo Birdeye MCP Server not found. Skipping...
+)
+
+REM Wait for MCP servers to start
+echo Waiting for MCP servers to initialize...
+timeout /t 10 /nobreak > nul
 
 REM Start Next.js development server
-echo Starting Next.js development server...
-start "Next.js Dev Server" cmd /c "npm run dev > logs\nextjs.log 2>&1"
-timeout /t 5 > nul
+echo Starting Next.js Development Server...
+start "Next.js Dev Server" cmd /c "npm run dev"
 
-REM Open browser
+REM Open browser after a delay
+timeout /t 10 /nobreak > nul
 echo Opening TradeForce in browser...
 start http://localhost:3000/tradeforce
 
 echo.
-echo TradeForce AI Trading System started successfully!
-echo.
-echo MCP Servers:
-echo - Token Discovery MCP: http://localhost:3001
-echo - DEXScreener MCP: http://localhost:3002
-echo - Pump.fun MCP: http://localhost:3003
-echo - SHYFT Data MCP: http://localhost:3004
-echo.
-echo Backend Server: http://localhost:3008
-echo Next.js Server: http://localhost:3000
-echo.
-echo Log files are stored in the logs directory.
+echo TradeForce AI Trading System Complete Environment started successfully!
 echo.
 echo Press any key to stop all servers...
 pause > nul
 
-REM Stop all servers
+REM Kill all processes
 echo Stopping all servers...
-taskkill /FI "WINDOWTITLE eq Token Discovery MCP*" /F > nul 2>&1
-taskkill /FI "WINDOWTITLE eq DEXScreener MCP*" /F > nul 2>&1
-taskkill /FI "WINDOWTITLE eq Pump.fun MCP*" /F > nul 2>&1
-taskkill /FI "WINDOWTITLE eq SHYFT Data MCP*" /F > nul 2>&1
-taskkill /FI "WINDOWTITLE eq Backend Server*" /F > nul 2>&1
-taskkill /FI "WINDOWTITLE eq Next.js Dev Server*" /F > nul 2>&1
+taskkill /f /im node.exe > nul 2>&1
 
-echo All servers stopped.
+echo.
+echo TradeForce AI Trading System Complete Environment stopped successfully!
+timeout /t 3 /nobreak > nul

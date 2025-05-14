@@ -3,11 +3,11 @@
  * Handles secure integration with Photon Network for trade execution
  */
 
-const axios = require('axios');
-const bs58 = require('bs58');
-const { Connection, PublicKey, Keypair, clusterApiUrl } = require('@solana/web3.js');
-const EMBAITokenManager = require('../../lib/embaiToken');
-require('dotenv').config();
+import axios from 'axios';
+import bs58 from 'bs58';
+import { Connection, PublicKey, Keypair, clusterApiUrl } from '@solana/web3.js';
+import EMBAITokenManager from '../../lib/embaiToken.js';
+import 'dotenv/config';
 
 // Secure access to private keys
 const PHOTON_PRIVATE_KEY = process.env.PHOTON_PRIVATE_KEY;
@@ -343,4 +343,5 @@ class PhotonApiClient {
 }
 
 // Export a singleton instance
-module.exports = new PhotonApiClient();
+const photonClient = new PhotonApiClient();
+export default photonClient;

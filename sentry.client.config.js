@@ -12,15 +12,9 @@ Sentry.init({
   
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: process.env.NODE_ENV === 'development',
-  
-  // Capture unhandled promise rejections
+    // Capture unhandled promise rejections
   integrations: [
-    new Sentry.BrowserTracing(),
-    new Sentry.Replay({
-      // Additional Replay configuration
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
+    // Remove BrowserTracing and Replay as they're not exported from @sentry/nextjs in this version
   ],
   
   // This sets the sample rate to be 10%. You may want this to be 100% while

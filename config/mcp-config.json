@@ -1,0 +1,28 @@
+{
+  "apiKeys": {
+    "shyft": "whv00T87G8Sd8TeK",
+    "birdeye": "your_birdeye_api_key"
+  },
+  "solana": {
+    "network": "devnet",
+    "rpcUrl": "https://api.devnet.solana.com"
+  },
+  "services": {
+    "tokenDiscovery": {
+      "port": 3001,
+      "enabled": true
+    },
+    "dexScreener": {
+      "port": 3002,
+      "enabled": true
+    },
+    "pumpFun": {
+      "port": 3003,
+      "enabled": true
+    },
+    "shyftData": {
+      "port": 3004,
+      "enabled": true
+    }
+  }
+}

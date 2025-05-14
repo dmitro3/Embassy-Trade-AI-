@@ -1,0 +1,30 @@
+[
+  {
+    "id": "trade_1714468805000_123",
+    "tokenPair": "SOL/USDC",
+    "inputToken": "SOL",
+    "outputToken": "USDC",
+    "side": "sell",
+    "entryPrice": 147.23,
+    "exitPrice": 152.85,
+    "amount": 0.5,
+    "pnl": 3.82,
+    "status": "completed",
+    "timestamp": "2025-04-30T08:00:05Z",
+    "txHash": "4bS6fEh9zJRJ1nEi5SHs5dAzGJEMhd7pCmV5HzDJkEnBK62UEb8QMgpKgTGJQQbvDCzSFNAVhU6Z7nbkBcSwLQFz"
+  },
+  {
+    "id": "trade_1714468205000_456",
+    "tokenPair": "RAY/SOL",
+    "inputToken": "RAY",
+    "outputToken": "SOL",
+    "side": "sell",
+    "entryPrice": 0.36,
+    "exitPrice": 0.347,
+    "amount": 100,
+    "pnl": -3.61,
+    "status": "completed",
+    "timestamp": "2025-04-30T07:50:05Z",
+    "txHash": "3jS5fEh9zJRJ1nEi5SHs5dAzGJEMhd7pCmV5HzDJkEnBK62UEb8QMgpKgTGJQQbvDCzSFNAVhU6Z7nbkBcSwLQ2z"
+  }
+]

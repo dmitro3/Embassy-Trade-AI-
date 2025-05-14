@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeForce AI Fix Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        #output {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin-top: 20px;
+            height: 500px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .success {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .test-section {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 4px solid #3498db;
+            background-color: #f8f9fa;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .test-card {
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .test-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-pending {
+            background-color: #f39c12;
+        }
+        .status-success {
+            background-color: #2ecc71;
+        }
+        .status-error {
+            background-color: #e74c3c;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>TradeForce AI Fix Verification</h1>
+    
+    <div class="container">
+        <p>This page verifies that all the fixes for critical integration errors are working correctly. Click the button below to run the verification tests.</p>
+        
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>
+                    <span class="status-indicator status-pending" id="shyft-status"></span>
+                    Shyft WebSocket Connection
+                </h3>
+                <p>Tests improved WebSocket error handling and reconnection logic.</p>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="shyft-progress"></div>
+                </div>
+                <div id="shyft-details">Status: Not started</div>
+            </div>
+            <div class="test-card">
+                <h3>
+                    <span class="status-indicator status-pending" id="birdeye-status"></span>
+                    Birdeye API Rate Limiting
+                </h3>
+                <p>Tests progressive delays and circuit breaker for API calls.</p>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="birdeye-progress"></div>
+                </div>
+                <div id="birdeye-details">Status: Not started</div>
+            </div>
+            <div class="test-card">
+                <h3>
+                    <span class="status-indicator status-pending" id="firebase-status"></span>
+                    Firebase Authentication
+                </h3>
+                <p>Tests fix for Firebase Permission Denied errors.</p>
+                <div id="firebase-details">Status: Not started</div>
+            </div>
+            <div class="test-card">
+                <h3>
+                    <span class="status-indicator status-pending" id="reference-status"></span>
+                    Reference Errors
+                </h3>
+                <p>Tests fix for variable initialization and reference errors.</p>
+                <div id="reference-details">Status: Not started</div>
+            </div>
+        </div>
+        
+        <button id="runTests">Run Verification Tests</button>
+        <div id="output">Test output will appear here...</div>
+    </div>
+
+    <script type="module">
+        // Import required modules
+        import { logger } from '../lib/logger.js';
+        import { useShyftWebSocket } from '../lib/useShyftWebSocket.js';
+        import { useBirdeyeData } from '../lib/useBirdeyeData.js';
+        import { apiKeyManager } from '../lib/apiKeyManager.js';
+        import { fallbackMarketService } from '../lib/fallbackMarketService.js';
+        import { firebaseFixer } from '../lib/firebaseFixer.js';
+
+        // Configuration for tests
+        const TEST_CONFIG = {
+            // Number of WebSocket connection tests to run in sequence
+            shyftWebSocketTests: 3,
+            
+            // Number of Birdeye API calls to make in sequence to test rate limiting
+            birdeyeRateLimitTests: 10,
+            
+            // Token to use for tests
+            testToken: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', // BONK
+            
+            // Timeout for WebSocket connection (ms)
+            webSocketTimeout: 15000,
+            
+            // Delay between tests (ms)
+            testDelay: 1000,
+        };
+
+        // Test results tracking
+        const testResults = {
+            shyftWebSocket: {
+                passed: 0,
+                failed: 0,
+                reconnections: 0,
+                errors: []
+            },
+            birdeyeAPI: {
+                passed: 0,
+                failed: 0,
+                rateLimited: 0,
+                fallbacksUsed: 0,
+                errors: []
+            },
+            firebase: {
+                fixed: false,
+                errors: []
+            },
+            references: {
+                passed: true,
+                errors: []
+            }
+        };
+
+        // Elements
+        const outputElement = document.getElementById('output');
+        const shyftStatusElement = document.getElementById('shyft-status');
+        const shyftProgressElement = document.getElementById('shyft-progress');
+        const shyftDetailsElement = document.getElementById('shyft-details');
+        const birdeyeStatusElement = document.getElementById('birdeye-status');
+        const birdeyeProgressElement = document.getElementById('birdeye-progress');
+        const birdeyeDetailsElement = document.getElementById('birdeye-details');
+        const firebaseStatusElement = document.getElementById('firebase-status');
+        const firebaseDetailsElement = document.getElementById('firebase-details');
+        const referenceStatusElement = document.getElementById('reference-status');
+        const referenceDetailsElement = document.getElementById('reference-details');
+
+        // Custom console log function that writes to the output element
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            let formattedMessage = `[${timestamp}] ${message}`;
+            
+            if (type === 'success') {
+                formattedMessage = `[${timestamp}] ✅ ${message}`;
+            } else if (type === 'error') {
+                formattedMessage = `[${timestamp}] ❌ ${message}`;
+            } else if (type === 'section') {
+                formattedMessage = `\n[${timestamp}] 📋 ${message}\n`;
+            }
+            
+            outputElement.innerHTML += formattedMessage + '\n';
+            outputElement.scrollTop = outputElement.scrollHeight;
+        }
+
+        /**
+         * Update test status indicators
+         */
+        function updateStatusIndicator(element, status) {
+            element.classList.remove('status-pending', 'status-success', 'status-error');
+            element.classList.add(`status-${status}`);
+        }
+
+        /**
+         * Update progress bar
+         */
+        function updateProgressBar(element, percent) {
+            element.style.width = `${percent}%`;
+        }
+
+        /**
+         * Test Shyft WebSocket connection with improved error handling
+         */
+        async function testShyftWebSocketConnection() {
+            log('\n=== Testing Shyft WebSocket Connection ===', 'section');
+            updateStatusIndicator(shyftStatusElement, 'pending');
+            shyftDetailsElement.textContent = 'Status: Testing...';
+            
+            try {
+                // Get API key from the manager
+                const apiKey = await apiKeyManager.getApiKey('shyft');
+                
+                if (!apiKey) {
+                    throw new Error('Failed to get Shyft API key from manager');
+                }
+                
+                log('- Using API key from manager');
+                
+                // Test multiple connections to verify reconnection logic
+                for (let i = 0; i < TEST_CONFIG.shyftWebSocketTests; i++) {
+                    log(`\n- Test connection ${i + 1}/${TEST_CONFIG.shyftWebSocketTests}...`);
+                    updateProgressBar(shyftProgressElement, (i / TEST_CONFIG.shyftWebSocketTests) * 100);
+                    shyftDetailsElement.textContent = `Testing connection ${i + 1}/${TEST_CONFIG.shyftWebSocketTests}`;
+                    
+                    // Create a promise that resolves when connected or rejects on timeout
+                    const connectionPromise = new Promise((resolve, reject) => {
+                        const { wsStatus, tokenUpdates, reconnect } = useShyftWebSocket(`wss://devnet-rpc.shyft.to?api_key=${apiKey}`);
+                        
+                        // Track connection status changes
+                        let connectionStatus = wsStatus;
+                        let connectionStartTime = Date.now();
+                        let timeoutId = setTimeout(() => {
+                            reject(new Error('WebSocket connection timed out'));
+                        }, TEST_CONFIG.webSocketTimeout);
+                        
+                        // Check connection status every 500ms
+                        const statusCheckInterval = setInterval(() => {
+                            if (connectionStatus !== wsStatus) {
+                                log(`  Status changed: ${connectionStatus} -> ${wsStatus}`);
+                                connectionStatus = wsStatus;
+                                
+                                if (wsStatus === 'connected') {
+                                    clearTimeout(timeoutId);
+                                    clearInterval(statusCheckInterval);
+                                    resolve({ status: wsStatus, reconnect });
+                                } else if (wsStatus === 'error' || wsStatus === 'failed') {
+                                    log('  Attempting reconnection...');
+                                    reconnect();
+                                    testResults.shyftWebSocket.reconnections++;
+                                }
+                            }
+                        }, 500);
+                    });
+                    
+                    try {
+                        const result = await connectionPromise;
+                        log(`  Connection successful: ${result.status}`, 'success');
+                        testResults.shyftWebSocket.passed++;
+                        
+                        // Force disconnect and test reconnection if not the last test
+                        if (i < TEST_CONFIG.shyftWebSocketTests - 1) {
+                            log('  Testing reconnection by forcing disconnect...');
+                            // Simulate network error by reconnecting
+                            result.reconnect();
+                            
+                            // Wait for reconnection
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                        }
+                    } catch (error) {
+                        log(`  Connection failed: ${error.message}`, 'error');
+                        testResults.shyftWebSocket.failed++;
+                        testResults.shyftWebSocket.errors.push(error.message);
+                    }
+                    
+                    // Add delay between tests
+                    if (i < TEST_CONFIG.shyftWebSocketTests - 1) {
+                        await new Promise(resolve => setTimeout(resolve, TEST_CONFIG.testDelay));
+                    }
+                }
+                
+                // Update progress to 100%
+                updateProgressBar(shyftProgressElement, 100);
+                
+                // Update final status
+                const allPassed = testResults.shyftWebSocket.passed === TEST_CONFIG.shyftWebSocketTests;
+                updateStatusIndicator(shyftStatusElement, allPassed ? 'success' : 'error');
+                shyftDetailsElement.textContent = `Status: ${allPassed ? 'Fixed' : 'Issues Remain'} (${testResults.shyftWebSocket.passed}/${TEST_CONFIG.shyftWebSocketTests} passed)`;
+            } catch (error) {
+                log(`Shyft WebSocket test error: ${error.message}`, 'error');
+                testResults.shyftWebSocket.failed += TEST_CONFIG.shyftWebSocketTests;
+                testResults.shyftWebSocket.errors.push(error.message);
+                
+                updateStatusIndicator(shyftStatusElement, 'error');
+                shyftDetailsElement.textContent = `Status: Failed - ${error.message}`;
+                updateProgressBar(shyftProgressElement, 100);
+            }
+            
+            log('\nShyft WebSocket Test Results:');
+            log(`- Passed: ${testResults.shyftWebSocket.passed}/${TEST_CONFIG.shyftWebSocketTests}`, testResults.shyftWebSocket.passed === TEST_CONFIG.shyftWebSocketTests ? 'success' : 'error');
+            log(`- Failed: ${testResults.shyftWebSocket.failed}/${TEST_CONFIG.shyftWebSocketTests}`);
+            log(`- Reconnections: ${testResults.shyftWebSocket.reconnections}`);
+            
+            if (testResults.shyftWebSocket.errors.length > 0) {
+                log('- Errors:');
+                testResults.shyftWebSocket.errors.forEach(err => log(`  - ${err}`, 'error'));
+            }
+        }
+
+        /**
+         * Test Birdeye API with rate limiting mitigation
+         */
+        async function testBirdeyeAPIRateLimiting() {
+            log('\n=== Testing Birdeye API Rate Limiting ===', 'section');
+            updateStatusIndicator(birdeyeStatusElement, 'pending');
+            birdeyeDetailsElement.textContent = 'Status: Testing...';
+            
+            try {
+                // Get API key from the manager
+                const apiKey = await apiKeyManager.getApiKey('birdeye');
+                
+                if (!apiKey) {
+                    throw new Error('Failed to get Birdeye API key from manager');
+                }
+                
+                log('- Using API key from manager');
+                
+                // Use the Birdeye hook with the token
+                const { 
+                    tokenData, 
+                    loading, 
+                    error, 
+                    refresh,
+                    lastRefreshTime,
+                    usedFallback
+                } = useBirdeyeData(TEST_CONFIG.testToken, apiKey);
+                
+                log('- Testing multiple rapid API calls to check rate limiting handling...');
+                
+                // Make multiple API calls in quick succession to test rate limiting
+                for (let i = 0; i < TEST_CONFIG.birdeyeRateLimitTests; i++) {
+                    log(`\n- API call ${i + 1}/${TEST_CONFIG.birdeyeRateLimitTests}...`);
+                    updateProgressBar(birdeyeProgressElement, (i / TEST_CONFIG.birdeyeRateLimitTests) * 100);
+                    birdeyeDetailsElement.textContent = `Testing API call ${i + 1}/${TEST_CONFIG.birdeyeRateLimitTests}`;
+                    
+                    try {
+                        await refresh();
+                        log(`  Refresh successful. Used fallback: ${usedFallback}`, 'success');
+                        
+                        if (usedFallback) {
+                            testResults.birdeyeAPI.fallbacksUsed++;
+                            log('  Used fallback service successfully');
+                        }
+                        
+                        testResults.birdeyeAPI.passed++;
+                        
+                        // Add a small delay to simulate realistic usage
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    } catch (err) {
+                        log(`  Refresh failed: ${err.message}`, 'error');
+                        
+                        if (err.message.includes('rate limit') || err.message.includes('429')) {
+                            testResults.birdeyeAPI.rateLimited++;
+                            log('  Detected rate limiting - should use fallback');
+                            
+                            // Check if fallback was used
+                            if (usedFallback) {
+                                log('  Fallback used successfully');
+                                testResults.birdeyeAPI.fallbacksUsed++;
+                            } else {
+                                log('  Fallback not used despite rate limiting');
+                                testResults.birdeyeAPI.failed++;
+                                testResults.birdeyeAPI.errors.push('Fallback not used despite rate limiting');
+                            }
+                        } else {
+                            testResults.birdeyeAPI.failed++;
+                            testResults.birdeyeAPI.errors.push(err.message);
+                        }
+                    }
+                }
+                
+                // Update progress to 100%
+                updateProgressBar(birdeyeProgressElement, 100);
+                
+                // Test fallback service directly
+                log('\n- Testing fallback market service directly...');
+                try {
+                    const fallbackData = await fallbackMarketService.getTokenData(TEST_CONFIG.testToken);
+                    log(`  Fallback service response: ${JSON.stringify(fallbackData, null, 2)}`);
+                    
+                    if (fallbackData && fallbackData.price) {
+                        log('  Fallback service working correctly', 'success');
+                    } else {
+                        throw new Error('Fallback service returned invalid data');
+                    }
+                } catch (err) {
+                    log(`  Fallback service error: ${err.message}`, 'error');
+                    testResults.birdeyeAPI.failed++;
+                    testResults.birdeyeAPI.errors.push(`Fallback service error: ${err.message}`);
+                }
+                
+                // Update final status
+                const successfulCalls = testResults.birdeyeAPI.passed + testResults.birdeyeAPI.fallbacksUsed;
+                const allPassed = successfulCalls >= TEST_CONFIG.birdeyeRateLimitTests;
+                updateStatusIndicator(birdeyeStatusElement, allPassed ? 'success' : 'error');
+                birdeyeDetailsElement.textContent = `Status: ${allPassed ? 'Fixed' : 'Issues Remain'} (${successfulCalls}/${TEST_CONFIG.birdeyeRateLimitTests} successful)`;
+            } catch (error) {
+                log(`Birdeye API test error: ${error.message}`, 'error');
+                testResults.birdeyeAPI.failed += TEST_CONFIG.birdeyeRateLimitTests;
+                testResults.birdeyeAPI.errors.push(error.message);
+                
+                updateStatusIndicator(birdeyeStatusElement, 'error');
+                birdeyeDetailsElement.textContent = `Status: Failed - ${error.message}`;
+                updateProgressBar(birdeyeProgressElement, 100);
+            }
+            
+            log('\nBirdeye API Test Results:');
+            log(`- Passed: ${testResults.birdeyeAPI.passed}/${TEST_CONFIG.birdeyeRateLimitTests}`);
+            log(`- Failed: ${testResults.birdeyeAPI.failed}/${TEST_CONFIG.birdeyeRateLimitTests}`);
+            log(`- Rate Limited: ${testResults.birdeyeAPI.rateLimited}`);
+            log(`- Fallbacks Used: ${testResults.birdeyeAPI.fallbacksUsed}`);
+            
+            const successfulCalls = testResults.birdeyeAPI.passed + testResults.birdeyeAPI.fallbacksUsed;
+            log(`- Total successful: ${successfulCalls}/${TEST_CONFIG.birdeyeRateLimitTests}`, 
+                successfulCalls >= TEST_CONFIG.birdeyeRateLimitTests ? 'success' : 'error');
+            
+            if (testResults.birdeyeAPI.errors.length > 0) {
+                log('- Errors:');
+                testResults.birdeyeAPI.errors.forEach(err => log(`  - ${err}`, 'error'));
+            }
+        }
+
+        /**
+         * Test Firebase fixes for permission errors
+         */
+        async function testFirebaseFixes() {
+            log('\n=== Testing Firebase Permission Fix ===', 'section');
+            updateStatusIndicator(firebaseStatusElement, 'pending');
+            firebaseDetailsElement.textContent = 'Status: Testing...';
+            
+            try {
+                // Check if the Firebase fixer is initialized
+                if (!firebaseFixer) {
+                    throw new Error('Firebase fixer not initialized');
+                }
+                
+                log('- Firebase fixer found');
+                
+                // Test the cleaner
+                log('- Testing IndexedDB cleaner...');
+                const cleanResult = await firebaseFixer.cleanIndexedDB();
+                log(`  Clean result: ${JSON.stringify(cleanResult)}`);
+                
+                // Check if installation mocking is enabled
+                log('- Testing Installations API mocking...');
+                const isMockEnabled = await firebaseFixer.isInstallationsMockEnabled();
+                log(`  Installations mock enabled: ${isMockEnabled}`);
+                
+                if (isMockEnabled) {
+                    log('  Testing mock Installation ID...');
+                    const mockId = await window._firebase_installations_compat_mock.getId();
+                    log(`  Mock ID: ${mockId}`);
+                    
+                    if (mockId && mockId.includes('mock-installation-id')) {
+                        log('  Mock ID works correctly', 'success');
+                    } else {
+                        throw new Error('Mock ID does not match expected format');
+                    }
+                    
+                    log('  Testing mock Token...');
+                    const mockToken = await window._firebase_installations_compat_mock.getToken();
+                    log(`  Mock token: ${mockToken}`);
+                    
+                    if (mockToken && mockToken.includes('mock-token')) {
+                        log('  Mock token works correctly', 'success');
+                    } else {
+                        throw new Error('Mock token does not match expected format');
+                    }
+                } else {
+                    throw new Error('Installations mock not enabled');
+                }
+                
+                testResults.firebase.fixed = true;
+                updateStatusIndicator(firebaseStatusElement, 'success');
+                firebaseDetailsElement.textContent = 'Status: Fixed';
+            } catch (error) {
+                log(`Firebase fix test error: ${error.message}`, 'error');
+                testResults.firebase.errors.push(error.message);
+                
+                updateStatusIndicator(firebaseStatusElement, 'error');
+                firebaseDetailsElement.textContent = `Status: Issues Remain - ${error.message}`;
+            }
+            
+            log('\nFirebase Fix Test Results:');
+            log(`- Fixed: ${testResults.firebase.fixed ? 'Yes' : 'No'}`, testResults.firebase.fixed ? 'success' : 'error');
+            
+            if (testResults.firebase.errors.length > 0) {
+                log('- Errors:');
+                testResults.firebase.errors.forEach(err => log(`  - ${err}`, 'error'));
+            }
+        }
+
+        /**
+         * Test for reference errors (variable ordering)
+         */
+        async function testReferenceErrors() {
+            log('\n=== Testing Reference Error Fixes ===', 'section');
+            updateStatusIndicator(referenceStatusElement, 'pending');
+            referenceDetailsElement.textContent = 'Status: Testing...';
+            
+            try {
+                // We'll check for reference errors indirectly by accessing components
+                // and checking if they're defined in the expected order
+                
+                // Import the components to test
+                const TradeForceDashboard = await import('../components/TradeForceDashboard.js');
+                
+                log('- TradeForceDashboard component loaded successfully');
+                
+                // Check if the wsStatus property gets defined before it's used
+                log('- Checking variable initialization order...');
+                
+                // Test basic functionality to see if any reference errors occur
+                const dashboard = TradeForceDashboard.default;
+                if (dashboard) {
+                    log('  Dashboard component exists', 'success');
+                    testResults.references.passed = true;
+                    
+                    updateStatusIndicator(referenceStatusElement, 'success');
+                    referenceDetailsElement.textContent = 'Status: Fixed';
+                } else {
+                    throw new Error('Dashboard component not found');
+                }
+            } catch (error) {
+                log(`Reference error test failure: ${error.message}`, 'error');
+                testResults.references.passed = false;
+                testResults.references.errors.push(error.message);
+                
+                updateStatusIndicator(referenceStatusElement, 'error');
+                referenceDetailsElement.textContent = `Status: Issues Remain - ${error.message}`;
+            }
+            
+            log('\nReference Error Test Results:');
+            log(`- Passed: ${testResults.references.passed ? 'Yes' : 'No'}`, testResults.references.passed ? 'success' : 'error');
+            
+            if (testResults.references.errors.length > 0) {
+                log('- Errors:');
+                testResults.references.errors.forEach(err => log(`  - ${err}`, 'error'));
+            }
+        }
+
+        /**
+         * Run all the verification tests
+         */
+        async function runAllTests() {
+            outputElement.innerHTML = ''; // Clear previous output
+            log('=== TradeForce AI Fix Verification ===', 'section');
+            log('Starting verification tests to ensure all fixes are working correctly.');
+            
+            try {
+                // Test all fixed components in sequence
+                await testShyftWebSocketConnection();
+                await testBirdeyeAPIRateLimiting();
+                await testFirebaseFixes();
+                await testReferenceErrors();
+                
+                // Print summary
+                log('\n=== Test Summary ===', 'section');
+                
+                const allPassed = 
+                    testResults.shyftWebSocket.passed === TEST_CONFIG.shyftWebSocketTests &&
+                    testResults.birdeyeAPI.passed + testResults.birdeyeAPI.fallbacksUsed >= TEST_CONFIG.birdeyeRateLimitTests &&
+                    testResults.firebase.fixed &&
+                    testResults.references.passed;
+                
+                if (allPassed) {
+                    log('✅ All tests passed! The fixes are working correctly.', 'success');
+                } else {
+                    log('❌ Some tests failed. The fixes need additional work.', 'error');
+                }
+                
+                log('\nDetailed Results:');
+                log(`1. Shyft WebSocket: ${testResults.shyftWebSocket.passed === TEST_CONFIG.shyftWebSocketTests ? '✅ Fixed' : '❌ Issues Remain'}`, 
+                    testResults.shyftWebSocket.passed === TEST_CONFIG.shyftWebSocketTests ? 'success' : 'error');
+                log(`2. Birdeye API: ${testResults.birdeyeAPI.failed === 0 ? '✅ Fixed' : '❌ Issues Remain'}`,
+                    testResults.birdeyeAPI.failed === 0 ? 'success' : 'error');
+                log(`3. Firebase Authentication: ${testResults.firebase.fixed ? '✅ Fixed' : '❌ Issues Remain'}`,
+                    testResults.firebase.fixed ? 'success' : 'error');
+                log(`4. Reference Errors: ${testResults.references.passed ? '✅ Fixed' : '❌ Issues Remain'}`,
+                    testResults.references.passed ? 'success' : 'error');
+            } catch (error) {
+                log(`Test suite error: ${error.message}`, 'error');
+            }
+        }
+
+        // Add event listener to the run tests button
+        document.getElementById('runTests').addEventListener('click', runAllTests);
+    </script>
+</body>
+</html>

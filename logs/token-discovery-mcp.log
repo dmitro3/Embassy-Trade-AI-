@@ -1,0 +1,364 @@
+bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)
+{"level":30,"time":1746495631102,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Server listening at http://127.0.0.1:3100"}
+Token Discovery MCP server running at http://localhost:3100
+Available tools:
+- scan_new_tokens: Scan for new token listings on Solana DEXs
+- analyze_token: Analyze a token for trading potential
+- monitor_token: Add a token to the monitoring watchlist
+- prepare_snipe: Prepare a token sniping transaction
+{"level":30,"time":1746495631103,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Server listening at http://192.168.1.78:3100"}
+{"level":30,"time":1746496531111,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746496531753,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746500285998,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746500286357,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746517515624,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746517516382,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746553640354,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746553641138,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746560810312,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746560810693,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746589642939,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746589644247,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746632881829,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746632882470,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746677658679,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746677661481,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746719687100,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746719688450,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746723651681,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746723652580,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746762773845,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746762774401,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746791963793,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746791966278,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746792863796,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746792864013,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746793763801,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746793764248,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746794663811,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746794664031,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746795562359,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746795562607,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746796462369,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746796462569,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746806227813,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746806228149,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746849174026,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746849175160,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746892681388,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746892682677,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746935575523,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746935576686,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1746979172680,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1746979173611,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747009502794,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747009503986,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747010401708,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747010401933,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747011301713,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747011301944,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747012201724,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747012201933,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747013101736,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747013102182,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747014001747,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747014001962,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747014901762,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747014901983,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747015801773,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747015802008,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747016701781,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747016702006,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747017601790,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747017602035,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747018501791,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747018502015,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747019401793,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747019402020,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747020301794,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747020302218,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747021201795,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747021202013,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747022101810,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747022102035,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747023001811,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747023001997,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747023901821,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747023902030,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747024801830,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747024802036,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747025701843,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747025702296,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747026601846,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747026602281,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747027501859,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747027502032,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747028401868,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747028402104,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747029301869,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747029302540,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747030201877,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747030202083,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747031101884,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747031102314,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747032001894,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747032002338,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747032901909,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747032902132,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747033801912,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747033802345,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747034701918,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747034702143,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747035601920,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747035602156,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747036501934,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747036502153,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747037401936,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747037402357,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747038301946,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747038302162,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747039201956,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747039202381,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747040101964,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747040102187,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747041001974,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747041002416,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747041901986,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747041902408,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747042801997,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747042802218,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747043701984,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747043702200,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747044601931,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747044602380,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747045501894,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747045502324,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747046401866,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747046402293,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747047301855,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747047302084,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747048201849,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747048202081,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747049101836,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747049102059,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747050001835,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747050002072,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747050901830,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747050902043,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747051801835,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747051802869,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747052701831,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747052702032,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747053601833,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747053602067,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747054501831,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747054502064,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747055401844,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747055402082,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747056301848,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747056302056,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747057201856,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747057202069,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747058101856,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747058102290,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747059001865,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747059002102,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747059901867,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747059902100,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747060801881,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747060802355,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747061701880,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747061702106,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747062601881,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747062602079,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747063501885,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747063502101,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747064401891,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747064402117,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747065301892,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747065302149,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747066201899,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747066202107,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747067101904,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747067102151,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747068001910,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747068002165,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747068901925,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747068902167,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747069801937,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747069802161,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747070701943,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747070702146,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747071601956,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747071602181,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747072501972,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747072502436,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747073401977,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747073402428,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747074301991,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747074302320,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747075201988,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747075202224,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747076101924,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747076102130,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747077001877,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747077002098,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747077901840,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747077902047,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747078801824,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747078802041,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747079701801,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747079702003,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747080601795,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747080602250,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747081501780,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747081502013,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747082401776,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747082402004,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747083301767,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747083302007,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747084201766,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747084201997,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747085101774,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747085101984,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747086001779,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747086001995,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747086901777,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747086901981,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747087801775,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747087801990,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747088701783,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747088702026,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747089601780,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747089602005,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747090501776,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747090501977,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747091401778,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747091401992,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747092301784,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747092302036,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747093201789,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747093202237,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747094101788,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747094101982,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747095001797,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747095002075,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747095901801,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747095902050,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747096801805,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747096802080,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747097701802,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747097702011,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747098601807,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747098602431,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747099501811,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747099502031,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747100401821,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747100402286,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747101301821,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747101302049,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747102201828,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747102202035,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747103101825,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747103102077,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747104001826,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747104002026,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747104901823,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747104902302,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747105801826,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747105802049,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747106701837,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747106702058,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747107601838,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747107602330,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747108501827,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747108502039,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747109401797,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747109402011,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747110301783,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747110302006,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747111201765,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747111201979,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747112101757,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747112102187,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747113001753,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747113001981,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747113901747,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747113901947,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747114801749,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747114801948,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747115701745,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747115701965,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747116601743,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747116601954,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747117501745,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747117501940,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747118401744,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747118402175,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747119301744,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747119302125,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747120201744,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747120202173,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747121101746,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747121101956,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747122001752,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747122001955,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747122901749,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747122902206,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747123801754,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747123802206,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747124701762,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747124702183,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747125601766,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747125601970,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747126501773,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747126502189,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747127401773,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747127402250,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747128301775,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747128301968,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747129201776,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747129202194,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747130101785,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747130102036,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747131001792,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747131002015,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747131901794,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747131902235,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747132801801,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747132802008,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747133701798,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747133702013,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747134601806,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747134602013,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747135501803,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747135502027,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747136401813,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747136402259,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747137301822,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747137302272,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747138201822,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747138202066,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747139101832,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747139102155,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747140001830,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747140002033,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747140901829,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747140902014,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747141801809,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747141802407,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747142701789,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747142702262,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747143601780,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747143601992,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747144501779,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747144501982,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747145401779,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747145401973,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747146301773,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747146302000,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747147201777,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747147203244,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+{"level":30,"time":1747148101772,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Scanning for new tokens: timeframe=1h, minLiquidity=5000, limit=20"}
+{"level":50,"time":1747148102750,"pid":20868,"hostname":"DESKTOP-KPL620K","msg":"Error scanning for new tokens: Request failed with status code 401"}
+^C
