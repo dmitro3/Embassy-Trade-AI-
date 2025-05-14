@@ -9,6 +9,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { burnEMBTokens } from '../lib/mcpService'; // Import MCP service
 import PokerGame from './PokerGame'; // Import the PokerGame component
+import ArcadeTetris from './ArcadeTetris'; // Import the new Tetris game
 import CompetitiveMatch from './CompetitiveMatch'; // Import the CompetitiveMatch component
 import ArcadeLeaderboard from './ArcadeLeaderboard'; // Import the ArcadeLeaderboard component
 import ArcadeNotification from './ArcadeNotification'; // Import the ArcadeNotification component

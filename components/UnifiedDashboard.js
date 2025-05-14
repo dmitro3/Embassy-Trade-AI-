@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   Button, 
-  Card, 
-  CardContent, 
   CircularProgress, 
   Divider, 
   Grid, 
@@ -13,49 +11,33 @@ import {
   Tab, 
   Tabs, 
   Typography,
-  Chip,
-  IconButton,
-  Tooltip,
   useTheme
 } from '@mui/material';
 import {
-  MoreVert,
   TrendingUp,
   TrendingDown,
-  AccessTime,
   AttachMoney,
   Speed,
-  BarChart,
   Timeline,
   ShowChart,
-  Analytics,
-  Tune,
-  Visibility,
-  Check,
-  Warning,
+  Refresh,
+  AccountBalanceWallet
 } from '@mui/icons-material';
 import { 
   LineChart, 
   Line, 
-  BarChart as RechartsBarChart,
-  Bar,
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip as RechartsTooltip, 
-  Legend,
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar
+  Cell
 } from 'recharts';
-import tokenDiscoveryMCP from '../mcp/token-discovery-mcp/integration.js';
 import logger from '../lib/logger.js';
+import HistoricalPerformanceAnalysis from './HistoricalPerformanceAnalysis.js';
+import WalletConnectionManager from './WalletConnectionManager.js';
 
 /**
  * Unified Dashboard Component
@@ -71,32 +53,7 @@ const UnifiedDashboard = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [timeRange, setTimeRange] = useState('1w');
   const [refreshInterval, setRefreshInterval] = useState(60000); // 1 minute
-  
-  // Token discovery metrics
-  const [discoveryMetrics, setDiscoveryMetrics] = useState({
-    totalTokensDiscovered: 0,
-    highOpportunityTokens: 0,
-    lowRiskTokens: 0,
-    recentDiscoveries: [],
-    opportunityDistribution: [],
-    riskDistribution: [],
-    sourceDistribution: [],
-    discoveryTrend: []
-  });
-  
-  // Trading metrics
-  const [tradingMetrics, setTradingMetrics] = useState({
-    activeStrategies: 0,
-    activePositions: 0,
-    totalPnL: 0,
-    dailyPnL: 0,
-    winRate: 0,
-    averageReturn: 0,
-    recentTrades: [],
-    pnlTrend: [],
-    strategyPerformance: [],
-    positionSummary: []
-  });
+  const [showWalletManager, setShowWalletManager] = useState(false);
   
   // Portfolio metrics
   const [portfolioMetrics, setPortfolioMetrics] = useState({
@@ -106,16 +63,6 @@ const UnifiedDashboard = () => {
     allocationDistribution: [],
     valueHistory: [],
     topHoldings: []
-  });
-  
-  // Market metrics
-  const [marketMetrics, setMarketMetrics] = useState({
-    totalMarketCap: 0,
-    solPrice: 0,
-    marketSentiment: 'neutral',
-    trendingTokens: [],
-    marketTrends: [],
-    globalRiskScore: 5
   });
   
   // Auto refresh dashboard
@@ -137,18 +84,8 @@ const UnifiedDashboard = () => {
     setLoading(true);
     
     try {
-      // Fetch data in parallel for better performance
-      const [discoveryData, tradingData, portfolioData, marketData] = await Promise.all([
-        fetchDiscoveryMetrics(),
-        fetchTradingMetrics(),
-        fetchPortfolioMetrics(),
-        fetchMarketMetrics()
-      ]);
-      
-      setDiscoveryMetrics(discoveryData);
-      setTradingMetrics(tradingData);
+      const portfolioData = await fetchPortfolioMetrics();
       setPortfolioMetrics(portfolioData);
-      setMarketMetrics(marketData);
     } catch (error) {
       logger.error(`Error fetching dashboard data: ${error.message}`);
     } finally {
@@ -156,137 +93,10 @@ const UnifiedDashboard = () => {
     }
   };
   
-  // Fetch token discovery metrics
-  const fetchDiscoveryMetrics = async () => {
-    try {
-      // In a production environment, these would be fetched from your MCP server
-      // For now, we'll use mock data that reflects what your API would return
-      
-      // Simulate API call
-      // const response = await tokenDiscoveryMCP.getDashboardMetrics(timeRange);
-      
-      // Mock data
-      const mockData = {
-        totalTokensDiscovered: 347,
-        highOpportunityTokens: 28,
-        lowRiskTokens: 42,
-        recentDiscoveries: [
-          { timestamp: '2025-04-26T08:30:00Z', tokenSymbol: 'HAWK', tokenName: 'Hawksight', opportunityScore: 87, riskScore: 3, source: 'birdeye' },
-          { timestamp: '2025-04-26T07:15:00Z', tokenSymbol: 'PIXEL', tokenName: 'Pixel Protocol', opportunityScore: 79, riskScore: 4, source: 'dexscreener' },
-          { timestamp: '2025-04-26T05:45:00Z', tokenSymbol: 'REALM', tokenName: 'Realm Games', opportunityScore: 81, riskScore: 5, source: 'birdeye' },
-          { timestamp: '2025-04-26T02:20:00Z', tokenSymbol: 'SHDW', tokenName: 'Shadow Finance', opportunityScore: 75, riskScore: 3, source: 'pumpfun' },
-          { timestamp: '2025-04-25T22:10:00Z', tokenSymbol: 'WARP', tokenName: 'Warp Protocol', opportunityScore: 82, riskScore: 4, source: 'birdeye' }
-        ],
-        opportunityDistribution: [
-          { range: '0-20', count: 42 },
-          { range: '21-40', count: 78 },
-          { range: '41-60', count: 124 },
-          { range: '61-80', count: 87 },
-          { range: '81-100', count: 16 }
-        ],
-        riskDistribution: [
-          { level: 'Very Low (1-2)', count: 24, color: '#4caf50' },
-          { level: 'Low (3-4)', count: 65, color: '#8bc34a' },
-          { level: 'Moderate (5-6)', count: 123, color: '#ffc107' },
-          { level: 'High (7-8)', count: 86, color: '#ff9800' },
-          { level: 'Very High (9-10)', count: 49, color: '#f44336' }
-        ],
-        sourceDistribution: [
-          { name: 'BirdEye', value: 156, color: '#2196f3' },
-          { name: 'DexScreener', value: 112, color: '#9c27b0' },
-          { name: 'PumpFun', value: 79, color: '#ff9800' }
-        ],
-        discoveryTrend: [
-          { date: '2025-04-20', count: 28 },
-          { date: '2025-04-21', count: 35 },
-          { date: '2025-04-22', count: 42 },
-          { date: '2025-04-23', count: 31 },
-          { date: '2025-04-24', count: 45 },
-          { date: '2025-04-25', count: 58 },
-          { date: '2025-04-26', count: 34 }
-        ]
-      };
-      
-      return mockData;
-    } catch (error) {
-      logger.error(`Error fetching discovery metrics: ${error.message}`);
-      return {
-        totalTokensDiscovered: 0,
-        highOpportunityTokens: 0,
-        lowRiskTokens: 0,
-        recentDiscoveries: [],
-        opportunityDistribution: [],
-        riskDistribution: [],
-        sourceDistribution: [],
-        discoveryTrend: []
-      };
-    }
-  };
-  
-  // Fetch trading metrics
-  const fetchTradingMetrics = async () => {
-    try {
-      // Mock data - would be fetched from your trading MCP service
-      const mockData = {
-        activeStrategies: 4,
-        activePositions: 7,
-        totalPnL: 12.34,
-        dailyPnL: 0.87,
-        winRate: 64.2,
-        averageReturn: 8.7,
-        recentTrades: [
-          { timestamp: '2025-04-26T09:15:00Z', tokenSymbol: 'HAWK', type: 'buy', amount: 0.5, price: 0.000245, status: 'completed' },
-          { timestamp: '2025-04-26T08:32:00Z', tokenSymbol: 'GFI', type: 'sell', amount: 0.3, price: 0.00178, status: 'completed', profit: 0.12 },
-          { timestamp: '2025-04-25T22:45:00Z', tokenSymbol: 'PIXEL', type: 'buy', amount: 0.4, price: 0.0015, status: 'completed' },
-          { timestamp: '2025-04-25T18:20:00Z', tokenSymbol: 'REALM', type: 'sell', amount: 0.6, price: 0.0022, status: 'completed', profit: -0.08 },
-          { timestamp: '2025-04-25T15:10:00Z', tokenSymbol: 'SHDW', type: 'buy', amount: 0.25, price: 0.00075, status: 'completed' }
-        ],
-        pnlTrend: [
-          { date: '2025-04-20', pnl: 1.2 },
-          { date: '2025-04-21', pnl: -0.4 },
-          { date: '2025-04-22', pnl: 0.8 },
-          { date: '2025-04-23', pnl: 1.5 },
-          { date: '2025-04-24', pnl: 2.3 },
-          { date: '2025-04-25', pnl: -0.7 },
-          { date: '2025-04-26', pnl: 0.87 }
-        ],
-        strategyPerformance: [
-          { name: 'High Opportunity Score', winRate: 72, pnl: 4.8, trades: 18, roi: 12.4 },
-          { name: 'New Token Sniper', winRate: 58, pnl: 5.2, trades: 12, roi: 18.2 },
-          { name: 'Momentum Chaser', winRate: 61, pnl: 2.1, trades: 9, roi: 7.5 },
-          { name: 'Whale Tracker', winRate: 45, pnl: 0.24, trades: 6, roi: 2.1 }
-        ],
-        positionSummary: [
-          { tokenSymbol: 'HAWK', entryPrice: 0.000245, currentPrice: 0.000278, pnlPercent: 13.47, pnlValue: 0.17 },
-          { tokenSymbol: 'GFI', entryPrice: 0.00187, currentPrice: 0.00163, pnlPercent: -12.83, pnlValue: -0.08 },
-          { tokenSymbol: 'PIXEL', entryPrice: 0.0015, currentPrice: 0.00162, pnlPercent: 8.0, pnlValue: 0.05 },
-          { tokenSymbol: 'REALM', entryPrice: 0.00215, currentPrice: 0.0024, pnlPercent: 11.63, pnlValue: 0.12 },
-          { tokenSymbol: 'SHDW', entryPrice: 0.00075, currentPrice: 0.00077, pnlPercent: 2.67, pnlValue: 0.01 }
-        ]
-      };
-      
-      return mockData;
-    } catch (error) {
-      logger.error(`Error fetching trading metrics: ${error.message}`);
-      return {
-        activeStrategies: 0,
-        activePositions: 0,
-        totalPnL: 0,
-        dailyPnL: 0,
-        winRate: 0,
-        averageReturn: 0,
-        recentTrades: [],
-        pnlTrend: [],
-        strategyPerformance: [],
-        positionSummary: []
-      };
-    }
-  };
-  
   // Fetch portfolio metrics
   const fetchPortfolioMetrics = async () => {
     try {
-      // Mock data - would be fetched from your portfolio service
+      // Mock data
       const mockData = {
         totalValue: 24.56,
         solBalance: 15.32,
@@ -329,47 +139,6 @@ const UnifiedDashboard = () => {
     }
   };
   
-  // Fetch market metrics
-  const fetchMarketMetrics = async () => {
-    try {
-      // Mock data - would be fetched from your market data service
-      const mockData = {
-        totalMarketCap: 4.2, // trillion
-        solPrice: 128.9,
-        marketSentiment: 'bullish',
-        trendingTokens: [
-          { tokenSymbol: 'HAWK', tokenName: 'Hawksight', priceChangePercent: 12.4 },
-          { tokenSymbol: 'BONK', tokenName: 'Bonk', priceChangePercent: 8.2 },
-          { tokenSymbol: 'JTO', tokenName: 'Jito', priceChangePercent: 6.8 },
-          { tokenSymbol: 'PYTH', tokenName: 'Pyth Network', priceChangePercent: 5.3 },
-          { tokenSymbol: 'MEAN', tokenName: 'Mean DAO', priceChangePercent: 4.9 }
-        ],
-        marketTrends: [
-          { date: '2025-04-20', solPrice: 121.4, marketCap: 4.05 },
-          { date: '2025-04-21', solPrice: 122.8, marketCap: 4.08 },
-          { date: '2025-04-22', solPrice: 124.5, marketCap: 4.11 },
-          { date: '2025-04-23', solPrice: 123.7, marketCap: 4.09 },
-          { date: '2025-04-24', solPrice: 125.6, marketCap: 4.14 },
-          { date: '2025-04-25', solPrice: 127.2, marketCap: 4.17 },
-          { date: '2025-04-26', solPrice: 128.9, marketCap: 4.2 }
-        ],
-        globalRiskScore: 4.2
-      };
-      
-      return mockData;
-    } catch (error) {
-      logger.error(`Error fetching market metrics: ${error.message}`);
-      return {
-        totalMarketCap: 0,
-        solPrice: 0,
-        marketSentiment: 'neutral',
-        trendingTokens: [],
-        marketTrends: [],
-        globalRiskScore: 5
-      };
-    }
-  };
-  
   // Handle tab change
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -381,617 +150,423 @@ const UnifiedDashboard = () => {
     fetchDashboardData();
   };
   
-  // Format number with K/M/B suffix
-  const formatNumber = (num) => {
-    if (num >= 1000000000) {
-      return (num / 1000000000).toFixed(1) + 'B';
-    }
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
-    }
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toString();
-  };
-  
-  // Get color based on value (positive/negative)
-  const getValueColor = (value) => {
-    if (value > 0) return 'success.main';
-    if (value < 0) return 'error.main';
-    return 'text.secondary';
-  };
-  
-  // Get risk color based on score (0-10)
-  const getRiskColor = (score) => {
-    if (score <= 3) return '#4caf50';
-    if (score <= 6) return '#ff9800';
-    return '#f44336';
-  };
-  
-  // Dashboard header with key metrics
-  const renderDashboardHeader = () => {
+  // Token discovery section
+  const renderDiscoveryTab = () => {
+    const [tokens, setTokens] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+      const fetchTokens = async () => {
+        try {
+          setLoading(true);
+          // Use MCP client to fetch tokens from DEXScreener MCP server
+          const response = await fetch('/api/tradeforce/tokens');
+          const data = await response.json();
+          
+          if (data && data.tokens && Array.isArray(data.tokens)) {
+            setTokens(data.tokens);
+          } else if (data && Array.isArray(data)) {
+            setTokens(data);
+          } else {
+            logger.error('Invalid token data format received');
+            setTokens([]);
+          }
+        } catch (error) {
+          logger.error(`Error fetching tokens: ${error.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      fetchTokens();
+      const interval = setInterval(fetchTokens, 60000); // Refresh every minute
+      
+      return () => clearInterval(interval);
+    }, []);
+    
     return (
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        {/* Total Portfolio Value */}
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="subtitle2" color="text.secondary">Portfolio Value</Typography>
-              <AttachMoney color="primary" />
-            </Box>
-            <Box mt={1}>
-              <Typography variant="h4">{portfolioMetrics.totalValue.toFixed(2)} SOL</Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  color: portfolioMetrics.valueHistory.length >= 2 
-                    ? getValueColor(portfolioMetrics.valueHistory[portfolioMetrics.valueHistory.length - 1].value - 
-                                  portfolioMetrics.valueHistory[portfolioMetrics.valueHistory.length - 2].value)
-                    : 'text.secondary'
-                }}
-              >
-                {portfolioMetrics.valueHistory.length >= 2 && (
-                  portfolioMetrics.valueHistory[portfolioMetrics.valueHistory.length - 1].value > 
-                  portfolioMetrics.valueHistory[portfolioMetrics.valueHistory.length - 2].value
-                    ? <TrendingUp fontSize="small" sx={{ mr: 0.5 }} />
-                    : <TrendingDown fontSize="small" sx={{ mr: 0.5 }} />
-                )}
-                {portfolioMetrics.valueHistory.length >= 2
-                  ? ((portfolioMetrics.valueHistory[portfolioMetrics.valueHistory.length - 1].value - 
-                     portfolioMetrics.valueHistory[portfolioMetrics.valueHistory.length - 2].value) /
-                     portfolioMetrics.valueHistory[portfolioMetrics.valueHistory.length - 2].value * 100).toFixed(2) + '% today'
-                  : '0% change'
-                }
-              </Typography>
-            </Box>
-          </Paper>
-        </Grid>
+      <Box>
+        <Typography variant="h6" gutterBottom>Token Discovery</Typography>
         
-        {/* Total P&L */}
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="subtitle2" color="text.secondary">Total P&L</Typography>
-              <ShowChart color="primary" />
-            </Box>
-            <Box mt={1}>
-              <Typography 
-                variant="h4" 
-                color={getValueColor(tradingMetrics.totalPnL)}
-              >
-                {tradingMetrics.totalPnL >= 0 ? '+' : ''}{tradingMetrics.totalPnL.toFixed(2)} SOL
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  color: getValueColor(tradingMetrics.dailyPnL)
-                }}
-              >
-                {tradingMetrics.dailyPnL >= 0 
-                  ? <TrendingUp fontSize="small" sx={{ mr: 0.5 }} /> 
-                  : <TrendingDown fontSize="small" sx={{ mr: 0.5 }} />
-                }
-                {tradingMetrics.dailyPnL >= 0 ? '+' : ''}{tradingMetrics.dailyPnL.toFixed(2)} SOL today
-              </Typography>
-            </Box>
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height={200}>
+            <CircularProgress />
+          </Box>
+        ) : tokens.length === 0 ? (
+          <Paper sx={{ p: 3, textAlign: 'center', bgcolor: 'rgba(255, 193, 7, 0.1)' }}>
+            <Typography color="warning.main">
+              Scanning for tokens matching your strategy criteria...
+            </Typography>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              sx={{ mt: 2 }}
+              onClick={() => setLoading(true)}
+            >
+              Refresh Scan
+            </Button>
           </Paper>
-        </Grid>
-        
-        {/* Win Rate */}
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="subtitle2" color="text.secondary">Win Rate</Typography>
-              <Timeline color="primary" />
-            </Box>
-            <Box mt={1}>
-              <Typography variant="h4">{tradingMetrics.winRate.toFixed(1)}%</Typography>
-              <Typography 
-                variant="body2" 
-                color="text.secondary"
-              >
-                {tradingMetrics.activePositions} active positions
-              </Typography>
-            </Box>
-          </Paper>
-        </Grid>
-        
-        {/* Market Sentiment */}
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="subtitle2" color="text.secondary">Market Sentiment</Typography>
-              <Speed color="primary" />
-            </Box>
-            <Box mt={1}>
-              <Typography variant="h4" sx={{ textTransform: 'capitalize' }}>
-                {marketMetrics.marketSentiment}
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  color: marketMetrics.solPrice >= 120 ? 'success.main' : 'text.secondary'
-                }}
-              >
-                SOL: ${marketMetrics.solPrice.toFixed(2)}
-              </Typography>
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
-    );
-  };
-  
-  // Token discovery overview section
-  const renderDiscoveryOverview = () => {
-    return (
-      <Grid container spacing={3}>
-        {/* Discovery Stats */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Discovery Overview</Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Box textAlign="center">
-                  <Typography variant="h4">{discoveryMetrics.totalTokensDiscovered}</Typography>
-                  <Typography variant="body2" color="text.secondary">Total Tokens</Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={4}>
-                <Box textAlign="center">
-                  <Typography variant="h4" color="primary.main">{discoveryMetrics.highOpportunityTokens}</Typography>
-                  <Typography variant="body2" color="text.secondary">High Opp.</Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={4}>
-                <Box textAlign="center">
-                  <Typography variant="h4" color="success.main">{discoveryMetrics.lowRiskTokens}</Typography>
-                  <Typography variant="body2" color="text.secondary">Low Risk</Typography>
-                </Box>
-              </Grid>
-            </Grid>
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <Typography variant="subtitle2" gutterBottom>Recent Discoveries</Typography>
-            {discoveryMetrics.recentDiscoveries.slice(0, 4).map((token, index) => (
-              <Box 
-                key={index}
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
-                  mb: 1,
-                  py: 0.5,
-                  borderBottom: index < 3 ? `1px solid ${theme.palette.divider}` : 'none'
-                }}
-              >
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {token.tokenSymbol}
+        ) : (
+          <Grid container spacing={2}>
+            {tokens.map((token, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Paper sx={{ p: 2, height: '100%', cursor: 'pointer', '&:hover': { boxShadow: 6 } }}>
+                  <Box display="flex" alignItems="center" mb={1}>
+                    <Box 
+                      component="img" 
+                      src={token.logoURI || '/token-placeholder.png'} 
+                      alt={token.symbol}
+                      sx={{ width: 32, height: 32, mr: 1, borderRadius: '50%' }}
+                    />
+                    <Typography variant="h6">{token.symbol}</Typography>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    {token.name}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {token.tokenName}
-                  </Typography>
-                </Box>
-                <Box display="flex" alignItems="center">
-                  <Chip 
-                    label={`Opp: ${token.opportunityScore}`} 
-                    size="small"
-                    color="primary"
-                    sx={{ mr: 1 }}
-                  />
-                  <Chip 
-                    label={`Risk: ${token.riskScore}`}
-                    size="small"
-                    sx={{ 
-                      bgcolor: getRiskColor(token.riskScore),
-                      color: 'white'
-                    }}
-                  />
-                </Box>
-              </Box>
+                  <Divider sx={{ my: 1 }} />
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2">Price:</Typography>
+                    <Typography variant="body2" fontWeight="bold">${token.price.toFixed(6)}</Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2">24h Volume:</Typography>
+                    <Typography variant="body2" fontWeight="bold">${token.volume24h.toLocaleString()}</Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body2">24h Change:</Typography>
+                    <Typography 
+                      variant="body2" 
+                      fontWeight="bold"
+                      color={token.priceChangePercent?.h24 > 0 ? 'success.main' : 'error.main'}
+                    >
+                      {token.priceChangePercent?.h24 > 0 ? '+' : ''}{token.priceChangePercent?.h24.toFixed(2)}%
+                    </Typography>
+                  </Box>
+                  {token.patterns && (
+                    <Box mt={1}>
+                      {token.patterns.cupAndHandle?.detected && (
+                        <Typography variant="body2" color="success.main">
+                          Cup and Handle Pattern ({(token.patterns.cupAndHandle.confidence * 100).toFixed(0)}%)
+                        </Typography>
+                      )}
+                      {token.patterns.bullFlag?.detected && (
+                        <Typography variant="body2" color="success.main">
+                          Bull Flag Pattern ({(token.patterns.bullFlag.confidence * 100).toFixed(0)}%)
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+                </Paper>
+              </Grid>
             ))}
-          </Paper>
-        </Grid>
-        
-        {/* Discovery Trend Chart */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Discovery Trend</Typography>
-            <Box height={250}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={discoveryMetrics.discoveryTrend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Line type="monotone" dataKey="count" stroke="#2196f3" activeDot={{ r: 8 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </Box>
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <Typography variant="subtitle2" gutterBottom>Source Distribution</Typography>
-            <Box height={150}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={discoveryMetrics.sourceDistribution}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={60}
-                    dataKey="value"
-                    nameKey="name"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {discoveryMetrics.sourceDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </Box>
-          </Paper>
-        </Grid>
-        
-        {/* Risk Distribution */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Risk Assessment</Typography>
-            <Box height={250}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={discoveryMetrics.riskDistribution}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="level" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Bar dataKey="count">
-                    {discoveryMetrics.riskDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <Typography variant="subtitle2" gutterBottom>Opportunity Distribution</Typography>
-            <Box height={150}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={discoveryMetrics.opportunityDistribution}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="range" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Bar dataKey="count" fill="#2196f3" />
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
+          </Grid>
+        )}
+      </Box>
     );
   };
   
-  // Trading performance section
-  const renderTradingPerformance = () => {
-    return (
-      <Grid container spacing={3} mt={2}>
-        {/* PnL Trend Chart */}
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>P&L Performance</Typography>
-            <Box height={300}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={tradingMetrics.pnlTrend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="pnl" 
-                    stroke="#4caf50"
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </Box>
-          </Paper>
-        </Grid>
+  // Trading section
+  const renderTradingTab = () => {
+    const [botActive, setBotActive] = useState(false);
+    const [tradingLogs, setTradingLogs] = useState([]);
+    
+    const startBot = async () => {
+      try {
+        setBotActive(true);
+        // Call the RoundTable AI analysis endpoint
+        const response = await fetch('/api/tradeforce/roundTable', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ activate: true }),
+        });
         
-        {/* Strategy Performance */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Strategy Performance</Typography>
-            <Box sx={{ overflowY: 'auto', maxHeight: 300 }}>
-              {tradingMetrics.strategyPerformance.map((strategy, index) => (
-                <Card 
+        const result = await response.json();
+        
+        // Add log entry
+        setTradingLogs(prev => [
+          {
+            timestamp: new Date().toISOString(),
+            message: `Bot started: ${result.message || 'RoundTable AI analysis activated'}`,
+            type: 'info'
+          },
+          ...prev
+        ]);
+        
+        // Start polling for bot status and logs
+        pollBotStatus();
+      } catch (error) {
+        logger.error(`Error starting bot: ${error.message}`);
+        setBotActive(false);
+        
+        // Add error log
+        setTradingLogs(prev => [
+          {
+            timestamp: new Date().toISOString(),
+            message: `Error: ${error.message}`,
+            type: 'error'
+          },
+          ...prev
+        ]);
+      }
+    };
+    
+    const stopBot = () => {
+      setBotActive(false);
+      
+      // Add log entry
+      setTradingLogs(prev => [
+        {
+          timestamp: new Date().toISOString(),
+          message: 'Bot stopped by user',
+          type: 'info'
+        },
+        ...prev
+      ]);
+    };
+    
+    const pollBotStatus = async () => {
+      try {
+        const response = await fetch('/api/tradeforce/bot');
+        const data = await response.json();
+        
+        if (data.logs && Array.isArray(data.logs)) {
+          // Update logs with new entries
+          setTradingLogs(prev => {
+            const newLogs = data.logs.filter(log => 
+              !prev.some(existingLog => 
+                existingLog.timestamp === log.timestamp && existingLog.message === log.message
+              )
+            );
+            
+            return [...newLogs, ...prev];
+          });
+        }
+        
+        // Continue polling if bot is active
+        if (botActive) {
+          setTimeout(pollBotStatus, 5000);
+        }
+      } catch (error) {
+        logger.error(`Error polling bot status: ${error.message}`);
+      }
+    };
+    
+    const formatTimestamp = (timestamp) => {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString();
+    };
+    
+    return (
+      <Box>
+        <Typography variant="h6" gutterBottom>Trading Bot</Typography>
+        
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box>
+              <Typography variant="h6" gutterBottom>RoundTable AI Trading</Typography>
+              <Typography variant="body2" color="text.secondary">
+                The RoundTable AI trading system uses multiple AI agents to analyze market conditions and execute trades.
+              </Typography>
+            </Box>
+            <Button 
+              variant="contained" 
+              color={botActive ? "error" : "success"}
+              size="large"
+              onClick={botActive ? stopBot : startBot}
+              startIcon={botActive ? <Speed /> : <TrendingUp />}
+            >
+              {botActive ? "Stop Bot" : "Start Bot"}
+            </Button>
+          </Box>
+          
+          {botActive && (
+            <Box mt={2} p={1} bgcolor="rgba(76, 175, 80, 0.1)" borderRadius={1}>
+              <Typography variant="body2" color="success.main">
+                Bot is running - Analyzing market conditions and looking for trading opportunities
+              </Typography>
+            </Box>
+          )}
+        </Paper>
+        
+        <Paper sx={{ p: 2 }}>
+          <Typography variant="subtitle1" gutterBottom>Bot Logs</Typography>
+          <Box 
+            sx={{ 
+              height: 300, 
+              overflowY: 'auto', 
+              bgcolor: 'background.paper', 
+              p: 1,
+              borderRadius: 1,
+              border: '1px solid',
+              borderColor: 'divider',
+              fontFamily: 'monospace',
+              fontSize: '0.875rem'
+            }}
+          >
+            {tradingLogs.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
+                No logs yet. Start the bot to begin trading.
+              </Typography>
+            ) : (
+              tradingLogs.map((log, index) => (
+                <Box 
                   key={index} 
-                  variant="outlined" 
                   sx={{ 
-                    mb: 1.5, 
-                    boxShadow: 'none', 
-                    borderLeft: '4px solid', 
-                    borderLeftColor: strategy.pnl >= 0 ? '#4caf50' : '#f44336' 
+                    py: 0.5, 
+                    borderBottom: index < tradingLogs.length - 1 ? '1px solid' : 'none',
+                    borderColor: 'divider',
+                    color: log.type === 'error' ? 'error.main' : 
+                           log.type === 'success' ? 'success.main' : 'text.primary'
                   }}
                 >
-                  <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-                    <Typography variant="subtitle2">{strategy.name}</Typography>
-                    <Grid container spacing={1} sx={{ mt: 0.5 }}>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" color="text.secondary">Win Rate</Typography>
-                        <Typography variant="body2">{strategy.winRate}%</Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" color="text.secondary">PnL</Typography>
-                        <Typography 
-                          variant="body2" 
-                          color={strategy.pnl >= 0 ? 'success.main' : 'error.main'}
-                        >
-                          {strategy.pnl >= 0 ? '+' : ''}{strategy.pnl.toFixed(2)} SOL
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" color="text.secondary">Trades</Typography>
-                        <Typography variant="body2">{strategy.trades}</Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" color="text.secondary">ROI</Typography>
-                        <Typography 
-                          variant="body2"
-                          color={strategy.roi >= 0 ? 'success.main' : 'error.main'}
-                        >
-                          {strategy.roi >= 0 ? '+' : ''}{strategy.roi.toFixed(1)}%
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              ))}
-            </Box>
-          </Paper>
-        </Grid>
-        
-        {/* Active Positions */}
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h6">Active Positions</Typography>
-              <Button size="small" variant="outlined">View All</Button>
-            </Box>
-            <Grid container spacing={2}>
-              {tradingMetrics.positionSummary.map((position, index) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                  <Card variant="outlined" sx={{ boxShadow: 'none' }}>
-                    <CardContent>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                        <Typography variant="h6">{position.tokenSymbol}</Typography>
-                        <Typography 
-                          variant="body1" 
-                          color={position.pnlPercent >= 0 ? 'success.main' : 'error.main'}
-                          sx={{ fontWeight: 'medium' }}
-                        >
-                          {position.pnlPercent >= 0 ? '+' : ''}{position.pnlPercent.toFixed(2)}%
-                        </Typography>
-                      </Box>
-                      <Grid container spacing={1}>
-                        <Grid item xs={6}>
-                          <Typography variant="caption" color="text.secondary">Entry</Typography>
-                          <Typography variant="body2">${position.entryPrice.toFixed(6)}</Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography variant="caption" color="text.secondary">Current</Typography>
-                          <Typography variant="body2">${position.currentPrice.toFixed(6)}</Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Typography variant="caption" color="text.secondary">P&L</Typography>
-                          <Typography 
-                            variant="body2" 
-                            color={position.pnlValue >= 0 ? 'success.main' : 'error.main'}
-                          >
-                            {position.pnlValue >= 0 ? '+' : ''}{position.pnlValue.toFixed(2)} SOL
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Paper>
-        </Grid>
-      </Grid>
+                  <Typography variant="body2" component="span" color="text.secondary">
+                    [{formatTimestamp(log.timestamp)}]
+                  </Typography>{' '}
+                  <Typography variant="body2" component="span">
+                    {log.message}
+                  </Typography>
+                </Box>
+              ))
+            )}
+          </Box>
+        </Paper>
+      </Box>
     );
   };
   
   // Portfolio overview section
-  const renderPortfolioOverview = () => {
+  const renderPortfolioTab = () => {
     return (
-      <Grid container spacing={3} mt={2}>
-        {/* Portfolio Value Chart */}
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Portfolio Value Trend</Typography>
-            <Box height={300}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={portfolioMetrics.valueHistory}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Line type="monotone" dataKey="value" stroke="#9c27b0" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </Box>
-          </Paper>
-        </Grid>
+      <Box>
+        {/* Historical Performance Analysis */}
+        <Box mb={3}>
+          <HistoricalPerformanceAnalysis />
+        </Box>
         
-        {/* Portfolio Allocation */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Portfolio Allocation</Typography>
-            <Box height={250}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={portfolioMetrics.allocationDistribution}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    dataKey="value"
-                    nameKey="name"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {portfolioMetrics.allocationDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </Box>
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <Typography variant="subtitle2" gutterBottom>Top Holdings</Typography>
-            {portfolioMetrics.topHoldings.slice(0, 4).map((holding, index) => (
-              <Box 
-                key={index}
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
-                  mb: 1,
-                  py: 0.5,
-                  borderBottom: index < 3 ? `1px solid ${theme.palette.divider}` : 'none'
-                }}
-              >
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {holding.tokenSymbol}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {holding.amount.toLocaleString()}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body2">${holding.valueUSD.toFixed(2)}</Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right' }}>
-                    {holding.percentOfPortfolio.toFixed(1)}%
-                  </Typography>
-                </Box>
+        <Grid container spacing={3}>
+          {/* Portfolio Value Chart */}
+          <Grid item xs={12} md={8}>
+            <Paper sx={{ p: 2, height: '100%' }}>
+              <Typography variant="h6" gutterBottom>Portfolio Value Trend</Typography>
+              <Box height={300}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={portfolioMetrics.valueHistory}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Line type="monotone" dataKey="value" stroke="#9c27b0" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
               </Box>
-            ))}
-          </Paper>
+            </Paper>
+          </Grid>
+          
+          {/* Portfolio Allocation */}
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 2, height: '100%' }}>
+              <Typography variant="h6" gutterBottom>Portfolio Allocation</Typography>
+              <Box height={250}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={portfolioMetrics.allocationDistribution}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      dataKey="value"
+                      nameKey="name"
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {portfolioMetrics.allocationDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     );
   };
   
   // Market overview section
-  const renderMarketOverview = () => {
+  const renderMarketTab = () => {
     return (
-      <Grid container spacing={3} mt={2}>
-        {/* Market Trends */}
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Market Trends</Typography>
-            <Box height={300}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={marketMetrics.marketTrends}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis yAxisId="left" orientation="left" stroke="#2196f3" />
-                  <YAxis yAxisId="right" orientation="right" stroke="#f44336" />
-                  <RechartsTooltip />
-                  <Line yAxisId="left" type="monotone" dataKey="solPrice" stroke="#2196f3" name="SOL Price ($)" />
-                  <Line yAxisId="right" type="monotone" dataKey="marketCap" stroke="#f44336" name="Market Cap (T)" />
-                  <Legend />
-                </LineChart>
-              </ResponsiveContainer>
-            </Box>
-          </Paper>
-        </Grid>
+      <Box>
+        <Typography variant="h6" gutterBottom>Market Overview</Typography>
         
-        {/* Trending Tokens */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Trending Tokens</Typography>
-            {marketMetrics.trendingTokens.map((token, index) => (
-              <Box 
-                key={index}
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
-                  mb: 1.5,
-                  py: 0.5,
-                  borderBottom: index < marketMetrics.trendingTokens.length - 1 ? `1px solid ${theme.palette.divider}` : 'none'
-                }}
-              >
-                <Box display="flex" alignItems="center">
-                  <Typography variant="body2" sx={{ fontWeight: 500, mr: 1 }}>
-                    {index + 1}.
-                  </Typography>
-                  <Box>
-                    <Typography variant="body1">{token.tokenSymbol}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {token.tokenName}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: token.priceChangePercent >= 0 ? 'success.main' : 'error.main',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  {token.priceChangePercent >= 0 ? <TrendingUp fontSize="small" sx={{ mr: 0.5 }} /> : <TrendingDown fontSize="small" sx={{ mr: 0.5 }} />}
-                  {token.priceChangePercent >= 0 ? '+' : ''}{token.priceChangePercent.toFixed(1)}%
-                </Typography>
+        <Grid container spacing={3}>
+          {/* Market Trends */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: '100%' }}>
+              <Typography variant="subtitle1" gutterBottom>Market Trends</Typography>
+              <Box height={300}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={[
+                    { date: '2025-04-20', sol: 129.45, btc: 72450, eth: 3560 },
+                    { date: '2025-04-21', sol: 131.12, btc: 73200, eth: 3590 },
+                    { date: '2025-04-22', sol: 130.87, btc: 72800, eth: 3540 },
+                    { date: '2025-04-23', sol: 132.55, btc: 74100, eth: 3620 },
+                    { date: '2025-04-24', sol: 135.21, btc: 75300, eth: 3680 },
+                    { date: '2025-04-25', sol: 137.98, btc: 76200, eth: 3710 },
+                    { date: '2025-04-26', sol: 138.56, btc: 76800, eth: 3750 }
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis yAxisId="sol" orientation="left" />
+                    <YAxis yAxisId="btc" orientation="right" />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Line yAxisId="sol" type="monotone" dataKey="sol" name="SOL" stroke="#14F195" strokeWidth={2} />
+                    <Line yAxisId="btc" type="monotone" dataKey="btc" name="BTC" stroke="#F7931A" strokeWidth={2} />
+                    <Line yAxisId="sol" type="monotone" dataKey="eth" name="ETH" stroke="#627EEA" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
               </Box>
-            ))}
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            </Paper>
+          </Grid>
+          
+          {/* Live TradingView Chart */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: '100%' }}>
+              <Typography variant="subtitle1" gutterBottom>SOL/USD Chart</Typography>
+              <Box 
+                component="iframe" 
+                src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76555&symbol=SOLUSD&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&hideideas=1&theme=dark&style=1&timezone=exchange&withdateranges=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=&utm_medium=widget&utm_campaign=chart&utm_term=SOLUSD"
+                sx={{ width: '100%', height: 300, border: 'none' }}
+              />
+            </Paper>
+          </Grid>
+          
+          {/* Market News */}
+          <Grid item xs={12}>
+            <Paper sx={{ p: 2 }}>
+              <Typography variant="subtitle1" gutterBottom>Market News</Typography>
               <Box>
-                <Typography variant="subtitle2" gutterBottom>Global Risk Score</Typography>
-                <Typography variant="body2" color="text.secondary">Current Market Conditions</Typography>
+                {[
+                  { title: 'Solana DeFi TVL reaches new all-time high', date: '2025-04-26', source: 'CryptoNews' },
+                  { title: 'New Solana token launch platform gains traction', date: '2025-04-25', source: 'BlockchainInsider' },
+                  { title: 'Major upgrade to Solana network improves transaction speeds', date: '2025-04-24', source: 'CoinDesk' }
+                ].map((news, index) => (
+                  <Box key={index} sx={{ py: 1, borderBottom: index < 2 ? '1px solid' : 'none', borderColor: 'divider' }}>
+                    <Typography variant="body1">{news.title}</Typography>
+                    <Box display="flex" justifyContent="space-between">
+                      <Typography variant="body2" color="text.secondary">{news.source}</Typography>
+                      <Typography variant="body2" color="text.secondary">{news.date}</Typography>
+                    </Box>
+                  </Box>
+                ))}
               </Box>
-              <Box 
-                sx={{ 
-                  width: 60, 
-                  height: 60, 
-                  borderRadius: '50%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  bgcolor: getRiskColor(marketMetrics.globalRiskScore)
-                }}
-              >
-                <Typography variant="h5" sx={{ color: 'white' }}>{marketMetrics.globalRiskScore.toFixed(1)}</Typography>
-              </Box>
-            </Box>
-          </Paper>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     );
   };
   
@@ -1000,7 +575,7 @@ const UnifiedDashboard = () => {
       {/* Dashboard Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4">TradeForce Dashboard</Typography>
-        <Box>
+        <Box display="flex" alignItems="center">
           <Button 
             variant="outlined" 
             size="small" 
@@ -1012,24 +587,34 @@ const UnifiedDashboard = () => {
           </Button>
           <Button
             variant="contained"
+            color="primary"
             size="small"
-            endIcon={<Timeline />}
+            startIcon={<AccountBalanceWallet />}
+            onClick={() => setShowWalletManager(!showWalletManager)}
           >
-            Performance Report
+            Wallet
           </Button>
         </Box>
       </Box>
       
+      {/* Wallet Manager Popup */}
+      {showWalletManager && (
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: '70px', 
+            right: '20px', 
+            zIndex: 1000,
+            width: '350px',
+            maxWidth: '90vw'
+          }}
+        >
+          <WalletConnectionManager />
+        </Box>
+      )}
+      
       {/* Time Range Selector */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-        <Button 
-          variant={timeRange === '1d' ? 'contained' : 'outlined'} 
-          size="small" 
-          onClick={() => handleTimeRangeChange('1d')}
-          sx={{ mx: 0.5 }}
-        >
-          1D
-        </Button>
         <Button 
           variant={timeRange === '1w' ? 'contained' : 'outlined'} 
           size="small" 
@@ -1055,14 +640,6 @@ const UnifiedDashboard = () => {
           3M
         </Button>
         <Button 
-          variant={timeRange === '1y' ? 'contained' : 'outlined'} 
-          size="small" 
-          onClick={() => handleTimeRangeChange('1y')}
-          sx={{ mx: 0.5 }}
-        >
-          1Y
-        </Button>
-        <Button 
           variant={timeRange === 'all' ? 'contained' : 'outlined'} 
           size="small" 
           onClick={() => handleTimeRangeChange('all')}
@@ -1072,16 +649,13 @@ const UnifiedDashboard = () => {
         </Button>
       </Box>
       
-      {/* Key Metrics */}
-      {renderDashboardHeader()}
-      
       {/* Tab Navigation */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={activeTab} onChange={handleTabChange} aria-label="dashboard tabs">
-          <Tab label="Discovery" icon={<Search />} iconPosition="start" />
-          <Tab label="Trading" icon={<ShowChart />} iconPosition="start" />
-          <Tab label="Portfolio" icon={<DonutLarge />} iconPosition="start" />
-          <Tab label="Market" icon={<BarChart />} iconPosition="start" />
+          <Tab label="Discovery" />
+          <Tab label="Trading" />
+          <Tab label="Portfolio" />
+          <Tab label="Market" />
         </Tabs>
       </Box>
       
@@ -1092,10 +666,10 @@ const UnifiedDashboard = () => {
         </Box>
       ) : (
         <>
-          {activeTab === 0 && renderDiscoveryOverview()}
-          {activeTab === 1 && renderTradingPerformance()}
-          {activeTab === 2 && renderPortfolioOverview()}
-          {activeTab === 3 && renderMarketOverview()}
+          {activeTab === 0 && renderDiscoveryTab()}
+          {activeTab === 1 && renderTradingTab()}
+          {activeTab === 2 && renderPortfolioTab()}
+          {activeTab === 3 && renderMarketTab()}
         </>
       )}
     </Box>

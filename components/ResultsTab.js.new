@@ -1,0 +1,592 @@
+'use client';
+
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { 
+  LineChart, Line, AreaChart, Area, BarChart, Bar, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
+import { FaTrophy, FaChartLine, FaExchangeAlt, FaPercentage, FaFilter, FaSolana } from 'react-icons/fa';
+import logger from '../lib/logger';
+import solanaLogger from '../lib/solanaLogger';
+
+/**
+ * ResultsTab Component
+ * 
+ * A dashboard component for TradeForce AI that displays trading performance metrics
+ * with a focus on Solana integration and real-time updates from blockchain data
+ */
+const ResultsTab = ({ trades = [], aiStats = {}, onRefresh }) => {
+  const [timeframe, setTimeframe] = useState('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const [filteredTrades, setFilteredTrades] = useState([]);
+  const [lastRefreshTime, setLastRefreshTime] = useState(null);
+  const [newTradesFound, setNewTradesFound] = useState(0);
+  const [metrics, setMetrics] = useState({
+    winRate: 0,
+    totalPnL: 0,
+    totalTrades: 0,
+    successfulTrades: 0,
+    failedTrades: 0,
+    avgProfit: 0,
+    avgLoss: 0,
+    bestTrade: 0,
+    worstTrade: 0,
+    solPnL: 0
+  });
+
+  // Handle refresh with blockchain data loading
+  const handleRefresh = async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    try {
+      // Record current trade count
+      const prevTradeCount = trades.length;
+      
+      // Call the parent refresh handler
+      await onRefresh();
+      
+      // Update UI state
+      setLastRefreshTime(new Date());
+      
+      // Calculate new trades found
+      const newTrades = trades.length - prevTradeCount;
+      if (newTrades > 0) {
+        setNewTradesFound(newTrades);
+        // Show toast notification if available
+        if (typeof window !== 'undefined' && window.toast) {
+          window.toast.success(`Found ${newTrades} new trades from blockchain`);
+        }
+      }
+      
+      solanaLogger.recordMetric('manualRefreshTriggered', 1);
+    } catch (error) {
+      logger.error('Error refreshing trade data:', error);
+      if (typeof window !== 'undefined' && window.toast) {
+        window.toast.error('Failed to refresh trade data');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Filter trades based on selected timeframe
+  const filterTradesByTimeframe = useCallback((trades, timeframe) => {
+    if (timeframe === 'all') return trades;
+    
+    const now = new Date();
+    let cutoff = new Date(now);
+    
+    switch (timeframe) {
+      case 'day':
+        cutoff.setDate(now.getDate() - 1);
+        break;
+      case 'week':
+        cutoff.setDate(now.getDate() - 7);
+        break;
+      case 'month':
+        cutoff.setMonth(now.getMonth() - 1);
+        break;
+      default:
+        return trades;
+    }
+    
+    return trades.filter(trade => new Date(trade.timestamp) >= cutoff);
+  }, []);
+
+  // Calculate metrics from trades
+  const calculateMetrics = useCallback((trades) => {
+    if (!trades || trades.length === 0) {
+      return {
+        winRate: 0,
+        totalPnL: 0,
+        totalTrades: 0,
+        successfulTrades: 0,
+        failedTrades: 0,
+        avgProfit: 0,
+        avgLoss: 0,
+        bestTrade: 0,
+        worstTrade: 0,
+        solPnL: 0
+      };
+    }
+    
+    const totalTrades = trades.length;
+    const successfulTrades = trades.filter(trade => trade.profit > 0).length;
+    const failedTrades = trades.filter(trade => trade.profit <= 0).length;
+    
+    const winRate = totalTrades > 0 ? (successfulTrades / totalTrades) * 100 : 0;
+    const totalPnL = trades.reduce((sum, trade) => sum + (trade.profit || 0), 0);
+    
+    const profitableTrades = trades.filter(trade => trade.profit > 0);
+    const losingTrades = trades.filter(trade => trade.profit < 0);
+    
+    const avgProfit = profitableTrades.length > 0
+      ? profitableTrades.reduce((sum, trade) => sum + trade.profit, 0) / profitableTrades.length
+      : 0;
+      
+    const avgLoss = losingTrades.length > 0
+      ? Math.abs(losingTrades.reduce((sum, trade) => sum + trade.profit, 0) / losingTrades.length)
+      : 0;
+      
+    const bestTrade = profitableTrades.length > 0
+      ? Math.max(...profitableTrades.map(trade => trade.profit))
+      : 0;
+      
+    const worstTrade = losingTrades.length > 0
+      ? Math.abs(Math.min(...losingTrades.map(trade => trade.profit)))
+      : 0;
+    
+    // Calculate Solana-specific P&L
+    const solTrades = trades.filter(trade => trade.token === 'SOL' || trade.symbol === 'SOL' || trade.outputToken === 'SOL');
+    const solPnL = solTrades.reduce((sum, trade) => sum + (trade.profit || 0), 0);
+    
+    return {
+      winRate,
+      totalPnL,
+      totalTrades,
+      successfulTrades,
+      failedTrades,
+      avgProfit,
+      avgLoss,
+      bestTrade,
+      worstTrade,
+      solPnL
+    };
+  }, []);
+
+  // Prepare data for win rate chart
+  const prepareWinRateChartData = useCallback(() => {
+    if (filteredTrades.length === 0) return [];
+    
+    // Group trades by day
+    const tradesByDay = {};
+    
+    filteredTrades.forEach(trade => {
+      const date = new Date(trade.timestamp).toISOString().split('T')[0];
+      
+      if (!tradesByDay[date]) {
+        tradesByDay[date] = {
+          date,
+          totalTrades: 0,
+          successfulTrades: 0,
+          winRate: 0
+        };
+      }
+      
+      tradesByDay[date].totalTrades++;
+      if (trade.profit > 0) {
+        tradesByDay[date].successfulTrades++;
+      }
+    });
+    
+    // Calculate win rate for each day
+    Object.values(tradesByDay).forEach(day => {
+      day.winRate = (day.successfulTrades / day.totalTrades) * 100;
+    });
+    
+    // Convert to array and sort by date
+    return Object.values(tradesByDay).sort((a, b) => a.date.localeCompare(b.date));
+  }, [filteredTrades]);
+
+  // Prepare data for cumulative PnL chart
+  const preparePnLChartData = useCallback(() => {
+    if (filteredTrades.length === 0) return [];
+    
+    // Sort by timestamp (oldest first)
+    const sortedTrades = [...filteredTrades].sort((a, b) => 
+      new Date(a.timestamp) - new Date(b.timestamp)
+    );
+    
+    let cumulativePnL = 0;
+    let solCumulativePnL = 0;
+    
+    return sortedTrades.map(trade => {
+      const isSolTrade = trade.token === 'SOL' || trade.symbol === 'SOL' || trade.outputToken === 'SOL';
+      cumulativePnL += trade.profit || 0;
+      
+      if (isSolTrade) {
+        solCumulativePnL += trade.profit || 0;
+      }
+      
+      return {
+        timestamp: new Date(trade.timestamp).toLocaleDateString(),
+        pnl: trade.profit || 0,
+        cumulativePnL,
+        solCumulativePnL: isSolTrade ? solCumulativePnL : null
+      };
+    });
+  }, [filteredTrades]);
+  
+  // Performance tracking
+  const lastRenderTime = useRef(0);
+  
+  // Memoize filtered trades for performance
+  const memoizedFilteredTrades = useMemo(() => {
+    if (!trades || trades.length === 0) return [];
+    
+    // Start performance tracking
+    const startTime = performance.now();
+    logger.debug(`Filtering ${trades.length} trades for timeframe: ${timeframe}`);
+    
+    const filtered = filterTradesByTimeframe(trades, timeframe);
+    
+    // Log performance
+    const endTime = performance.now();
+    solanaLogger.recordMetric('tradesFilterTime', endTime - startTime);
+    logger.debug(`Filtered to ${filtered.length} trades in ${(endTime - startTime).toFixed(1)}ms`);
+    
+    return filtered;
+  }, [trades, timeframe, filterTradesByTimeframe]);
+  
+  // Memoize metrics calculation for performance
+  const calculatedMetrics = useMemo(() => {
+    if (memoizedFilteredTrades.length === 0) {
+      return {
+        winRate: 0,
+        totalPnL: 0,
+        totalTrades: 0,
+        successfulTrades: 0,
+        failedTrades: 0,
+        avgProfit: 0,
+        avgLoss: 0,
+        bestTrade: 0,
+        worstTrade: 0,
+        solPnL: 0
+      };
+    }
+    
+    // Start performance tracking
+    const startTime = performance.now();
+    
+    const metrics = calculateMetrics(memoizedFilteredTrades);
+    
+    // Log performance
+    const endTime = performance.now();
+    solanaLogger.recordMetric('metricsCalculationTime', endTime - startTime);
+    
+    return metrics;
+  }, [memoizedFilteredTrades, calculateMetrics]);
+  
+  // Update state when memoized values change
+  useEffect(() => {
+    setIsLoading(true);
+    
+    // Track overall rendering performance
+    const now = performance.now();
+    const timeSinceLastRender = now - lastRenderTime.current;
+    if (lastRenderTime.current > 0) {
+      solanaLogger.recordMetric('resultsTabRenderInterval', timeSinceLastRender);
+    }
+    lastRenderTime.current = now;
+    
+    setFilteredTrades(memoizedFilteredTrades);
+    setMetrics(calculatedMetrics);
+    
+    setIsLoading(false);
+    
+    // Log total update time including render
+    setTimeout(() => {
+      const renderTime = performance.now() - now;
+      solanaLogger.recordMetric('resultsTabUpdateTime', renderTime);
+    }, 0);
+  }, [memoizedFilteredTrades, calculatedMetrics]);
+
+  // Metric Card component with enhanced tooltip and loading state
+  const MetricCard = ({ title, value, icon, color, tooltip, isLoading }) => (
+    <div className="bg-gray-800/50 p-4 rounded-lg shadow-lg relative overflow-hidden" title={tooltip}>
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center">
+          <div className="w-5 h-5 border-t-2 border-blue-500 rounded-full animate-spin"></div>
+        </div>
+      )}
+      <div className="flex items-center mb-2">
+        <div className={`p-2 rounded-full mr-2 bg-${color}-900/30 text-${color}-500`}>
+          {icon === 'trophy' && <FaTrophy />}
+          {icon === 'chart-line' && <FaChartLine />}
+          {icon === 'exchange' && <FaExchangeAlt />}
+          {icon === 'percentage' && <FaPercentage />}
+          {icon === 'solana' && <FaSolana />}
+        </div>
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
+      </div>
+      <p className={`text-2xl font-bold ${color === 'green' ? 'text-green-500' : color === 'red' ? 'text-red-500' : `text-${color}-400`}`}>
+        {value}
+      </p>
+      {tooltip && <div className="text-xs text-gray-400 mt-1">{tooltip}</div>}
+    </div>
+  );
+
+  // Enhanced RefreshButton component with loading state and refresh time
+  const RefreshButton = () => {
+    const refreshTimeText = lastRefreshTime ? 
+      `Last refreshed ${lastRefreshTime.toLocaleTimeString()}` : 
+      'Not yet refreshed';
+    
+    return (
+      <div className="flex flex-col items-end">
+        <button
+          onClick={handleRefresh}
+          disabled={isLoading}
+          className={`${
+            isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+          } text-white py-2 px-4 rounded flex items-center space-x-2`}
+        >
+          {isLoading ? (
+            <>
+              <div className="w-4 h-4 border-t-2 border-white rounded-full animate-spin"></div>
+              <span>Fetching blockchain data...</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh Blockchain Data</span>
+            </>
+          )}
+        </button>
+        <span className="text-xs text-gray-400 mt-1">{refreshTimeText}</span>
+        {newTradesFound > 0 && (
+          <span className="text-xs text-green-400 mt-1">+{newTradesFound} new trades found</span>
+        )}
+      </div>
+    );
+  };
+
+  if (isLoading && filteredTrades.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="results-tab bg-gray-900 p-6 rounded-lg">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-white">Trading Results</h2>
+        
+        <div className="flex space-x-4">
+          <div className="flex items-center">
+            <label htmlFor="timeframe" className="text-gray-300 mr-2">Timeframe:</label>
+            <select
+              id="timeframe"
+              value={timeframe}
+              onChange={(e) => setTimeframe(e.target.value)}
+              className="bg-gray-800 text-white py-1 px-2 rounded border border-gray-700"
+            >
+              <option value="all">All Time</option>
+              <option value="day">24 Hours</option>
+              <option value="week">7 Days</option>
+              <option value="month">30 Days</option>
+            </select>
+          </div>
+          <RefreshButton />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <MetricCard
+          title="Win Rate"
+          value={`${metrics.winRate.toFixed(1)}%`}
+          icon="percentage"
+          color="blue"
+          isLoading={isLoading}
+          tooltip={`${metrics.successfulTrades} winning trades out of ${metrics.totalTrades} total trades`}
+        />
+        <MetricCard
+          title="Total P&L"
+          value={`$${metrics.totalPnL.toFixed(2)}`}
+          icon="chart-line"
+          color={metrics.totalPnL >= 0 ? "green" : "red"}
+          isLoading={isLoading}
+        />
+        <MetricCard
+          title="Total Trades"
+          value={metrics.totalTrades}
+          icon="exchange"
+          color="purple"
+          isLoading={isLoading}
+        />
+        <MetricCard
+          title="Solana P&L"
+          value={`$${metrics.solPnL.toFixed(2)}`}
+          icon="solana"
+          color={metrics.solPnL >= 0 ? "green" : "red"}
+          isLoading={isLoading}
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <MetricCard
+          title="Avg. Profit"
+          value={`$${metrics.avgProfit.toFixed(2)}`}
+          icon="chart-line"
+          color="green"
+          isLoading={isLoading}
+        />
+        <MetricCard
+          title="Avg. Loss"
+          value={`$${metrics.avgLoss.toFixed(2)}`}
+          icon="chart-line"
+          color="red"
+          isLoading={isLoading}
+        />
+        <MetricCard
+          title="Best Trade"
+          value={`$${metrics.bestTrade.toFixed(2)}`}
+          icon="trophy"
+          color="yellow"
+          isLoading={isLoading}
+        />
+      </div>
+      
+      {/* Win rate chart */}
+      <div className="bg-gray-800/50 p-4 rounded-lg mb-6">
+        <h3 className="text-lg font-semibold text-white mb-2">Win Rate Over Time</h3>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={prepareWinRateChartData()}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="date" stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', color: '#F9FAFB' }}
+                formatter={(value) => [`${value.toFixed(0)}%`, 'Win Rate']}
+              />
+              <Bar 
+                dataKey="winRate" 
+                fill="#3B82F6" 
+                radius={[4, 4, 0, 0]} 
+                name="Win Rate"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      {/* Cumulative PnL chart */}
+      <div className="bg-gray-800/50 p-4 rounded-lg mb-6">
+        <h3 className="text-lg font-semibold text-white mb-2">Cumulative P&L</h3>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={preparePnLChartData()}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="timestamp" stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', color: '#F9FAFB' }}
+                formatter={(value, name) => {
+                  if (name === 'cumulativePnL') return [`$${value.toFixed(2)}`, 'Total P&L'];
+                  if (name === 'solCumulativePnL' && value !== null) return [`$${value.toFixed(2)}`, 'Solana P&L'];
+                  return [value, name];
+                }}
+              />
+              <defs>
+                <linearGradient id="colorPnL" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
+                </linearGradient>
+                <linearGradient id="colorSolPnL" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <Area 
+                type="monotone" 
+                dataKey="cumulativePnL" 
+                stroke="#10B981" 
+                fill="url(#colorPnL)" 
+                strokeWidth={2}
+                name="Total P&L"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="solCumulativePnL" 
+                stroke="#3B82F6" 
+                fill="url(#colorSolPnL)" 
+                strokeWidth={2}
+                name="Solana P&L"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      {/* Recent trades table */}
+      <div className="bg-gray-800/50 p-4 rounded-lg">
+        <h3 className="text-lg font-semibold text-white mb-2">Recent Trades</h3>
+        {filteredTrades.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-gray-700/50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    Time
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    Token
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    Action
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    P&L
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-800/30 divide-y divide-gray-700">
+                {filteredTrades.slice(0, 10).map((trade, index) => (
+                  <tr key={trade.id || index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {new Date(trade.timestamp).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {trade.token || trade.symbol || 'Unknown'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        trade.action === 'buy' || trade.side === 'buy' 
+                          ? 'bg-green-900/50 text-green-400' 
+                          : 'bg-red-900/50 text-red-400'
+                      }`}>
+                        {(trade.action || trade.side || '').toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {trade.amount?.toFixed(6) || trade.size?.toFixed(6) || '0'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      ${(trade.price || trade.entryPrice || 0).toFixed(2)}
+                    </td>
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${(trade.profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      ${(trade.profit || 0).toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filteredTrades.length > 10 && (
+              <div className="mt-4 text-center text-sm text-gray-400">
+                Showing 10 of {filteredTrades.length} trades
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center text-gray-400 py-8">
+            No trades found in the selected timeframe
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ResultsTab;

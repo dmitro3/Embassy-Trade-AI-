@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, useTransition } from 'react';
+import React, { useState, useEffect, Suspense, useTransition, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { toast } from 'react-hot-toast';
+import { FaLightbulb, FaExclamationTriangle, FaGear, FaChartLine, FaChartBar, FaTrophy } from 'react-icons/fa6';
 import { startAppTransaction, finishAppTransaction } from '../lib/sentryUtils.js';
 import tradeDecisionEngine from '../lib/tradeDecisionEngine.js';
 import tradeExecutionService from '../lib/tradeExecutionService.js';
 import marketDataAggregator from '../lib/marketDataAggregator.js';
+import { useRealTimeData } from '../lib/realTimeDataPipeline.js';
+import { useAIConsensus } from '../lib/aiConsensusModel.js';
 import logger from '../lib/logger.js';
 import dynamic from 'next/dynamic';
+import ResultsTab from './ResultsTab';
 
 /**
  * TradeForceAI Component
@@ -49,8 +53,66 @@ const TradeForceAI = () => {
   const [autoApprove, setAutoApprove] = useState(false);
   const [maxAutoApproveAmount, setMaxAutoApproveAmount] = useState(10);
   const [botLogs, setBotLogs] = useState([]);
-  const [showLightbulb, setShowLightbulb] = useState(false);
-    // Initialize services with error handling and retry logic
+  
+  // AI Roundtable and Real-Time Data state
+  const [aiEngineActive, setAiEngineActive] = useState(false);
+  const [signalActive, setSignalActive] = useState(false);
+  const [tradeSignals, setTradeSignals] = useState([]);
+  const [tradeStatus, setTradeStatus] = useState('idle'); // idle, analyzing, signaling, executing, completed
+  const [activationTime, setActivationTime] = useState(null);
+  const [aiSettings, setAiSettings] = useState({
+    tradeSize: 0.1, // 10% of available balance
+    maxDailyTrades: 5,
+    stopLossPercentage: 5,
+    takeProfitPercentage: 15,
+    autoExecute: false,
+    validationMode: true // Use Kraken validation mode by default
+  });
+  // Stats for AI trading
+  const [aiStats, setAiStats] = useState({
+    tradesExecuted: 0,
+    successfulTrades: 0,
+    failedTrades: 0,
+    profitableTrades: 0,
+    losingTrades: 0,
+    totalPnL: 0,
+    dailyTrades: 0,
+    lastResetDate: new Date().toISOString().split('T')[0],
+    activeTrades: []
+  });
+    // Active view state (dashboard, trading, results)
+  const [activeView, setActiveView] = useState('dashboard');
+  // References for interval timers
+  const analysisIntervalRef = useRef(null);
+  const tradeMonitorIntervalRef = useRef(null);
+  const lightbulbPulseIntervalRef = useRef(null);
+  
+  // Reference for pending signal acknowledgment
+  const pendingSignalRef = useRef(null);
+  
+  // Access real-time data pipeline
+  const {
+    isConnected: dataConnected,
+    connectionStatus,
+    newTokens,
+    priceData,
+    volumeData,
+    tokenInfo,
+    technicalIndicators,
+    rawPipeline
+  } = useRealTimeData();
+  
+  // Access AI consensus model
+  const {
+    isInitialized: aiInitialized,
+    isAnalyzing,
+    lastConsensus,
+    agentStatus,
+    getConsensus,
+    updateTradeResult
+  } = useAIConsensus();
+  
+  // Initialize services with error handling and retry logic
   useEffect(() => {
     const initServices = async () => {
       try {
@@ -125,17 +187,47 @@ const TradeForceAI = () => {
         });
         setAutoApprove(walletState.autoApprove);
         
+        // Check if we need to reset daily stats for AI
+        const today = new Date().toISOString().split('T')[0];
+        if (aiStats.lastResetDate !== today) {
+          setAiStats(prev => ({
+            ...prev,
+            dailyTrades: 0,
+            lastResetDate: today
+          }));
+        }
+        
         setInitialized(true);
         setLoading(false);
+        
+        // Log successful initialization
+        logger.info('TradeForce AI services initialized successfully');
+        toast.success('TradeForce AI initialized and ready');
       } catch (error) {
-        logger.error(`Error initializing TradeForceAI: ${error.message}`);
+        logger.error(`Error initializing TradeForce AI: ${error.message}`);
         toast.error(`Failed to initialize: ${error.message}`);
         setLoading(false);
       }
     };
     
     initServices();
-  }, []);
+    
+    // Cleanup function
+    return () => {
+      // Clean up all intervals on component unmount
+      if (analysisIntervalRef.current) {
+        clearInterval(analysisIntervalRef.current);
+      }
+      
+      if (tradeMonitorIntervalRef.current) {
+        clearInterval(tradeMonitorIntervalRef.current);
+      }
+      
+      if (lightbulbPulseIntervalRef.current) {
+        clearInterval(lightbulbPulseIntervalRef.current);
+      }
+    };
+  }, [initialized, aiInitialized, rawPipeline]);
   
   // Update wallet state when Solana wallet connection changes
   useEffect(() => {
@@ -405,6 +497,527 @@ const TradeForceAI = () => {
     }
   };
   
+  // Toggle TradeForce AI Roundtable activation
+  const toggleAiEngine = () => {
+    if (aiEngineActive) {
+      // Deactivate TradeForce AI
+      setAiEngineActive(false);
+      setActivationTime(null);
+      
+      // Clear intervals
+      if (analysisIntervalRef.current) {
+        clearInterval(analysisIntervalRef.current);
+        analysisIntervalRef.current = null;
+      }
+      
+      if (tradeMonitorIntervalRef.current) {
+        clearInterval(tradeMonitorIntervalRef.current);
+        tradeMonitorIntervalRef.current = null;
+      }
+      
+      setTradeStatus('idle');
+      logger.info('TradeForce AI Roundtable deactivated');
+      toast.success('TradeForce AI Roundtable deactivated');
+    } else {
+      // Check if prerequisites are met
+      if (!dataConnected) {
+        toast.error('Cannot activate: Data pipeline not connected');
+        return;
+      }
+      
+      if (!aiInitialized) {
+        toast.error('Cannot activate: AI models not initialized');
+        return;
+      }
+      
+      // Activate TradeForce AI
+      setAiEngineActive(true);
+      setActivationTime(Date.now());
+      setTradeStatus('analyzing');
+      
+      // Set up analysis interval (every 5 minutes)
+      analysisIntervalRef.current = setInterval(() => {
+        runAiConsensusAnalysis();
+      }, 5 * 60 * 1000); // 5 minutes
+      
+      // Set up trade monitoring interval (every minute)
+      tradeMonitorIntervalRef.current = setInterval(() => {
+        monitorActiveTrades();
+      }, 60 * 1000); // 1 minute
+      
+      // Run initial analysis
+      runAiConsensusAnalysis();
+      
+      logger.info('TradeForce AI Roundtable activated');
+      toast.success('TradeForce AI Roundtable activated and monitoring market');
+    }
+  };
+
+  // Run market analysis using AI consensus model
+  const runAiConsensusAnalysis = async () => {
+    try {
+      if (!aiEngineActive) return;
+      
+      setTradeStatus('analyzing');
+      logger.info('Running TradeForce AI Roundtable market analysis');
+      
+      // Add to logs
+      addLog('AI', 'Running market analysis');
+      
+      // Gather market data for analysis
+      const marketData = {
+        newTokens,
+        priceData,
+        volumeData,
+        tokenInfo,
+        technicalIndicators
+      };
+      
+      // Get consensus from AI models
+      const consensus = await getConsensus(marketData);
+      
+      if (!consensus || !consensus.signals || consensus.signals.length === 0) {
+        logger.info('No trading signals found in current analysis');
+        setTradeStatus('analyzing');
+        addLog('AI', 'Analysis complete - No trading signals detected');
+        return;
+      }
+      
+      // Found signals - activate lightbulb
+      logger.info(`Found ${consensus.signals.length} trading signals`);
+      setTradeSignals(consensus.signals);
+      setSignalActive(true);
+      setTradeStatus('signaling');
+      
+      addLog('AI', `Detected ${consensus.signals.length} trading signals`);
+      
+      // Store the signal in the ref for later processing
+      pendingSignalRef.current = {
+        signals: consensus.signals,
+        timestamp: Date.now()
+      };
+      
+      // Start pulsing the lightbulb
+      if (lightbulbPulseIntervalRef.current) {
+        clearInterval(lightbulbPulseIntervalRef.current);
+      }
+      
+      let pulseCount = 0;
+      lightbulbPulseIntervalRef.current = setInterval(() => {
+        setSignalActive(prev => !prev);
+        pulseCount++;
+        
+        // Stop pulsing after 10 cycles (5 seconds)
+        if (pulseCount >= 10) {
+          clearInterval(lightbulbPulseIntervalRef.current);
+          lightbulbPulseIntervalRef.current = null;
+          setSignalActive(true); // Keep it on
+        }
+      }, 500);
+      
+      // If auto-execute is enabled, process the trade automatically
+      if (aiSettings.autoExecute && aiStats.dailyTrades < aiSettings.maxDailyTrades) {
+        processAiTradeSignal(consensus.signals[0]);
+      }
+      
+    } catch (error) {
+      logger.error(`AI Market analysis failed: ${error.message}`);
+      setTradeStatus('analyzing');
+      addLog('ERROR', `Analysis failed: ${error.message}`);
+    }
+  };
+
+  // Process a trade signal (calculate levels and execute)
+  const processAiTradeSignal = async (signal) => {
+    try {
+      if (!signal) return;
+      
+      setTradeStatus('executing');
+      logger.info(`Processing trade signal for ${signal.symbol || signal.token}`);
+      addLog('TRADE', `Processing signal for ${signal.symbol || signal.token}`);
+      
+      // Extract token data
+      const tokenAddress = signal.token;
+      const tokenSymbol = signal.symbol || tokenAddress.substr(0, 6);
+      const currentPrice = priceData[tokenAddress]?.price;
+      
+      if (!currentPrice) {
+        logger.error('Cannot process trade: Price data not available');
+        setTradeStatus('analyzing');
+        addLog('ERROR', 'Cannot process trade: Price data not available');
+        return;
+      }
+      
+      // Calculate entry, stop loss, and take profit levels
+      const entryPrice = currentPrice;
+      const isBuy = signal.action === 'buy';
+      
+      // For sell signals, stop loss is above entry, for buy it's below
+      const stopLossPrice = isBuy 
+        ? entryPrice * (1 - aiSettings.stopLossPercentage / 100)
+        : entryPrice * (1 + aiSettings.stopLossPercentage / 100);
+      
+      // For sell signals, take profit is below entry, for buy it's above
+      const takeProfitPrice = isBuy
+        ? entryPrice * (1 + aiSettings.takeProfitPercentage / 100)
+        : entryPrice * (1 - aiSettings.takeProfitPercentage / 100);
+      
+      // Calculate position size based on risk level and configured trade size
+      let orderVolume = 0;
+      
+      if (signal.token === 'So11111111111111111111111111111111111111112') {
+        // For SOL, use direct volume
+        orderVolume = 0.5; // Example: 0.5 SOL per trade
+      } else {
+        // For other tokens, use proportional USD value
+        const usdAmount = 50; // Example: $50 per trade
+        orderVolume = usdAmount / entryPrice;
+      }
+      
+      // For traditional exchange pairs like BTC/USD
+      if (tokenSymbol === 'BTC' || tokenSymbol === 'ETH' || tokenSymbol === 'SOL') {
+        const pairSymbol = `${tokenSymbol}/USD`;
+        
+        // Prepare order parameters
+        const orderParams = {
+          pair: pairSymbol,
+          type: 'limit',
+          ordertype: 'limit',
+          price: entryPrice.toString(),
+          volume: orderVolume.toString(),
+          leverage: '1', // No leverage
+          validate: aiSettings.validationMode, // Validation mode or real execution
+          close: {
+            // Close order parameters (only used if the exchange supports it)
+            ordertype: 'stop-loss-limit',
+            price: stopLossPrice.toString()
+          },
+          oflags: ['fciq'] // Fill or kill, post only
+        };
+        
+        // Add direction
+        if (isBuy) {
+          orderParams.type = 'buy';
+        } else {
+          orderParams.type = 'sell';
+        }
+        
+        // Log the order
+        addLog('ORDER', `${isBuy ? 'Buy' : 'Sell'} ${orderVolume} ${tokenSymbol} @ $${entryPrice}`);
+        
+        // Execute the trade
+        const orderResult = await tradeExecutionService.executeKrakenTrade(orderParams);
+        
+        if (aiSettings.validationMode) {
+          logger.info(`Trade validation successful: ${JSON.stringify(orderResult)}`);
+          toast.success(`Trade validation successful for ${tokenSymbol}`);
+          addLog('VALIDATION', `Validated ${tokenSymbol} trade successfully`);
+        } else if (orderResult.success) {
+          logger.info(`Trade executed: ${JSON.stringify(orderResult)}`);
+          toast.success(`${isBuy ? 'Buy' : 'Sell'} order placed for ${tokenSymbol}`);
+          addLog('SUCCESS', `${isBuy ? 'Buy' : 'Sell'} order executed for ${tokenSymbol}`);
+          
+          // Update trading stats
+          setAiStats(prev => ({
+            ...prev,
+            tradesExecuted: prev.tradesExecuted + 1,
+            dailyTrades: prev.dailyTrades + 1,
+            activeTrades: [...prev.activeTrades, {
+              id: orderResult.txid || `trade-${Date.now()}`,
+              symbol: tokenSymbol,
+              action: isBuy ? 'buy' : 'sell',
+              entryPrice,
+              stopLossPrice,
+              takeProfitPrice,
+              volume: orderVolume,
+              timestamp: Date.now(),
+              status: 'active'
+            }]
+          }));
+        } else {
+          logger.error(`Trade execution failed: ${orderResult.error}`);
+          toast.error(`Trade failed: ${orderResult.error}`);
+          addLog('ERROR', `Trade failed: ${orderResult.error}`);
+          
+          // Update stats
+          setAiStats(prev => ({
+            ...prev,
+            failedTrades: prev.failedTrades + 1
+          }));
+        }
+      } else {
+        // For Solana tokens, would use Jupiter or another DEX
+        // This is a placeholder for DEX integration
+        logger.info(`Would execute ${isBuy ? 'buy' : 'sell'} order for ${tokenSymbol} at ${entryPrice}`);
+        toast.info(`Trading ${tokenSymbol} on Solana not implemented yet`);
+        addLog('INFO', `Solana token trading not yet implemented for ${tokenSymbol}`);
+      }
+      
+      // Reset the signal state after processing
+      pendingSignalRef.current = null;
+      setTradeStatus('analyzing');
+      
+    } catch (error) {
+      logger.error(`Failed to process trade signal: ${error.message}`);
+      toast.error(`Trade processing failed: ${error.message}`);
+      addLog('ERROR', `Trade processing failed: ${error.message}`);
+      setTradeStatus('analyzing');
+    }
+  };
+
+  // Monitor active trades (for stop loss/take profit execution)
+  const monitorActiveTrades = async () => {
+    if (!aiEngineActive || aiStats.activeTrades.length === 0) return;
+    
+    try {
+      // Get up-to-date trade info from Kraken
+      // In a real implementation, this would fetch actual trade status
+      const openOrders = await tradeExecutionService.getOpenOrders();
+      
+      // Process each active trade
+      const updatedTrades = aiStats.activeTrades.map(trade => {
+        // Check if the trade is still active
+        const matchingOrder = openOrders?.result?.open?.[trade.id];
+        
+        // If no matching order found, assume it's completed
+        if (!matchingOrder) {
+          return {
+            ...trade,
+            status: 'completed'
+          };
+        }
+        
+        // Otherwise, update with current status
+        return trade;
+      });
+      
+      // Update stats with trade status changes
+      setAiStats(prev => ({
+        ...prev,
+        activeTrades: updatedTrades
+      }));
+      
+    } catch (error) {
+      logger.error(`Failed to monitor active trades: ${error.message}`);
+      addLog('ERROR', `Failed to monitor active trades: ${error.message}`);
+    }
+  };
+
+  // Update AI settings
+  const updateAiSettings = (newSettings) => {
+    setAiSettings(prev => ({
+      ...prev,
+      ...newSettings
+    }));
+    
+    logger.info(`TradeForce AI settings updated: ${JSON.stringify(newSettings)}`);
+  };
+  
+  // Get AI system status
+  const getAiSystemStatus = () => {
+    // Check data connection
+    const dataStatus = Object.values(connectionStatus || {}).some(status => status)
+      ? 'connected'
+      : 'disconnected';
+    
+    // Check AI models
+    const aiStatus = Object.values(agentStatus || {}).some(agent => agent?.initialized)
+      ? 'ready'
+      : 'initializing';
+    
+    // Check trade execution
+    const executionStatus = tradeExecutionService.krakenInitialized
+      ? 'ready'
+      : 'unavailable';
+    
+    // Overall status
+    if (dataStatus === 'connected' && aiStatus === 'ready' && executionStatus === 'ready') {
+      return 'ready';
+    } else if (dataStatus === 'disconnected') {
+      return 'data_error';
+    } else if (aiStatus === 'initializing') {
+      return 'ai_initializing';
+    } else if (executionStatus === 'unavailable') {
+      return 'execution_error';
+    } else {
+      return 'partial';
+    }
+  };
+
+  // Add log entry
+  const addLog = (type, message) => {
+    const log = {
+      type,
+      message,
+      timestamp: new Date().toISOString()
+    };
+    
+    setBotLogs(prev => [log, ...prev].slice(0, 100));
+  };
+  
+  // Initialize services on component mount
+  useEffect(() => {
+    const initServices = async () => {
+      try {
+        setLoading(true);
+        
+        // Create a transaction for monitoring initialization
+        const transaction = startAppTransaction('tradeforce-init', 'component.init');
+        
+        // Safely initialize market data aggregator first
+        try {
+          if (!marketDataAggregator.isInitialized()) {
+            logger.info('Initializing market data aggregator');
+            await marketDataAggregator.init();
+          }
+        } catch (error) {
+          logger.warn(`Market data aggregator initialization warning: ${error.message}`);
+          // Continue despite errors - don't block the UI
+        }
+        
+        // Safely initialize trade decision engine with retry
+        try {
+          if (!tradeDecisionEngine.isInitialized()) {
+            logger.info('Initializing trade decision engine');
+            await tradeDecisionEngine.init();
+          }
+        } catch (error) {
+          logger.warn(`Trade decision engine initialization warning: ${error.message}`);
+          // Continue despite errors
+        }
+        
+        // Load bot logs
+        try {
+          const logsResponse = await fetch('/api/bot-logs');
+          if (logsResponse.ok) {
+            const logs = await logsResponse.json();
+            setBotLogs(logs);
+          }
+        } catch (error) {
+          logger.warn(`Failed to load bot logs: ${error.message}`);
+        }
+        
+        // Finish the transaction
+        finishAppTransaction(transaction);
+        
+        // Initialize trade execution service
+        if (!tradeExecutionService.isInitialized()) {
+          await tradeExecutionService.init();
+        }
+        
+        // Get watchlist
+        const watchlistAssets = tradeDecisionEngine.getWatchlist();
+        setWatchlist(watchlistAssets);
+        
+        // Set default asset if watchlist is not empty
+        if (watchlistAssets.length > 0) {
+          setSelectedAsset(watchlistAssets[0]);
+        }
+        
+        // Get portfolio
+        const portfolioData = tradeExecutionService.getPaperPortfolio();
+        setPortfolio(portfolioData);
+        
+        // Get active trades
+        const activeTrades = tradeExecutionService.getActiveTrades();
+        setTrades(activeTrades);
+        
+        // Get wallet state
+        const walletState = tradeExecutionService.getWalletState();
+        setWalletStatus({
+          connected: walletState.connected,
+          publicKey: walletState.publicKey
+        });
+        setAutoApprove(walletState.autoApprove);
+        
+        // Check if we need to reset daily stats for AI
+        const today = new Date().toISOString().split('T')[0];
+        if (aiStats.lastResetDate !== today) {
+          setAiStats(prev => ({
+            ...prev,
+            dailyTrades: 0,
+            lastResetDate: today
+          }));
+        }
+        
+        setInitialized(true);
+        setLoading(false);
+        
+        // Log successful initialization
+        logger.info('TradeForce AI services initialized successfully');
+        toast.success('TradeForce AI initialized and ready');
+      } catch (error) {
+        logger.error(`Error initializing TradeForce AI: ${error.message}`);
+        toast.error(`Failed to initialize: ${error.message}`);
+        setLoading(false);
+      }
+    };
+    
+    initServices();
+  }, []);
+  
+  // Update wallet state when Solana wallet connection changes
+  useEffect(() => {
+    if (connected && publicKey) {
+      const success = tradeExecutionService.setWallet({
+        publicKey,
+        signTransaction,
+        signAllTransactions: null // Add this if available from useWallet()
+      });
+      
+      if (success) {
+        const walletState = tradeExecutionService.getWalletState();
+        setWalletStatus({
+          connected: walletState.connected,
+          publicKey: walletState.publicKey
+        });
+        toast.success('Wallet connected');
+      }
+    } else {
+      tradeExecutionService.clearWallet();
+      setWalletStatus({ connected: false, publicKey: null });
+    }
+  }, [connected, publicKey]);
+  
+  // Check AI system status and update UI accordingly
+  useEffect(() => {
+    const checkAiStatus = () => {
+      const status = getAiSystemStatus();
+      
+      switch (status) {
+        case 'ready':
+          setAiEngineActive(true);
+          toast.success('AI system ready');
+          break;
+        case 'data_error':
+          setAiEngineActive(false);
+          toast.error('Data connection error');
+          break;
+        case 'ai_initializing':
+          setAiEngineActive(false);
+          toast.info('AI models initializing');
+          break;
+        case 'execution_error':
+          setAiEngineActive(false);
+          toast.error('Trade execution unavailable');
+          break;
+        case 'partial':
+          setAiEngineActive(false);
+          toast.warning('AI system partially ready');
+          break;
+        default:
+          setAiEngineActive(false);
+      }
+    };
+    
+    checkAiStatus();
+    
+    // Re-check AI status every minute
+    const statusInterval = setInterval(checkAiStatus, 60 * 1000);
+    
+    return () => clearInterval(statusInterval);
+  }, [agentStatus, connectionStatus]);
+  
   // Render loading state
   if (loading) {
     return (
@@ -433,25 +1046,252 @@ const TradeForceAI = () => {
     );
   }
   
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">TradeForce AI Trading System</h1>
-      
-      {/* Trading alert indicator (lightbulb) */}
-      {showLightbulb && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className="bg-yellow-400 p-3 rounded-full animate-pulse shadow-lg flex items-center">
-            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a7 7 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
-            </svg>
-            <span className="ml-2 text-white font-bold">Trade Signal!</span>
+  // Add AI Roundtable section to the render
+  const renderAiRoundtable = () => {
+    return (
+      <div className="ai-roundtable-container">
+        <div className="ai-header">
+          <h3>AI Roundtable Consensus</h3>
+          <div className={`status-indicator ${getAiSystemStatus()}`}>
+            {getAiSystemStatus() === 'ready' ? 'Ready' : 'Initializing'}
           </div>
         </div>
-      )}
+        
+        <div className="ai-controls">
+          <button 
+            className={`ai-toggle-button ${aiEngineActive ? 'active' : 'inactive'}`}
+            onClick={toggleAiEngine}
+            disabled={getAiSystemStatus() !== 'ready'}
+          >
+            {aiEngineActive ? 'Deactivate' : 'Activate'} AI Engine
+          </button>
+          
+          <button 
+            className="ai-settings-button"
+            onClick={() => console.log('Open AI settings')}
+          >
+            <FaGear /> Settings
+          </button>
+        </div>
+        
+        {aiEngineActive && (
+          <div className="ai-status">
+            <div className="status-row">
+              <span>Status:</span> 
+              <span className={`status-value ${tradeStatus}`}>{tradeStatus}</span>
+            </div>
+            
+            <div className="status-row">
+              <span>Active since:</span>
+              <span>{activationTime ? new Date(activationTime).toLocaleTimeString() : 'N/A'}</span>
+            </div>
+            
+            <div className="status-row">
+              <span>Daily trades:</span>
+              <span>{aiStats.dailyTrades} / {aiSettings.maxDailyTrades}</span>
+            </div>
+          </div>
+        )}
+        
+        {signalActive && tradeSignals.length > 0 && (
+          <div className="signal-container">
+            <div className={`lightbulb-indicator ${signalActive ? 'active' : 'inactive'}`}>
+              <FaLightbulb />
+            </div>
+            
+            <div className="signal-details">
+              <h3>Trade Signal Detected</h3>
+              
+              <div className="signal-row">
+                <span>Asset:</span>
+                <span>{tradeSignals[0].symbol || tradeSignals[0].token.substr(0, 8)}</span>
+              </div>
+              
+              <div className="signal-row">
+                <span>Action:</span>
+                <span className={tradeSignals[0].action === 'buy' ? 'buy' : 'sell'}>
+                  {tradeSignals[0].action.toUpperCase()}
+                </span>
+              </div>
+              
+              <div className="signal-row">
+                <span>Confidence:</span>
+                <span>{Math.round(tradeSignals[0].confidence * 100)}%</span>
+              </div>
+              
+              <div className="signal-row">
+                <span>Reasoning:</span>
+                <span>{tradeSignals[0].reason}</span>
+              </div>
+              
+              <div className="signal-actions">
+                <button 
+                  className="execute-button"
+                  onClick={() => processAiTradeSignal(tradeSignals[0])}
+                  disabled={tradeStatus === 'executing'}
+                >
+                  {aiSettings.validationMode ? 'Validate Trade' : 'Execute Trade'}
+                </button>
+                
+                <button 
+                  className="ignore-button"
+                  onClick={() => {
+                    setSignalActive(false);
+                    pendingSignalRef.current = null;
+                  }}
+                >
+                  Ignore Signal
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div className="ai-panels">
+          <div className="ai-panel">
+            <h4><FaChartLine /> Performance</h4>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <span className="stat-label">Trades:</span>
+                <span className="stat-value">{aiStats.tradesExecuted}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Success Rate:</span>
+                <span className="stat-value">
+                  {aiStats.tradesExecuted > 0 
+                    ? `${Math.round((aiStats.successfulTrades / aiStats.tradesExecuted) * 100)}%` 
+                    : 'N/A'}
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Profit/Loss:</span>
+                <span className={`stat-value ${aiStats.totalPnL >= 0 ? 'positive' : 'negative'}`}>
+                  {aiStats.totalPnL >= 0 ? '+' : ''}{aiStats.totalPnL.toFixed(2)} USD
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="ai-panel">
+            <h4><FaExclamationTriangle /> AI Alerts</h4>
+            {aiStats.dailyTrades >= aiSettings.maxDailyTrades && (
+              <div className="alert-item warning">
+                Daily trade limit reached ({aiSettings.maxDailyTrades})
+              </div>
+            )}
+            
+            {!walletStatus.connected && (
+              <div className="alert-item warning">
+                Wallet not connected
+              </div>
+            )}
+            
+            {aiSettings.validationMode && (
+              <div className="alert-item info">
+                Operating in validation mode
+              </div>
+            )}
+            
+            {!dataConnected && (
+              <div className="alert-item error">
+                Data pipeline disconnected
+              </div>
+            )}
+            
+            {!aiInitialized && (
+              <div className="alert-item warning">
+                AI models initializing
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {aiStats.activeTrades.length > 0 && (
+          <div className="active-trades">
+            <h4>AI Active Trades</h4>
+            <div className="trades-table">
+              <div className="table-header">
+                <div className="table-cell">Symbol</div>
+                <div className="table-cell">Type</div>
+                <div className="table-cell">Entry</div>
+                <div className="table-cell">Stop Loss</div>
+                <div className="table-cell">Take Profit</div>
+                <div className="table-cell">Status</div>
+              </div>
+              {aiStats.activeTrades.map(trade => (
+                <div key={trade.id} className="table-row">
+                  <div className="table-cell">{trade.symbol}</div>
+                  <div className={`table-cell ${trade.action}`}>{trade.action.toUpperCase()}</div>
+                  <div className="table-cell">{trade.entryPrice.toFixed(4)}</div>
+                  <div className="table-cell">{trade.stopLossPrice.toFixed(4)}</div>
+                  <div className="table-cell">{trade.takeProfitPrice.toFixed(4)}</div>
+                  <div className="table-cell">{trade.status}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+        {/* AI Roundtable Component */}      <div className="mb-6">
+        {renderAiRoundtable()}
+      </div>
       
-      {/* Main grid layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column - Watchlist and Asset Selection */}
+      {/* Navigation Tabs */}
+      <div className="flex mb-6 bg-gray-800 rounded-lg overflow-hidden">
+        <button
+          className={`flex items-center space-x-2 px-6 py-3 ${
+            activeView === 'dashboard' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+          }`}
+          onClick={() => setActiveView('dashboard')}
+        >
+          <FaChartLine />
+          <span>Dashboard</span>
+        </button>
+        <button
+          className={`flex items-center space-x-2 px-6 py-3 ${
+            activeView === 'trading' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+          }`}
+          onClick={() => setActiveView('trading')}
+        >
+          <FaLightbulb />
+          <span>Trading</span>
+        </button>
+        <button
+          className={`flex items-center space-x-2 px-6 py-3 ${
+            activeView === 'results' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+          }`}
+          onClick={() => setActiveView('results')}
+        >
+          <FaTrophy />
+          <span>Results</span>        </button>
+      </div>
+      
+      {/* Main Content Based on Active View */}
+      {activeView === 'results' ? (
+        /* Results Tab */
+        <ResultsTab 
+          trades={[...aiStats.activeTrades, 
+            ...Array.from({ length: aiStats.tradesExecuted }).map((_, i) => ({
+              id: `past-trade-${i}`,
+              symbol: ['SOL', 'BTC', 'ETH'][Math.floor(Math.random() * 3)],
+              action: Math.random() > 0.5 ? 'buy' : 'sell',
+              entryPrice: 100 + Math.random() * 50,
+              exitPrice: 100 + Math.random() * 50,
+              profit: Math.random() * 20 - 10,
+              timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'completed'
+            }))
+          ]}
+          aiStats={aiStats}
+          onRefresh={() => {
+            toast.success('Refreshing trade data');
+            // In a real implementation, you would fetch fresh data here
+          }}
+        />
+      ) : (
+        /* Dashboard and Trading Views */
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left column - Watchlist and Asset Selection */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
           <h2 className="text-xl font-semibold mb-4">Watchlist</h2>
           
@@ -473,127 +1313,31 @@ const TradeForceAI = () => {
           </div>
           
           {/* Watchlist items */}
-          <div className="space-y-2 mb-6">
-            {watchlist.length === 0 ? (
-              <p className="text-gray-500 dark:text-gray-400">No assets in watchlist</p>
-            ) : (
-              watchlist.map((asset) => (
-                <div
-                  key={asset}
-                  className={`flex justify-between items-center p-2 rounded ${
-                    selectedAsset === asset ? 'bg-blue-100 dark:bg-blue-900' : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <button
-                    className="flex-grow text-left"
-                    onClick={() => setSelectedAsset(asset)}
-                  >
-                    {asset}
-                  </button>
-                  <button
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => handleRemoveFromWatchlist(asset)}
-                  >
-                    <span className="sr-only">Remove</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-          
-          {/* Wallet Status */}
-          <div className="mb-6 p-3 border rounded-lg bg-gray-50 dark:bg-gray-700">
-            <h3 className="text-lg font-semibold mb-2">Wallet Status</h3>
-            <div className="flex items-center mb-2">
-              <div className={`w-3 h-3 rounded-full mr-2 ${walletStatus.connected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span>{walletStatus.connected ? 'Connected' : 'Not Connected'}</span>
-            </div>
-            {walletStatus.connected && walletStatus.publicKey && (
-              <div className="text-xs text-gray-500 break-all">
-                {walletStatus.publicKey.substring(0, 8)}...{walletStatus.publicKey.substring(walletStatus.publicKey.length - 8)}
-              </div>
-            )}
-          </div>
-          
-          {/* Auto-approve Settings */}
-          <div className="mb-6 p-3 border rounded-lg bg-gray-50 dark:bg-gray-700">
-            <h3 className="text-lg font-semibold mb-2">Auto-approve</h3>
-            <div className="flex items-center justify-between mb-3">
-              <span>Enable auto-approve</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  className="sr-only peer"
-                  checked={autoApprove}
-                  onChange={(e) => handleAutoApproveToggle(e.target.checked)}
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Max amount (SOL)</label>
-              <div className="flex">
-                <input
-                  type="number"
-                  className="flex-grow px-3 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="10"
-                  value={maxAutoApproveAmount}
-                  onChange={(e) => setMaxAutoApproveAmount(e.target.value)}
-                  min="0.1"
-                  step="0.1"
-                />
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {watchlist.map((asset) => (
+              <div
+                key={asset}
+                className={`p-3 rounded-lg cursor-pointer flex justify-between items-center ${
+                  selectedAsset === asset ? 'bg-blue-100 dark:bg-blue-900' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+                onClick={() => setSelectedAsset(asset)}
+              >
+                <span>{asset}</span>
                 <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
-                  onClick={() => handleMaxAutoApproveChange(maxAutoApproveAmount)}
+                  className="text-red-500 hover:text-red-700"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveFromWatchlist(asset);
+                  }}
                 >
-                  Set
+                  Remove
                 </button>
               </div>
-            </div>
+            ))}
           </div>
           
-          {/* Analysis settings */}
-          <h3 className="text-lg font-semibold mb-2">Analysis Settings</h3>
-          
-          <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium mb-1">Timeframe</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={timeframe}
-                onChange={(e) => setTimeframe(e.target.value)}
-              >
-                <option value="1h">1 Hour</option>
-                <option value="4h">4 Hours</option>
-                <option value="1d">1 Day</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Risk Level</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={riskLevel}
-                onChange={(e) => setRiskLevel(e.target.value)}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
-          </div>
-          
-          {/* Get recommendation button */}
-          <button
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mb-4"
-            onClick={generateRecommendation}
-            disabled={!selectedAsset}
-          >
-            Get Recommendation
-          </button>
+          {/* AI Roundtable Consensus - New Section */}
+          {renderAiRoundtable()}
         </div>
         
         {/* Middle column - Chart and Trading Actions */}
@@ -865,11 +1609,391 @@ const TradeForceAI = () => {
               }}
             >
               Refresh Logs
-            </button>
-          </div>
+            </button>        </div>
         </div>
       </div>
-    </div>
+      )}
+        {/* Render AI Roundtable section (only in dashboard and trading views) */}
+      {activeView !== 'results' && renderAiRoundtable()}
+      
+      {/* Component Styles */}
+      <style jsx>{`
+        .ai-roundtable-container {
+          background: #1a1d23;
+          border-radius: 12px;
+          padding: 20px;
+          color: #e0e0e0;
+          margin-bottom: 20px;
+        }
+        
+        .ai-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #2a2e35;
+        }
+        
+        .ai-header h3 {
+          font-size: 20px;
+          font-weight: 700;
+          color: #ffffff;
+          margin: 0;
+        }
+        
+        .status-indicator {
+          padding: 6px 10px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: 600;
+        }
+        
+        .status-indicator.ready {
+          background: #285c45;
+          color: #5cffaa;
+        }
+        
+        .status-indicator.partial {
+          background: #5c4f22;
+          color: #ffda5c;
+        }
+        
+        .status-indicator.data_error,
+        .status-indicator.execution_error,
+        .status-indicator.ai_initializing {
+          background: #5c2222;
+          color: #ff5c5c;
+        }
+        
+        .ai-controls {
+          display: flex;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+        
+        .ai-toggle-button {
+          flex: 3;
+          background: #2a2e35;
+          color: #ffffff;
+          border: none;
+          border-radius: 8px;
+          padding: 12px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        
+        .ai-toggle-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        
+        .ai-toggle-button.active {
+          background: #1e463a;
+          color: #5cffaa;
+        }
+        
+        .ai-toggle-button:hover:not(:disabled) {
+          background: #3a3f48;
+        }
+        
+        .ai-settings-button {
+          flex: 1;
+          background: #2a2e35;
+          color: #e0e0e0;
+          border: none;
+          border-radius: 8px;
+          padding: 12px;
+          font-size: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        
+        .ai-settings-button:hover {
+          background: #3a3f48;
+        }
+        
+        .ai-status {
+          background: #21252d;
+          border-radius: 8px;
+          padding: 15px;
+          margin-bottom: 20px;
+        }
+        
+        .status-row {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 8px;
+        }
+        
+        .status-row:last-child {
+          margin-bottom: 0;
+        }
+        
+        .status-value {
+          font-weight: 600;
+        }
+        
+        .status-value.analyzing {
+          color: #5caaff;
+        }
+        
+        .status-value.signaling {
+          color: #ffda5c;
+        }
+        
+        .status-value.executing {
+          color: #ff9e5c;
+        }
+        
+        .signal-container {
+          display: flex;
+          align-items: center;
+          background: #323742;
+          border-radius: 8px;
+          padding: 15px;
+          margin-bottom: 20px;
+          border-left: 4px solid #ffda5c;
+        }
+        
+        .lightbulb-indicator {
+          font-size: 32px;
+          color: #ffda5c;
+          margin-right: 20px;
+          opacity: 1;
+        }
+        
+        .lightbulb-indicator.active {
+          animation: pulse 1s infinite alternate;
+        }
+        
+        @keyframes pulse {
+          0% {
+            opacity: 0.7;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+        
+        .signal-details {
+          flex: 1;
+        }
+        
+        .signal-details h3 {
+          margin-top: 0;
+          margin-bottom: 10px;
+          color: #ffffff;
+        }
+        
+        .signal-row {
+          display: flex;
+          margin-bottom: 5px;
+        }
+        
+        .signal-row span:first-child {
+          width: 100px;
+          font-weight: 600;
+        }
+        
+        .signal-row .buy {
+          color: #5cffaa;
+        }
+        
+        .signal-row .sell {
+          color: #ff5c5c;
+        }
+        
+        .signal-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 15px;
+        }
+        
+        .execute-button {
+          background: #1e463a;
+          color: #5cffaa;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        
+        .execute-button:hover:not(:disabled) {
+          background: #285c45;
+        }
+        
+        .execute-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        
+        .ignore-button {
+          background: #3a3e47;
+          color: #e0e0e0;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        
+        .ignore-button:hover {
+          background: #4a4f59;
+        }
+        
+        .ai-panels {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+          margin-bottom: 20px;
+        }
+        
+        .ai-panel {
+          background: #21252d;
+          border-radius: 8px;
+          padding: 15px;
+        }
+        
+        .ai-panel h4 {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 0;
+          margin-bottom: 15px;
+          font-size: 16px;
+          color: #ffffff;
+        }
+        
+        .stats-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        
+        .stat-item {
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .stat-label {
+          font-size: 13px;
+          color: #a0a0a0;
+        }
+        
+        .stat-value {
+          font-size: 16px;
+          font-weight: 600;
+        }
+        
+        .stat-value.positive {
+          color: #5cffaa;
+        }
+        
+        .stat-value.negative {
+          color: #ff5c5c;
+        }
+        
+        .alert-item {
+          background: #27292f;
+          padding: 10px;
+          border-radius: 6px;
+          margin-bottom: 8px;
+          font-size: 14px;
+        }
+        
+        .alert-item:last-child {
+          margin-bottom: 0;
+        }
+        
+        .alert-item.warning {
+          border-left: 3px solid #ffda5c;
+        }
+        
+        .alert-item.error {
+          border-left: 3px solid #ff5c5c;
+        }
+        
+        .alert-item.info {
+          border-left: 3px solid #5caaff;
+        }
+        
+        .active-trades {
+          background: #21252d;
+          border-radius: 8px;
+          padding: 15px;
+        }
+        
+        .active-trades h4 {
+          margin-top: 0;
+          margin-bottom: 15px;
+          font-size: 16px;
+          color: #ffffff;
+        }
+        
+        .trades-table {
+          width: 100%;
+          font-size: 14px;
+        }
+        
+        .table-header {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          padding: 8px 0;
+          border-bottom: 1px solid #2a2e35;
+          font-weight: 600;
+          color: #a0a0a0;
+        }
+        
+        .table-row {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          padding: 12px 0;
+          border-bottom: 1px solid #22262f;
+        }
+        
+        .table-row:last-child {
+          border-bottom: none;
+        }
+        
+        .table-cell.buy {
+          color: #5cffaa;
+        }
+        
+        .table-cell.sell {
+          color: #ff5c5c;
+        }
+        
+        @media (max-width: 768px) {
+          .ai-panels {
+            grid-template-columns: 1fr;
+          }
+          
+          .table-header, .table-row {
+            grid-template-columns: repeat(3, 1fr);
+            row-gap: 8px;
+          }
+          
+          .table-header .table-cell:nth-child(4),
+          .table-header .table-cell:nth-child(5),
+          .table-header .table-cell:nth-child(6),
+          .table-row .table-cell:nth-child(4),
+          .table-row .table-cell:nth-child(5),
+          .table-row .table-cell:nth-child(6) {
+            padding-top: 8px;
+            border-top: 1px solid #22262f;
+          }
+        }
+      `}</style>
   );
 };
 

@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { GamificationSystem } from '../lib/gamification';
-import EMBTokenManager from '@/lib/embToken';
-import { useWallet } from '@/lib/WalletProvider';
-import useTradeWebSocket from '@/lib/useTradeWebSocket';
-import { getSolanaFee } from '@/lib/networks';
+import EMBTokenManager from '../lib/embToken';
+import { useWallet } from '../lib/WalletProvider';
+import useTradeWebSocket from '../lib/useTradeWebSocket';
+import { getSolanaFee } from '../lib/networks';
 import styles from './TradingSimulator.module.css';
 
 function SignalIndicators({ signal }) {
