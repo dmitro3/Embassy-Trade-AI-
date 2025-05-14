@@ -11,9 +11,17 @@ import NodeCache from 'node-cache';
 import winston from 'winston';
 import { createServer } from 'http';
 import { createInterface } from 'readline';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables - try multiple locations
+dotenv.config(); // Load default .env
+dotenv.config({ path: '.env.local' }); // Load .env.local
+// Try to load from the workspace root if we're in a subdirectory
+const rootEnvPath = path.resolve(process.cwd(), '../../.env.local');
+if (fs.existsSync(rootEnvPath)) {
+  dotenv.config({ path: rootEnvPath });
+}
 
 // Configure logger
 const logger = winston.createLogger({

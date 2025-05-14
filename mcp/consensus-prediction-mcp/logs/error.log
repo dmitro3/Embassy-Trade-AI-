@@ -1,0 +1,1 @@
+{"error":"ENOENT: no such file or directory, open 'C:\\Users\\pablo\\Projects\\embassy-trade-motia\\web\\mcp\\consensus-prediction-mcp\\scripts\\utils\\httpClient.js'","level":"error","message":"Failed to migrate HTTP Client","service":"consensus-prediction-mcp","timestamp":"2025-05-14T01:43:01.451Z"}

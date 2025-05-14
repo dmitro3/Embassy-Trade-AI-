@@ -1,0 +1,16 @@
+{
+  "servers": [
+    {
+      "name": "token-discovery-mcp",
+      "description": "Token Discovery MCP Server for TradeForce AI Trading System",
+      "url": "http://localhost:3000",
+      "enabled": true
+    },
+    {
+      "name": "pumpfun-mcp",
+      "description": "Pump.fun MCP Server for monitoring new token launches and sniping opportunities",
+      "url": "http://localhost:3001",
+      "enabled": true
+    }
+  ]
+}

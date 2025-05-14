@@ -1,0 +1,49 @@
+{
+  "name": "consensus-prediction-mcp",
+  "version": "1.0.0",
+  "description": "MCP server providing cryptocurrency price predictions based on consensus from multiple language models",
+  "main": "index.js",  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPattern='.*\\.test\\.js$'",
+    "test:integration": "jest --testPathPattern='.*\\.integration\\.test\\.js$'",
+    "test:file": "jest --verbose"
+  },
+  "keywords": [
+    "mcp",
+    "ai",
+    "consensus",
+    "prediction",
+    "cryptocurrency",
+    "trading",
+    "openai",
+    "birdeye"
+  ],
+  "author": "TradeForce AI",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "openai": "^4.20.1",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "nock": "^13.5.6",
+    "nodemon": "^3.0.1",
+    "sinon": "^17.0.1",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

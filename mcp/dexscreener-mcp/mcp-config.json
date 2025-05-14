@@ -1,0 +1,30 @@
+{
+  "name": "dexscreener-mcp",
+  "version": "1.0.0",
+  "description": "DEXScreener MCP Server for TradeForce AI Trading System",
+  "port": "3002",
+  "tools": [
+    {
+      "name": "get_trending_tokens",
+      "description": "Get trending tokens from DEXScreener with volume increase metrics"
+    },
+    {
+      "name": "analyze_token_patterns",
+      "description": "Analyze token for bullish patterns (cup and handle, bull flag)"
+    },
+    {
+      "name": "get_token_details",
+      "description": "Get detailed information about a specific token"
+    }
+  ],
+  "resources": [
+    {
+      "name": "trending_tokens",
+      "description": "List of trending tokens on Solana DEXs"
+    },
+    {
+      "name": "bullish_patterns",
+      "description": "Tokens showing bullish patterns (cup and handle, bull flag)"
+    }
+  ]
+}

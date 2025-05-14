@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="19" failures="0" errors="0" time="0.668">
+  <testsuite name="CircuitBreaker" errors="0" failures="0" skipped="0" timestamp="2025-05-14T02:07:18" time="0.567" tests="19">
+    <testcase classname="CircuitBreaker initialization should initialize with default config if none provided" name="CircuitBreaker initialization should initialize with default config if none provided" time="0.004">
+    </testcase>
+    <testcase classname="CircuitBreaker initialization should use provided config" name="CircuitBreaker initialization should use provided config" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker get should create a new breaker if one does not exist" name="CircuitBreaker get should create a new breaker if one does not exist" time="0.002">
+    </testcase>
+    <testcase classname="CircuitBreaker get should return existing breaker if one exists" name="CircuitBreaker get should return existing breaker if one exists" time="0.002">
+    </testcase>
+    <testcase classname="CircuitBreaker recordSuccess should reset failure count when in CLOSED state" name="CircuitBreaker recordSuccess should reset failure count when in CLOSED state" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker recordSuccess should increment success count when in HALF_OPEN state" name="CircuitBreaker recordSuccess should increment success count when in HALF_OPEN state" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker recordSuccess should transition to CLOSED state after enough successes in HALF_OPEN state" name="CircuitBreaker recordSuccess should transition to CLOSED state after enough successes in HALF_OPEN state" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker recordFailure should increment failure count" name="CircuitBreaker recordFailure should increment failure count" time="0.002">
+    </testcase>
+    <testcase classname="CircuitBreaker recordFailure should transition to OPEN state if failure threshold is reached" name="CircuitBreaker recordFailure should transition to OPEN state if failure threshold is reached" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker recordFailure should transition from HALF_OPEN to OPEN state on failure" name="CircuitBreaker recordFailure should transition from HALF_OPEN to OPEN state on failure" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker canCall should always allow calls when in CLOSED state" name="CircuitBreaker canCall should always allow calls when in CLOSED state" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker canCall should not allow calls when in OPEN state before reset timeout" name="CircuitBreaker canCall should not allow calls when in OPEN state before reset timeout" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker canCall should transition to HALF_OPEN and allow call after reset timeout" name="CircuitBreaker canCall should transition to HALF_OPEN and allow call after reset timeout" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker canCall should allow limited calls in HALF_OPEN state" name="CircuitBreaker canCall should allow limited calls in HALF_OPEN state" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker forceState should manually change state" name="CircuitBreaker forceState should manually change state" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker forceState should reset counters when changing to CLOSED state" name="CircuitBreaker forceState should reset counters when changing to CLOSED state" time="0">
+    </testcase>
+    <testcase classname="CircuitBreaker forceState should throw error for invalid state" name="CircuitBreaker forceState should throw error for invalid state" time="0.031">
+    </testcase>
+    <testcase classname="CircuitBreaker reset should reset to CLOSED state" name="CircuitBreaker reset should reset to CLOSED state" time="0.001">
+    </testcase>
+    <testcase classname="CircuitBreaker getStatus should return all circuit breakers status" name="CircuitBreaker getStatus should return all circuit breakers status" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>

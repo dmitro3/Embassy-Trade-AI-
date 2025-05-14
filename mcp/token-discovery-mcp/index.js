@@ -9,10 +9,18 @@ import Fastify from 'fastify';
 import { Connection, PublicKey } from '@solana/web3.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import * as path from 'path';
+import * as fs from 'fs';
 import WebSocket from 'ws';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables - try multiple locations
+dotenv.config(); // Load default .env
+dotenv.config({ path: '.env.local' }); // Load .env.local
+// Try to load from the workspace root if we're in a subdirectory
+const rootEnvPath = path.resolve(process.cwd(), '../../.env.local');
+if (fs.existsSync(rootEnvPath)) {
+  dotenv.config({ path: rootEnvPath });
+}
 
 // Initialize Fastify server
 const fastify = Fastify({

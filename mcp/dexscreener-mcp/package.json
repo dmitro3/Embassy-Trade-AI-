@@ -1,0 +1,19 @@
+{
+  "name": "dexscreener-mcp",
+  "version": "1.0.0",
+  "description": "DEXScreener MCP Server for TradeForce AI Trading System",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test-server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0",
+    "winston": "^3.11.0",
+    "ws": "^8.14.2"
+  }
+}

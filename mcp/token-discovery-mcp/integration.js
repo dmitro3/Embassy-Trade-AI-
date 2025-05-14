@@ -5,7 +5,13 @@
  * and handles all communication between the frontend and MCP services.
  */
 
-import logger from '../lib/logger.js';
+// Simple logger implementation
+const logger = {
+  info: (message) => console.log(`[INFO] ${message}`),
+  warn: (message) => console.warn(`[WARN] ${message}`),
+  error: (message) => console.error(`[ERROR] ${message}`),
+  debug: (message) => console.debug(`[DEBUG] ${message}`)
+};
 
 // Default MCP server URL - use environment variable if available
 const MCP_SERVER_URL = process.env.NEXT_PUBLIC_TOKEN_DISCOVERY_MCP_URL || 'http://localhost:3002';

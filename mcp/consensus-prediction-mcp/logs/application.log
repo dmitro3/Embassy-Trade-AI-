@@ -1,0 +1,4 @@
+{"level":"info","message":"Starting HTTP Client migration...","service":"consensus-prediction-mcp","timestamp":"2025-05-14T01:43:01.441Z"}
+{"error":"ENOENT: no such file or directory, open 'C:\\Users\\pablo\\Projects\\embassy-trade-motia\\web\\mcp\\consensus-prediction-mcp\\scripts\\utils\\httpClient.js'","level":"error","message":"Failed to migrate HTTP Client","service":"consensus-prediction-mcp","timestamp":"2025-05-14T01:43:01.451Z"}
+{"level":"info","message":"Starting HTTP Client migration...","service":"consensus-prediction-mcp","timestamp":"2025-05-14T01:43:31.504Z"}
+{"level":"info","message":"HTTP Client migration completed successfully","service":"consensus-prediction-mcp","timestamp":"2025-05-14T01:43:31.512Z"}
